@@ -38,3 +38,10 @@ description='''${mod_description}'''
     versionRange="${armor_model_api_version_range}"
     ordering="NONE"
     side="BOTH"
+
+[[dependencies.${mod_id}]]
+    modId="dynamic_difficulty"
+    type="optional"
+    versionRange="${dynamic_difficulty_version_range}"
+    ordering="NONE"
+    side="BOTH"

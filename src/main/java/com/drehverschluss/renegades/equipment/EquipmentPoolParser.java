@@ -1,0 +1,164 @@
+package com.drehverschluss.renegades.equipment;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
+import net.minecraft.util.GsonHelper;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.Item;
+import org.slf4j.Logger;
+
+/**
+ * Parses equipment pool files. Invalid entries are skipped with a warning; an invalid file header throws.
+ */
+final class EquipmentPoolParser {
+    private static final Set<String> FILE_KEYS = Set.of("entity", "fallback", "entries", "neoforge:conditions");
+    private static final Set<String> ENTRY_KEYS = Set.of("id", "weight", "conditions", "equipment");
+    private static final Set<String> CONDITION_KEYS = Set.of("dimensions", "min_distance", "max_distance", "min_y", "max_y", "min_level", "max_level");
+    private static final Map<String, EquipmentSlot> SLOTS = Map.of(
+            "head", EquipmentSlot.HEAD,
+            "chest", EquipmentSlot.CHEST,
+            "legs", EquipmentSlot.LEGS,
+            "feet", EquipmentSlot.FEET,
+            "mainhand", EquipmentSlot.MAINHAND,
+            "offhand", EquipmentSlot.OFFHAND);
+
+    private EquipmentPoolParser() {
+    }
+
+    record ParsedFile(EntityType<?> entityType, List<EquipmentPoolEntry> entries) {
+    }
+
+    static ParsedFile parseFile(ResourceLocation fileId, JsonObject json, Logger logger) {
+        warnUnknownKeys(json, FILE_KEYS, "file " + fileId, logger);
+
+        ResourceLocation entityId = parseId(GsonHelper.getAsString(json, "entity"), "entity");
+        EntityType<?> entityType = BuiltInRegistries.ENTITY_TYPE.getOptional(entityId)
+                .orElseThrow(() -> new JsonParseException("Unknown entity '" + entityId + "'"));
+        boolean fallback = GsonHelper.getAsBoolean(json, "fallback", false);
+        JsonArray entriesJson = GsonHelper.getAsJsonArray(json, "entries");
+
+        List<EquipmentPoolEntry> entries = new ArrayList<>();
+        for (int i = 0; i < entriesJson.size(); i++) {
+            JsonElement element = entriesJson.get(i);
+            String defaultId = fileId + "#" + i;
+            try {
+                entries.add(parseEntry(fileId, defaultId, GsonHelper.convertToJsonObject(element, "entry"), fallback, logger));
+            } catch (RuntimeException e) {
+                String id = element.isJsonObject() ? GsonHelper.getAsString(element.getAsJsonObject(), "id", defaultId) : defaultId;
+                logger.warn("Skipping equipment pool entry '{}' in {}: {}", id, fileId, e.getMessage());
+            }
+        }
+        return new ParsedFile(entityType, entries);
+    }
+
+    private static EquipmentPoolEntry parseEntry(ResourceLocation fileId, String defaultId, JsonObject json, boolean fallback, Logger logger) {
+        String id = GsonHelper.getAsString(json, "id", defaultId);
+        warnUnknownKeys(json, ENTRY_KEYS, "entry '" + id + "' in " + fileId, logger);
+
+        int weight = GsonHelper.getAsInt(json, "weight", 1);
+        if (weight <= 0) {
+            throw new JsonParseException("weight must be greater than 0, got " + weight);
+        }
+
+        EquipmentConditions conditions = json.has("conditions")
+                ? parseConditions(GsonHelper.getAsJsonObject(json, "conditions"))
+                : EquipmentConditions.NONE;
+
+        JsonObject equipmentJson = GsonHelper.getAsJsonObject(json, "equipment");
+        Map<EquipmentSlot, ItemChoice> equipment = new EnumMap<>(EquipmentSlot.class);
+        for (Map.Entry<String, JsonElement> slotEntry : equipmentJson.entrySet()) {
+            EquipmentSlot slot = SLOTS.get(slotEntry.getKey());
+            if (slot == null) {
+                throw new JsonParseException("Unknown slot '" + slotEntry.getKey() + "', expected one of " + SLOTS.keySet());
+            }
+            equipment.put(slot, parseChoice(slotEntry.getValue(), slotEntry.getKey()));
+        }
+
+        return new EquipmentPoolEntry(id, fileId, fallback, weight, conditions, Map.copyOf(equipment));
+    }
+
+    private static EquipmentConditions parseConditions(JsonObject json) {
+        for (String key : json.keySet()) {
+            if (!CONDITION_KEYS.contains(key)) {
+                throw new JsonParseException("Unknown condition '" + key + "', expected one of " + CONDITION_KEYS);
+            }
+        }
+
+        Set<ResourceLocation> dimensions = new HashSet<>();
+        if (json.has("dimensions")) {
+            for (JsonElement dimension : GsonHelper.getAsJsonArray(json, "dimensions")) {
+                dimensions.add(parseId(GsonHelper.convertToString(dimension, "dimension"), "dimension"));
+            }
+        }
+
+        return new EquipmentConditions(Set.copyOf(dimensions),
+                parseBounds(json, "min_distance", "max_distance"),
+                parseBounds(json, "min_y", "max_y"),
+                parseBounds(json, "min_level", "max_level"));
+    }
+
+    private static IntBounds parseBounds(JsonObject json, String minKey, String maxKey) {
+        Integer min = json.has(minKey) ? GsonHelper.getAsInt(json, minKey) : null;
+        Integer max = json.has(maxKey) ? GsonHelper.getAsInt(json, maxKey) : null;
+        if (min != null && max != null && min > max) {
+            throw new JsonParseException(minKey + " (" + min + ") is greater than " + maxKey + " (" + max + ")");
+        }
+        return min == null && max == null ? IntBounds.ANY : new IntBounds(min, max);
+    }
+
+    private static ItemChoice parseChoice(JsonElement json, String slotName) {
+        List<ItemChoice.Option> options = new ArrayList<>();
+        if (json.isJsonArray()) {
+            for (JsonElement element : json.getAsJsonArray()) {
+                options.add(parseOption(GsonHelper.convertToString(element, slotName)));
+            }
+        } else {
+            options.add(parseOption(GsonHelper.convertToString(json, slotName)));
+        }
+
+        if (options.isEmpty()) {
+            throw new JsonParseException("Slot '" + slotName + "' has an empty list");
+        }
+        return new ItemChoice(List.copyOf(options));
+    }
+
+    private static ItemChoice.Option parseOption(String value) {
+        if (value.startsWith("#")) {
+            return new ItemChoice.TagOption(TagKey.create(Registries.ITEM, parseId(value.substring(1), "item tag")));
+        }
+
+        ResourceLocation itemId = parseId(value, "item");
+        Item item = BuiltInRegistries.ITEM.getOptional(itemId)
+                .orElseThrow(() -> new JsonParseException("Unknown item '" + itemId + "'"));
+        return new ItemChoice.ItemOption(item);
+    }
+
+    private static ResourceLocation parseId(String value, String what) {
+        ResourceLocation id = ResourceLocation.tryParse(value);
+        if (id == null) {
+            throw new JsonParseException("Invalid " + what + " id '" + value + "'");
+        }
+        return id;
+    }
+
+    private static void warnUnknownKeys(JsonObject json, Set<String> known, String where, Logger logger) {
+        for (String key : json.keySet()) {
+            if (!known.contains(key)) {
+                logger.warn("Ignoring unknown key '{}' in equipment pool {}", key, where);
+            }
+        }
+    }
+}

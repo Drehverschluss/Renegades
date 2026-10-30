@@ -1,6 +1,13 @@
 package com.drehverschluss.renegades;
 
+import com.drehverschluss.renegades.command.RenegadesCommand;
+import com.drehverschluss.renegades.compat.dynamicdifficulty.DynamicDifficultyCompat;
+import com.drehverschluss.renegades.compat.dynamicdifficulty.DynamicDifficultyLevelProvider;
+import com.drehverschluss.renegades.config.RenegadesConfig;
 import com.drehverschluss.renegades.entity.WarriorRenegade;
+import com.drehverschluss.renegades.equipment.EquipmentPoolLoader;
+import com.drehverschluss.renegades.equipment.EquipmentPools;
+import com.drehverschluss.renegades.level.RenegadeLevels;
 import com.drehverschluss.renegades.registry.ModEntityTypes;
 import com.drehverschluss.renegades.registry.ModItems;
 import com.mojang.logging.LogUtils;
@@ -8,7 +15,12 @@ import net.minecraft.world.item.CreativeModeTabs;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.config.ModConfig;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.AddReloadListenerEvent;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
+import net.neoforged.neoforge.event.RegisterCommandsEvent;
+import net.neoforged.neoforge.event.TagsUpdatedEvent;
 import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
 import org.slf4j.Logger;
 
@@ -20,9 +32,19 @@ public class Renegades {
     public Renegades(IEventBus modEventBus, ModContainer modContainer) {
         ModEntityTypes.ENTITY_TYPES.register(modEventBus);
         ModItems.ITEMS.register(modEventBus);
+        modContainer.registerConfig(ModConfig.Type.SERVER, RenegadesConfig.SPEC);
 
         modEventBus.addListener(Renegades::registerAttributes);
         modEventBus.addListener(Renegades::addCreativeTabContents);
+
+        NeoForge.EVENT_BUS.addListener(Renegades::addReloadListeners);
+        NeoForge.EVENT_BUS.addListener(Renegades::onTagsUpdated);
+        NeoForge.EVENT_BUS.addListener(Renegades::registerCommands);
+
+        if (DynamicDifficultyCompat.isLoaded()) {
+            RenegadeLevels.setProvider(new DynamicDifficultyLevelProvider());
+            LOGGER.info("Dynamic Difficulty found; mob levels are available for equipment pool conditions");
+        }
     }
 
     private static void registerAttributes(EntityAttributeCreationEvent event) {
@@ -33,5 +55,19 @@ public class Renegades {
         if (event.getTabKey() == CreativeModeTabs.SPAWN_EGGS) {
             event.accept(ModItems.WARRIOR_SPAWN_EGG);
         }
+    }
+
+    private static void addReloadListeners(AddReloadListenerEvent event) {
+        event.addListener(new EquipmentPoolLoader());
+    }
+
+    private static void onTagsUpdated(TagsUpdatedEvent event) {
+        if (event.getUpdateCause() == TagsUpdatedEvent.UpdateCause.SERVER_DATA_LOAD) {
+            EquipmentPools.validateTagsAndLog();
+        }
+    }
+
+    private static void registerCommands(RegisterCommandsEvent event) {
+        RenegadesCommand.register(event.getDispatcher());
     }
 }

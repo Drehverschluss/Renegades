@@ -49,6 +49,17 @@ repositories {
             includeGroup 'maven.modrinth'
         }
     }
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = 'Muon'
+                url = 'https://maven.muon.rip/releases/'
+            }
+        }
+        filter {
+            includeGroup 'dev.muon.dynamic_difficulty'
+        }
+    }
 }
 
 base {
@@ -141,6 +152,9 @@ dependencies {
 
     // Optional integration: only compiled against, never bundled or required at runtime.
     compileOnly "maven.modrinth:armor-model-api:${armor_model_api_version}"
+    compileOnly("dev.muon.dynamic_difficulty:dynamic_difficulty-neoforge:${dynamic_difficulty_version}") {
+        transitive = false
+    }
 
     // Local test mods (not in the repo) that are only loaded in the dev runs.
     localRuntime fileTree(dir: 'libs/test', include: '*.jar')
@@ -184,6 +198,7 @@ var generateModMetadata = tasks.register("generateModMetadata", ProcessResources
             mod_description        : mod_description,
             geckolib_version       : geckolib_version,
             armor_model_api_version_range: armor_model_api_version_range,
+            dynamic_difficulty_version_range: dynamic_difficulty_version_range,
     ]
     inputs.properties replaceProperties
     expand replaceProperties

@@ -1,0 +1,81 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "rogues"
+    }
+  ],
+  "entity": "renegades:warrior",
+  "fallback": false,
+  "entries": [
+    {
+      "id": "rogues_tier1",
+      "conditions": {
+        "dimensions": ["minecraft:overworld"],
+        "max_distance": 1500
+      },
+      "equipment": {
+        "head": "rogues:warrior_armor_head",
+        "chest": "rogues:warrior_armor_chest",
+        "legs": "rogues:warrior_armor_legs",
+        "feet": "rogues:warrior_armor_feet",
+        "mainhand": ["rogues:iron_double_axe", "rogues:iron_glaive"]
+      }
+    },
+    {
+      "id": "rogues_tier2",
+      "conditions": {
+        "dimensions": ["minecraft:overworld"],
+        "min_distance": 1500,
+        "max_distance": 4000
+      },
+      "equipment": {
+        "head": "rogues:berserker_armor_head",
+        "chest": "rogues:berserker_armor_chest",
+        "legs": "rogues:berserker_armor_legs",
+        "feet": "rogues:berserker_armor_feet",
+        "mainhand": ["rogues:diamond_double_axe", "rogues:diamond_glaive"]
+      }
+    },
+    {
+      "id": "rogues_tier2_nether",
+      "conditions": {
+        "dimensions": ["minecraft:the_nether"]
+      },
+      "equipment": {
+        "head": "rogues:berserker_armor_head",
+        "chest": "rogues:berserker_armor_chest",
+        "legs": "rogues:berserker_armor_legs",
+        "feet": "rogues:berserker_armor_feet",
+        "mainhand": ["rogues:diamond_double_axe", "rogues:diamond_glaive"]
+      }
+    },
+    {
+      "id": "rogues_tier3",
+      "conditions": {
+        "dimensions": ["minecraft:overworld"],
+        "min_distance": 4000
+      },
+      "equipment": {
+        "head": "rogues:netherite_berserker_armor_head",
+        "chest": "rogues:netherite_berserker_armor_chest",
+        "legs": "rogues:netherite_berserker_armor_legs",
+        "feet": "rogues:netherite_berserker_armor_feet",
+        "mainhand": ["rogues:netherite_double_axe", "rogues:netherite_glaive"]
+      }
+    },
+    {
+      "id": "rogues_tier3_end",
+      "conditions": {
+        "dimensions": ["minecraft:the_end"]
+      },
+      "equipment": {
+        "head": "rogues:netherite_berserker_armor_head",
+        "chest": "rogues:netherite_berserker_armor_chest",
+        "legs": "rogues:netherite_berserker_armor_legs",
+        "feet": "rogues:netherite_berserker_armor_feet",
+        "mainhand": ["rogues:netherite_double_axe", "rogues:netherite_glaive"]
+      }
+    }
+  ]
+}
