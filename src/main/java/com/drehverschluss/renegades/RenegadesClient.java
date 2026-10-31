@@ -1,5 +1,6 @@
 package com.drehverschluss.renegades;
 
+import com.drehverschluss.renegades.client.renderer.ArcherTrapRenderer;
 import com.drehverschluss.renegades.client.renderer.RenegadeRenderer;
 import com.drehverschluss.renegades.client.renderer.ThrowingKnifeRenderer;
 import com.drehverschluss.renegades.registry.ModEntityTypes;
@@ -18,6 +19,8 @@ public class RenegadesClient {
         event.registerEntityRenderer(ModEntityTypes.WARRIOR.get(), RenegadeRenderer::new);
         event.registerEntityRenderer(ModEntityTypes.ROGUE.get(), RenegadeRenderer::new);
         event.registerEntityRenderer(ModEntityTypes.PALADIN.get(), RenegadeRenderer::new);
+        event.registerEntityRenderer(ModEntityTypes.ARCHER.get(), RenegadeRenderer::new);
+        event.registerEntityRenderer(ModEntityTypes.ARCHER_TRAP.get(), ArcherTrapRenderer::new);
         event.registerEntityRenderer(ModEntityTypes.THROWING_KNIFE.get(), ThrowingKnifeRenderer::new);
     }
 }

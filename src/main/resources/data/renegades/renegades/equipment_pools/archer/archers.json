@@ -1,0 +1,150 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "archers"
+    }
+  ],
+  "entity": "renegades:archer",
+  "fallback": false,
+  "entries": [
+    {
+      "id": "archers_tier1_bow",
+      "conditions": {
+        "dimensions": ["minecraft:overworld"],
+        "max_distance": 1500
+      },
+      "equipment": {
+        "head": "archers:archer_armor_head",
+        "chest": "archers:archer_armor_chest",
+        "legs": "archers:archer_armor_legs",
+        "feet": "archers:archer_armor_feet",
+        "mainhand": "archers:composite_longbow"
+      }
+    },
+    {
+      "id": "archers_tier1_crossbow",
+      "conditions": {
+        "dimensions": ["minecraft:overworld"],
+        "max_distance": 1500
+      },
+      "equipment": {
+        "head": "archers:archer_armor_head",
+        "chest": "archers:archer_armor_chest",
+        "legs": "archers:archer_armor_legs",
+        "feet": "archers:archer_armor_feet",
+        "mainhand": "minecraft:crossbow"
+      }
+    },
+    {
+      "id": "archers_tier2_bow",
+      "conditions": {
+        "dimensions": ["minecraft:overworld"],
+        "min_distance": 1500,
+        "max_distance": 4000
+      },
+      "equipment": {
+        "head": "archers:ranger_armor_head",
+        "chest": "archers:ranger_armor_chest",
+        "legs": "archers:ranger_armor_legs",
+        "feet": "archers:ranger_armor_feet",
+        "mainhand": ["archers:royal_longbow", "archers:mechanic_shortbow"]
+      }
+    },
+    {
+      "id": "archers_tier2_crossbow",
+      "conditions": {
+        "dimensions": ["minecraft:overworld"],
+        "min_distance": 1500,
+        "max_distance": 4000
+      },
+      "equipment": {
+        "head": "archers:ranger_armor_head",
+        "chest": "archers:ranger_armor_chest",
+        "legs": "archers:ranger_armor_legs",
+        "feet": "archers:ranger_armor_feet",
+        "mainhand": ["archers:heavy_crossbow", "archers:rapid_crossbow"]
+      }
+    },
+    {
+      "id": "archers_tier2_nether_bow",
+      "conditions": {
+        "dimensions": ["minecraft:the_nether"]
+      },
+      "equipment": {
+        "head": "archers:ranger_armor_head",
+        "chest": "archers:ranger_armor_chest",
+        "legs": "archers:ranger_armor_legs",
+        "feet": "archers:ranger_armor_feet",
+        "mainhand": ["archers:royal_longbow", "archers:mechanic_shortbow"]
+      }
+    },
+    {
+      "id": "archers_tier2_nether_crossbow",
+      "conditions": {
+        "dimensions": ["minecraft:the_nether"]
+      },
+      "equipment": {
+        "head": "archers:ranger_armor_head",
+        "chest": "archers:ranger_armor_chest",
+        "legs": "archers:ranger_armor_legs",
+        "feet": "archers:ranger_armor_feet",
+        "mainhand": ["archers:heavy_crossbow", "archers:rapid_crossbow"]
+      }
+    },
+    {
+      "id": "archers_tier3_bow",
+      "conditions": {
+        "dimensions": ["minecraft:overworld"],
+        "min_distance": 4000
+      },
+      "equipment": {
+        "head": "archers:netherite_ranger_armor_head",
+        "chest": "archers:netherite_ranger_armor_chest",
+        "legs": "archers:netherite_ranger_armor_legs",
+        "feet": "archers:netherite_ranger_armor_feet",
+        "mainhand": ["archers:netherite_longbow", "archers:netherite_shortbow"]
+      }
+    },
+    {
+      "id": "archers_tier3_crossbow",
+      "conditions": {
+        "dimensions": ["minecraft:overworld"],
+        "min_distance": 4000
+      },
+      "equipment": {
+        "head": "archers:netherite_ranger_armor_head",
+        "chest": "archers:netherite_ranger_armor_chest",
+        "legs": "archers:netherite_ranger_armor_legs",
+        "feet": "archers:netherite_ranger_armor_feet",
+        "mainhand": ["archers:netherite_heavy_crossbow", "archers:netherite_rapid_crossbow"]
+      }
+    },
+    {
+      "id": "archers_tier3_end_bow",
+      "conditions": {
+        "dimensions": ["minecraft:the_end"]
+      },
+      "equipment": {
+        "head": "archers:netherite_ranger_armor_head",
+        "chest": "archers:netherite_ranger_armor_chest",
+        "legs": "archers:netherite_ranger_armor_legs",
+        "feet": "archers:netherite_ranger_armor_feet",
+        "mainhand": ["archers:netherite_longbow", "archers:netherite_shortbow"]
+      }
+    },
+    {
+      "id": "archers_tier3_end_crossbow",
+      "conditions": {
+        "dimensions": ["minecraft:the_end"]
+      },
+      "equipment": {
+        "head": "archers:netherite_ranger_armor_head",
+        "chest": "archers:netherite_ranger_armor_chest",
+        "legs": "archers:netherite_ranger_armor_legs",
+        "feet": "archers:netherite_ranger_armor_feet",
+        "mainhand": ["archers:netherite_heavy_crossbow", "archers:netherite_rapid_crossbow"]
+      }
+    }
+  ]
+}

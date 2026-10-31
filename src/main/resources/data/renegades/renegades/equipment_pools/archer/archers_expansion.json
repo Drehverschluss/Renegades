@@ -1,0 +1,181 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "archers"
+    },
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "archers_expansion"
+    }
+  ],
+  "entity": "renegades:archer",
+  "fallback": false,
+  "entries": [
+    {
+      "id": "expansion_tier2_tundra_hunter",
+      "conditions": {
+        "dimensions": ["minecraft:overworld"],
+        "min_distance": 1500,
+        "max_distance": 4000
+      },
+      "equipment": {
+        "head": "archers_expansion:tundra_hunter_head",
+        "chest": "archers_expansion:tundra_hunter_chest",
+        "legs": "archers_expansion:tundra_hunter_legs",
+        "feet": "archers_expansion:tundra_hunter_feet",
+        "mainhand": ["archers:royal_longbow", "archers:mechanic_shortbow", "archers:heavy_crossbow", "archers:rapid_crossbow"]
+      }
+    },
+    {
+      "id": "expansion_tier2_war_archer",
+      "conditions": {
+        "dimensions": ["minecraft:overworld"],
+        "min_distance": 1500,
+        "max_distance": 4000
+      },
+      "equipment": {
+        "head": "archers_expansion:war_archer_head",
+        "chest": "archers_expansion:war_archer_chest",
+        "legs": "archers_expansion:war_archer_legs",
+        "feet": "archers_expansion:war_archer_feet",
+        "mainhand": ["archers:royal_longbow", "archers:mechanic_shortbow", "archers:heavy_crossbow", "archers:rapid_crossbow"]
+      }
+    },
+    {
+      "id": "expansion_tier2_deadeye",
+      "conditions": {
+        "dimensions": ["minecraft:overworld"],
+        "min_distance": 1500,
+        "max_distance": 4000
+      },
+      "equipment": {
+        "head": "archers_expansion:deadeye_head",
+        "chest": "archers_expansion:deadeye_chest",
+        "legs": "archers_expansion:deadeye_legs",
+        "feet": "archers_expansion:deadeye_feet",
+        "mainhand": ["archers:royal_longbow", "archers:mechanic_shortbow", "archers:heavy_crossbow", "archers:rapid_crossbow"]
+      }
+    },
+    {
+      "id": "expansion_tier2_nether_tundra_hunter",
+      "conditions": {
+        "dimensions": ["minecraft:the_nether"]
+      },
+      "equipment": {
+        "head": "archers_expansion:tundra_hunter_head",
+        "chest": "archers_expansion:tundra_hunter_chest",
+        "legs": "archers_expansion:tundra_hunter_legs",
+        "feet": "archers_expansion:tundra_hunter_feet",
+        "mainhand": ["archers:royal_longbow", "archers:mechanic_shortbow", "archers:heavy_crossbow", "archers:rapid_crossbow"]
+      }
+    },
+    {
+      "id": "expansion_tier2_nether_war_archer",
+      "conditions": {
+        "dimensions": ["minecraft:the_nether"]
+      },
+      "equipment": {
+        "head": "archers_expansion:war_archer_head",
+        "chest": "archers_expansion:war_archer_chest",
+        "legs": "archers_expansion:war_archer_legs",
+        "feet": "archers_expansion:war_archer_feet",
+        "mainhand": ["archers:royal_longbow", "archers:mechanic_shortbow", "archers:heavy_crossbow", "archers:rapid_crossbow"]
+      }
+    },
+    {
+      "id": "expansion_tier2_nether_deadeye",
+      "conditions": {
+        "dimensions": ["minecraft:the_nether"]
+      },
+      "equipment": {
+        "head": "archers_expansion:deadeye_head",
+        "chest": "archers_expansion:deadeye_chest",
+        "legs": "archers_expansion:deadeye_legs",
+        "feet": "archers_expansion:deadeye_feet",
+        "mainhand": ["archers:royal_longbow", "archers:mechanic_shortbow", "archers:heavy_crossbow", "archers:rapid_crossbow"]
+      }
+    },
+    {
+      "id": "expansion_tier3_tundra_hunter",
+      "conditions": {
+        "dimensions": ["minecraft:overworld"],
+        "min_distance": 4000
+      },
+      "equipment": {
+        "head": "archers_expansion:netherite_tundra_hunter_head",
+        "chest": "archers_expansion:netherite_tundra_hunter_chest",
+        "legs": "archers_expansion:netherite_tundra_hunter_legs",
+        "feet": "archers_expansion:netherite_tundra_hunter_feet",
+        "mainhand": ["archers:netherite_longbow", "archers:netherite_shortbow", "archers:netherite_heavy_crossbow", "archers:netherite_rapid_crossbow"]
+      }
+    },
+    {
+      "id": "expansion_tier3_war_archer",
+      "conditions": {
+        "dimensions": ["minecraft:overworld"],
+        "min_distance": 4000
+      },
+      "equipment": {
+        "head": "archers_expansion:netherite_war_archer_head",
+        "chest": "archers_expansion:netherite_war_archer_chest",
+        "legs": "archers_expansion:netherite_war_archer_legs",
+        "feet": "archers_expansion:netherite_war_archer_feet",
+        "mainhand": ["archers:netherite_longbow", "archers:netherite_shortbow", "archers:netherite_heavy_crossbow", "archers:netherite_rapid_crossbow"]
+      }
+    },
+    {
+      "id": "expansion_tier3_deadeye",
+      "conditions": {
+        "dimensions": ["minecraft:overworld"],
+        "min_distance": 4000
+      },
+      "equipment": {
+        "head": "archers_expansion:netherite_deadeye_head",
+        "chest": "archers_expansion:netherite_deadeye_chest",
+        "legs": "archers_expansion:netherite_deadeye_legs",
+        "feet": "archers_expansion:netherite_deadeye_feet",
+        "mainhand": ["archers:netherite_longbow", "archers:netherite_shortbow", "archers:netherite_heavy_crossbow", "archers:netherite_rapid_crossbow"]
+      }
+    },
+    {
+      "id": "expansion_tier3_end_tundra_hunter",
+      "conditions": {
+        "dimensions": ["minecraft:the_end"]
+      },
+      "equipment": {
+        "head": "archers_expansion:netherite_tundra_hunter_head",
+        "chest": "archers_expansion:netherite_tundra_hunter_chest",
+        "legs": "archers_expansion:netherite_tundra_hunter_legs",
+        "feet": "archers_expansion:netherite_tundra_hunter_feet",
+        "mainhand": ["archers:netherite_longbow", "archers:netherite_shortbow", "archers:netherite_heavy_crossbow", "archers:netherite_rapid_crossbow"]
+      }
+    },
+    {
+      "id": "expansion_tier3_end_war_archer",
+      "conditions": {
+        "dimensions": ["minecraft:the_end"]
+      },
+      "equipment": {
+        "head": "archers_expansion:netherite_war_archer_head",
+        "chest": "archers_expansion:netherite_war_archer_chest",
+        "legs": "archers_expansion:netherite_war_archer_legs",
+        "feet": "archers_expansion:netherite_war_archer_feet",
+        "mainhand": ["archers:netherite_longbow", "archers:netherite_shortbow", "archers:netherite_heavy_crossbow", "archers:netherite_rapid_crossbow"]
+      }
+    },
+    {
+      "id": "expansion_tier3_end_deadeye",
+      "conditions": {
+        "dimensions": ["minecraft:the_end"]
+      },
+      "equipment": {
+        "head": "archers_expansion:netherite_deadeye_head",
+        "chest": "archers_expansion:netherite_deadeye_chest",
+        "legs": "archers_expansion:netherite_deadeye_legs",
+        "feet": "archers_expansion:netherite_deadeye_feet",
+        "mainhand": ["archers:netherite_longbow", "archers:netherite_shortbow", "archers:netherite_heavy_crossbow", "archers:netherite_rapid_crossbow"]
+      }
+    }
+  ]
+}

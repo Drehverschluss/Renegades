@@ -1,10 +1,12 @@
 // Based on JuggernautBrain from ANARCHY - RPG Minibosses by cleannrooster (CC0-1.0).
-// Changes: the ground impact ("juggernaut/pound") is a radial strike of our combat system instead of the ANARCHY ability
-// system; bracing raises a real shield when the paladin carries one; leaps only to safe, reachable landing spots;
-// bracing and leaping can be switched off in the config; no slash ribbons or ANARCHY sounds/effects; numbers unchanged.
+// Changes: the ground impact ("juggernaut/pound") is a cylindrical area strike of our combat system instead of the ANARCHY
+// ability system, with damage lowered to attack damage x 1.0; bracing raises a real shield when the paladin carries one;
+// leaps only to safe, reachable landing spots; bracing and leaping can be switched off in the config; no slash ribbons
+// or ANARCHY sounds/effects; other numbers unchanged.
 package com.drehverschluss.renegades.combat.brain;
 
 import com.drehverschluss.renegades.combat.ActionContext;
+import com.drehverschluss.renegades.combat.AreaStrike;
 import com.drehverschluss.renegades.combat.AttackMotion;
 import com.drehverschluss.renegades.combat.CombatAction;
 import com.drehverschluss.renegades.combat.GroundLocomotion;
@@ -74,9 +76,11 @@ public class PaladinBrain extends MobBrain {
     // Deepest drop below the flight path that still counts as ground (deeper = abyss).
     private static final int LEAP_MAX_DROP = 3;
     private static final int LEAP_CHECK_INTERVAL = 10;
-    // ANARCHY's "juggernaut/pound" ability: radius 6, attack damage x 1.8, knockback 0.4.
+    // ANARCHY's "juggernaut/pound" ability: a cylinder of radius 6 and height 3, knockback 0.4. Damage lowered from
+    // attack damage x 1.8 to x 1.0 (about one regular hit in the area).
     private static final double POUND_RADIUS = 6.0;
-    private static final float POUND_DAMAGE = 1.8F;
+    private static final double POUND_HEIGHT = 3.0;
+    private static final float POUND_DAMAGE = 1.0F;
     private static final double POUND_KNOCKBACK = 0.4;
     // Ticks a shield stays unusable after an axe disabled it (same as for players).
     private static final int SHIELD_DISABLE_TICKS = 100;
@@ -405,14 +409,19 @@ public class PaladinBrain extends MobBrain {
     }
 
     /**
-     * Replacement for ANARCHY's "juggernaut/pound" ability: a radial strike around the paladin (radius 6, attack
-     * damage x 1.8, knockback 0.4) that follows the usual hit rules (only allowed targets, line of sight).
+     * Replacement for ANARCHY's "juggernaut/pound" ability: a cylindrical strike around the paladin (radius 6, height 3,
+     * attack damage x 1.0, knockback 0.4) that follows the usual hit rules (only allowed targets, no hits through blocks).
      */
     private void groundImpact() {
         if (!(this.entity.level() instanceof ServerLevel level)) {
             return;
         }
-        this.strikeVolume(AttackVolume.radial(POUND_RADIUS), POUND_DAMAGE, POUND_KNOCKBACK, null);
+        Vec3 centre = this.entity.position();
+        for (LivingEntity victim : AreaStrike.victims(this.entity, centre, POUND_RADIUS, POUND_HEIGHT)) {
+            if (this.entity.meleeHit(victim, POUND_DAMAGE)) {
+                AreaStrike.knockAway(victim, centre, POUND_KNOCKBACK);
+            }
+        }
 
         BlockPos below = this.entity.blockPosition().below();
         BlockState ground = level.getBlockState(below);

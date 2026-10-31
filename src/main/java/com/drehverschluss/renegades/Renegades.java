@@ -4,8 +4,10 @@ import com.drehverschluss.renegades.command.RenegadesCommand;
 import com.drehverschluss.renegades.compat.dynamicdifficulty.DynamicDifficultyCompat;
 import com.drehverschluss.renegades.compat.dynamicdifficulty.DynamicDifficultyLevelProvider;
 import com.drehverschluss.renegades.config.RenegadesConfig;
+import com.drehverschluss.renegades.entity.ArcherRenegade;
 import com.drehverschluss.renegades.entity.PaladinRenegade;
 import com.drehverschluss.renegades.entity.RenegadeEntity;
+import com.drehverschluss.renegades.entity.RenegadeProjectiles;
 import com.drehverschluss.renegades.entity.RogueRenegade;
 import com.drehverschluss.renegades.entity.WarriorRenegade;
 import com.drehverschluss.renegades.equipment.EquipmentPoolLoader;
@@ -53,6 +55,7 @@ public class Renegades {
         NeoForge.EVENT_BUS.addListener(Renegades::registerCommands);
         NeoForge.EVENT_BUS.addListener((ServerStartedEvent event) -> SpawnStats.reset(event.getServer().getTickCount()));
         NeoForge.EVENT_BUS.addListener(RenegadeSpawner::onServerTick);
+        NeoForge.EVENT_BUS.addListener(RenegadeProjectiles::onProjectileImpact);
 
         if (DynamicDifficultyCompat.isLoaded()) {
             RenegadeLevels.setProvider(new DynamicDifficultyLevelProvider());
@@ -64,6 +67,7 @@ public class Renegades {
         event.put(ModEntityTypes.WARRIOR.get(), WarriorRenegade.createAttributes().build());
         event.put(ModEntityTypes.ROGUE.get(), RogueRenegade.createAttributes().build());
         event.put(ModEntityTypes.PALADIN.get(), PaladinRenegade.createAttributes().build());
+        event.put(ModEntityTypes.ARCHER.get(), ArcherRenegade.createAttributes().build());
     }
 
     private static void registerSpawnPlacements(RegisterSpawnPlacementsEvent event) {
@@ -73,6 +77,8 @@ public class Renegades {
                 RenegadeEntity::checkRenegadeSpawnRules, RegisterSpawnPlacementsEvent.Operation.REPLACE);
         event.register(ModEntityTypes.PALADIN.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
                 RenegadeEntity::checkRenegadeSpawnRules, RegisterSpawnPlacementsEvent.Operation.REPLACE);
+        event.register(ModEntityTypes.ARCHER.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+                RenegadeEntity::checkRenegadeSpawnRules, RegisterSpawnPlacementsEvent.Operation.REPLACE);
     }
 
     private static void addCreativeTabContents(BuildCreativeModeTabContentsEvent event) {
@@ -80,6 +86,7 @@ public class Renegades {
             event.accept(ModItems.WARRIOR_SPAWN_EGG);
             event.accept(ModItems.ROGUE_SPAWN_EGG);
             event.accept(ModItems.PALADIN_SPAWN_EGG);
+            event.accept(ModItems.ARCHER_SPAWN_EGG);
         }
     }
 

@@ -352,7 +352,8 @@ public abstract class MobBrain {
         return "stance " + this.currentStance.id() + ", state " + this.currentCombatState.id()
                 + (this.unreachable ? ", target unreachable (" + (this.pathReachesTarget ? "pathing" : "holding") + ")" : "")
                 + ", action " + (action == null ? "none" : action.id() + " " + this.actions.phase().name().toLowerCase() + " t" + this.actions.phaseTick())
-                + String.format(java.util.Locale.ROOT, ", speed x%.2f", this.locomotion.speedFactor());
+                + String.format(java.util.Locale.ROOT, ", speed x%.2f", this.locomotion.speedFactor())
+                + (this.locomotion.isAvoidingHazard() ? ", avoiding hazard" : "");
     }
 
     protected void performArcDamage(LivingEntity primaryTarget, float halfAngleDeg, float range) {

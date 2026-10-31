@@ -1,6 +1,8 @@
 package com.drehverschluss.renegades.registry;
 
 import com.drehverschluss.renegades.Renegades;
+import com.drehverschluss.renegades.entity.ArcherRenegade;
+import com.drehverschluss.renegades.entity.ArcherTrap;
 import com.drehverschluss.renegades.entity.PaladinRenegade;
 import com.drehverschluss.renegades.entity.RogueRenegade;
 import com.drehverschluss.renegades.entity.ThrowingKnife;
@@ -34,6 +36,21 @@ public final class ModEntityTypes {
                     .eyeHeight(1.62F)
                     .clientTrackingRange(8)
                     .build("paladin"));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<ArcherRenegade>> ARCHER = ENTITY_TYPES.register("archer",
+            () -> EntityType.Builder.of(ArcherRenegade::new, MobCategory.MONSTER)
+                    .sized(0.6F, 1.8F)
+                    .eyeHeight(1.62F)
+                    .clientTrackingRange(8)
+                    .build("archer"));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<ArcherTrap>> ARCHER_TRAP = ENTITY_TYPES.register("archer_trap",
+            () -> EntityType.Builder.<ArcherTrap>of(ArcherTrap::new, MobCategory.MISC)
+                    .sized(0.5F, 0.25F)
+                    .clientTrackingRange(6)
+                    .updateInterval(2)
+                    .noSave()
+                    .build("archer_trap"));
 
     public static final DeferredHolder<EntityType<?>, EntityType<ThrowingKnife>> THROWING_KNIFE = ENTITY_TYPES.register("throwing_knife",
             () -> EntityType.Builder.<ThrowingKnife>of(ThrowingKnife::new, MobCategory.MISC)

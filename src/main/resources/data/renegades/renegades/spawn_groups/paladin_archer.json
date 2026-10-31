@@ -1,0 +1,7 @@
+{
+  "leader": "renegades:paladin",
+  "weight": 1,
+  "members": [
+    { "entity": "renegades:archer", "min": 1, "max": 1 }
+  ]
+}

@@ -1,9 +1,13 @@
 // Ported from ANARCHY - RPG Minibosses by cleannrooster (CC0-1.0).
 // Changes: limitApproach keeps the renegade from walking or dashing through its target (entities do not block each
-// other); all combat movement is scaled by the movement speed attribute (speedFactor).
+// other); all combat movement is scaled by the movement speed attribute (speedFactor); direct movement never steps
+// into hazards or off deep drops (avoidHazards).
 package com.drehverschluss.renegades.combat;
 
 import com.drehverschluss.renegades.entity.RenegadeEntity;
+import net.minecraft.core.BlockPos;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.FluidTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -11,6 +15,11 @@ import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.attributes.DefaultAttributes;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.CampfireBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
@@ -22,6 +31,12 @@ public final class GroundLocomotion {
     // Minimum gap between the hitboxes of the renegade and its target that steering and attack motion may close.
     private static final double MIN_TARGET_GAP = 0.5;
     private static final double MAX_SPEED_FACTOR = 2.0;
+    // Deepest drop (in blocks) direct movement may step down, like vanilla's default max fall distance.
+    private static final int MAX_SAFE_DROP = 3;
+    // Extra distance checked ahead of the hitbox for hazards.
+    private static final double HAZARD_LOOKAHEAD = 0.15;
+    private static final int HAZARD_MEMORY_TICKS = 20;
+    private int hazardTicks;
     private double speedFactor = 1.0;
     private final RenegadeEntity entity;
     private MovementOwner owner = MovementOwner.NAVIGATION;
@@ -59,6 +74,10 @@ public final class GroundLocomotion {
 
         if (this.fallbackTicks > 0) {
             this.fallbackTicks--;
+        }
+
+        if (this.hazardTicks > 0) {
+            this.hazardTicks--;
         }
 
         this.trackProgress();
@@ -202,8 +221,13 @@ public final class GroundLocomotion {
         this.steering = this.committedVelocity;
         this.intentThisTick = true;
         this.stalledTicks = 0;
+        boolean safe = verticalImpulse > 0.0 || this.isGroundStepSafe(this.committedVelocity.scale(this.speedFactor));
+        if (!safe) {
+            this.hazardTicks = HAZARD_MEMORY_TICKS;
+        }
         this.entity
-            .setDeltaMovement(this.committedVelocity.x * this.speedFactor, verticalImpulse > 0.0 ? verticalImpulse : this.entity.getDeltaMovement().y, this.committedVelocity.z * this.speedFactor);
+            .setDeltaMovement(safe ? this.committedVelocity.x * this.speedFactor : 0.0, verticalImpulse > 0.0 ? verticalImpulse : this.entity.getDeltaMovement().y,
+                    safe ? this.committedVelocity.z * this.speedFactor : 0.0);
         if (verticalImpulse > 0.0) {
             this.entity.setOnGround(false);
             this.entity.hasImpulse = true;
@@ -251,6 +275,12 @@ public final class GroundLocomotion {
             this.steering = this.committedVelocity;
             this.entity.getNavigation().stop();
             Vec3 velocity = this.limitApproach(this.committedVelocity.scale(this.speedFactor));
+            if (!this.committedAirborne && !this.isGroundStepSafe(velocity)) {
+                // Dashes, rolls and charges stop at the edge of a hazard.
+                this.hazardTicks = HAZARD_MEMORY_TICKS;
+                this.cancelCommitted();
+                return;
+            }
             this.entity.setDeltaMovement(velocity.x, this.entity.getDeltaMovement().y, velocity.z);
             this.entity.hasImpulse = true;
             if (this.committedTicks <= 0) {
@@ -331,10 +361,99 @@ public final class GroundLocomotion {
         if (this.impulseTicks > 0) {
             this.steering = horizontal(this.entity.getDeltaMovement());
         } else {
-            Vec3 combined = this.limitApproach(this.steering.add(this.attackMotion).scale(this.speedFactor));
+            Vec3 combined = this.avoidHazards(this.limitApproach(this.steering.add(this.attackMotion).scale(this.speedFactor)));
             this.entity.setDeltaMovement(combined.x, this.entity.getDeltaMovement().y, combined.z);
             this.entity.hasImpulse = true;
         }
+    }
+
+    /**
+     * Direct combat movement has no pathfinding, so every step is checked first: the renegade never walks into lava,
+     * fire, magma, cactus, powder snow, sweet berries or water, and never off a drop deeper than MAX_SAFE_DROP blocks.
+     * An unsafe step is cut to the movement along the edge that stays safe (or stopped); with a fallback goal the
+     * renegade then walks there with normal pathfinding for a while, so it finds the way around instead of waiting.
+     */
+    private Vec3 avoidHazards(Vec3 velocity) {
+        if (!this.entity.onGround() || this.entity.isInWater() || this.entity.isInLava()
+                || horizontal(velocity).lengthSqr() < REST_EPSILON * REST_EPSILON || this.isSafeStep(velocity)) {
+            return velocity;
+        }
+
+        this.hazardTicks = HAZARD_MEMORY_TICKS;
+        Vec3 alongX = new Vec3(velocity.x, velocity.y, 0.0);
+        Vec3 alongZ = new Vec3(0.0, velocity.y, velocity.z);
+        boolean xSafe = Math.abs(velocity.x) > REST_EPSILON && this.isSafeStep(alongX);
+        boolean zSafe = Math.abs(velocity.z) > REST_EPSILON && this.isSafeStep(alongZ);
+        Vec3 slide = xSafe && (!zSafe || Math.abs(velocity.x) >= Math.abs(velocity.z)) ? alongX : zSafe ? alongZ : new Vec3(0.0, velocity.y, 0.0);
+        if (this.fallbackGoal != null) {
+            this.fallbackTicks = FALLBACK_TICKS;
+        }
+        return slide;
+    }
+
+    /**
+     * Whether the ground just ahead of the hitbox in the direction of the velocity is safe, checked at the middle and
+     * both front corners of the hitbox.
+     */
+    private boolean isSafeStep(Vec3 velocity) {
+        Vec3 flat = horizontal(velocity);
+        double length = flat.length();
+        if (length < REST_EPSILON) {
+            return true;
+        }
+        Vec3 direction = flat.scale(1.0 / length);
+        double halfWidth = this.entity.getBbWidth() * 0.5;
+        Vec3 ahead = this.entity.position().add(direction.scale(halfWidth + length + HAZARD_LOOKAHEAD));
+        Vec3 side = new Vec3(-direction.z, 0.0, direction.x).scale(halfWidth - 0.05);
+        return this.isSafeColumn(ahead.x, ahead.z) && this.isSafeColumn(ahead.x + side.x, ahead.z + side.z)
+                && this.isSafeColumn(ahead.x - side.x, ahead.z - side.z);
+    }
+
+    private boolean isSafeColumn(double x, double z) {
+        Level level = this.entity.level();
+        BlockPos feet = BlockPos.containing(x, this.entity.getY() + 0.01, z);
+        if (this.isHazard(level, feet)) {
+            return false;
+        }
+        if (!level.getBlockState(feet).getCollisionShape(level, feet).isEmpty()) {
+            // A wall stops the movement by itself; a step up only needs a safe block on top.
+            return !this.isHazard(level, feet.above());
+        }
+        for (int depth = 1; depth <= MAX_SAFE_DROP + 1; depth++) {
+            BlockPos pos = feet.below(depth);
+            if (this.isHazard(level, pos)) {
+                return false;
+            }
+            if (!level.getBlockState(pos).getCollisionShape(level, pos).isEmpty()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isHazard(Level level, BlockPos pos) {
+        FluidState fluid = level.getFluidState(pos);
+        if (fluid.is(FluidTags.LAVA) || fluid.is(FluidTags.WATER)) {
+            return true;
+        }
+        BlockState state = level.getBlockState(pos);
+        return state.is(BlockTags.FIRE) || state.is(Blocks.MAGMA_BLOCK) || state.is(Blocks.CACTUS) || state.is(Blocks.POWDER_SNOW)
+                || state.is(Blocks.SWEET_BERRY_BUSH) || state.is(Blocks.WITHER_ROSE) || state.is(Blocks.LAVA_CAULDRON)
+                || CampfireBlock.isLitCampfire(state);
+    }
+
+    /**
+     * Whether a ground step with this velocity is safe (always true in the air or when already in a fluid).
+     */
+    private boolean isGroundStepSafe(Vec3 velocity) {
+        return !this.entity.onGround() || this.entity.isInWater() || this.entity.isInLava() || this.isSafeStep(velocity);
+    }
+
+    /**
+     * Whether direct movement was recently cut short at a hazard (debug output).
+     */
+    public boolean isAvoidingHazard() {
+        return this.hazardTicks > 0;
     }
 
     /**

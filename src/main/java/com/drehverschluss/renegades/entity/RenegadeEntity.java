@@ -62,6 +62,7 @@ public abstract class RenegadeEntity extends Monster implements GeoEntity {
     public static final String ACTION_CONTROLLER = "action";
     private static final String TAG_GROUP = "RenegadesGroup";
     private static final double COOLDOWN_ALLY_RADIUS = 32.0D;
+    private static final int MAX_FALL_DISTANCE = 3;
     private static final EquipmentSlot[] DROPPABLE_SLOTS = {
             EquipmentSlot.MAINHAND, EquipmentSlot.OFFHAND, EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET
     };
@@ -289,6 +290,15 @@ public abstract class RenegadeEntity extends Monster implements GeoEntity {
             return lateral > 0.0D ? CombatMoveState.LATERAL_RIGHT : CombatMoveState.LATERAL_LEFT;
         }
         return along < -speed * 0.2D ? CombatMoveState.BACKSTEP : CombatMoveState.ADVANCE;
+    }
+
+    /**
+     * Never more than 3 blocks, also while chasing a target (vanilla allows much deeper drops then), matching the
+     * hazard check of the direct combat movement.
+     */
+    @Override
+    public int getMaxFallDistance() {
+        return MAX_FALL_DISTANCE;
     }
 
     @Override

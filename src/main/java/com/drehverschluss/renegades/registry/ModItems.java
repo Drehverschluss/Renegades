@@ -18,6 +18,9 @@ public final class ModItems {
     public static final DeferredItem<DeferredSpawnEggItem> PALADIN_SPAWN_EGG = ITEMS.register("paladin_spawn_egg",
             () -> new DeferredSpawnEggItem(ModEntityTypes.PALADIN, 0xD8D2C0, 0xC9A23A, new Item.Properties()));
 
+    public static final DeferredItem<DeferredSpawnEggItem> ARCHER_SPAWN_EGG = ITEMS.register("archer_spawn_egg",
+            () -> new DeferredSpawnEggItem(ModEntityTypes.ARCHER, 0x3F5A2A, 0x8B6A3E, new Item.Properties()));
+
     private ModItems() {
     }
 }

@@ -16,7 +16,14 @@ Combat system based on [ANARCHY - RPG Minibosses](https://github.com/cleannroost
 - `WarriorBrain`: based on `TemplarBrain`.
 - `RogueBrain`: based on `RogueBrain` (knife throw as an own projectile instead of the ability system).
 - `RogueNavigation`: based on `TricksterEntity$TricksterNavigation` and `RogueNodeMaker`.
-- `PaladinBrain`: based on `JuggernautBrain` (ground impact as a radial strike instead of the ability system; shield bracing added).
+- `PaladinBrain`: based on `JuggernautBrain` (ground impact as an area strike instead of the ability system; shield bracing added).
+- `ArcherBrain`: based on `MercenaryBrain` (shots with the held bow or crossbow, traps as an own entity instead of the ability system).
+
+## Trap model
+
+- `assets/renegades/geo/entity/trap.geo.json`, `animations/entity/trap.animation.json` and `textures/entity/trap.png`:
+  the trap model, animation and texture of [ANARCHY - RPG Minibosses](https://github.com/cleannrooster/rpg-minibosses)
+  by cleannrooster (CC0-1.0).
 
 ## Optional integrations
 

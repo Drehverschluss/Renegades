@@ -1,0 +1,86 @@
+{
+  "entity": "renegades:archer",
+  "fallback": true,
+  "entries": [
+    {
+      "id": "vanilla_near_leather_bow",
+      "conditions": {
+        "max_distance": 1500
+      },
+      "equipment": {
+        "head": "minecraft:leather_helmet",
+        "chest": "minecraft:leather_chestplate",
+        "legs": "minecraft:leather_leggings",
+        "feet": "minecraft:leather_boots",
+        "mainhand": "minecraft:bow"
+      }
+    },
+    {
+      "id": "vanilla_near_leather_crossbow",
+      "conditions": {
+        "max_distance": 1500
+      },
+      "equipment": {
+        "head": "minecraft:leather_helmet",
+        "chest": "minecraft:leather_chestplate",
+        "legs": "minecraft:leather_leggings",
+        "feet": "minecraft:leather_boots",
+        "mainhand": "minecraft:crossbow"
+      }
+    },
+    {
+      "id": "vanilla_mid_chain_bow",
+      "conditions": {
+        "min_distance": 1500,
+        "max_distance": 4000
+      },
+      "equipment": {
+        "head": "minecraft:chainmail_helmet",
+        "chest": "minecraft:chainmail_chestplate",
+        "legs": "minecraft:chainmail_leggings",
+        "feet": "minecraft:chainmail_boots",
+        "mainhand": "minecraft:bow"
+      }
+    },
+    {
+      "id": "vanilla_mid_chain_crossbow",
+      "conditions": {
+        "min_distance": 1500,
+        "max_distance": 4000
+      },
+      "equipment": {
+        "head": "minecraft:chainmail_helmet",
+        "chest": "minecraft:chainmail_chestplate",
+        "legs": "minecraft:chainmail_leggings",
+        "feet": "minecraft:chainmail_boots",
+        "mainhand": "minecraft:crossbow"
+      }
+    },
+    {
+      "id": "vanilla_far_iron_bow",
+      "conditions": {
+        "min_distance": 4000
+      },
+      "equipment": {
+        "head": "minecraft:iron_helmet",
+        "chest": "minecraft:iron_chestplate",
+        "legs": "minecraft:iron_leggings",
+        "feet": "minecraft:iron_boots",
+        "mainhand": "minecraft:bow"
+      }
+    },
+    {
+      "id": "vanilla_far_iron_crossbow",
+      "conditions": {
+        "min_distance": 4000
+      },
+      "equipment": {
+        "head": "minecraft:iron_helmet",
+        "chest": "minecraft:iron_chestplate",
+        "legs": "minecraft:iron_leggings",
+        "feet": "minecraft:iron_boots",
+        "mainhand": "minecraft:crossbow"
+      }
+    }
+  ]
+}

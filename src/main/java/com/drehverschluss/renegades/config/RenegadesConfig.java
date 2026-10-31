@@ -28,6 +28,7 @@ public final class RenegadesConfig {
     public static final ModConfigSpec.BooleanValue ENABLE_STEALTH;
     public static final ModConfigSpec.BooleanValue ENABLE_BRACE;
     public static final ModConfigSpec.BooleanValue ENABLE_LEAP;
+    public static final ModConfigSpec.BooleanValue ENABLE_TRAPS;
 
     static {
         ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
@@ -119,6 +120,10 @@ public final class RenegadesConfig {
         ENABLE_LEAP = builder
                 .comment("If true, renegades that leap (e.g. the paladin) jump at distant targets and land with a ground impact.")
                 .define("enableLeap", true);
+
+        ENABLE_TRAPS = builder
+                .comment("If true, renegades that set traps (e.g. the archer) throw traps that go off when an enemy comes close.")
+                .define("enableTraps", true);
 
         builder.pop();
         SPEC = builder.build();
