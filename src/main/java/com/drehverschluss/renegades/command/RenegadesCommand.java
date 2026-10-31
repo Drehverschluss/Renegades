@@ -157,7 +157,8 @@ public final class RenegadesCommand {
                     + " | spawn " + origin
                     + " | persistent " + persistent
                     + String.format(Locale.ROOT, " | HP %.1f/%.1f | attack %.1f", renegade.getHealth(), renegade.getMaxHealth(),
-                            renegade.getAttributeValue(Attributes.ATTACK_DAMAGE))), false);
+                            renegade.getAttributeValue(Attributes.ATTACK_DAMAGE))
+                    + (renegade.getCombatBrain() == null ? "" : " | " + renegade.getCombatBrain().describe())), false);
         }
         return renegades.size();
     }

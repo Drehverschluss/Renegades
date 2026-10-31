@@ -23,6 +23,7 @@ public final class RenegadesConfig {
     public static final ModConfigSpec.IntValue MAX_NEARBY;
     public static final ModConfigSpec.IntValue CAP_RADIUS;
     public static final ModConfigSpec.BooleanValue PERSISTENT_NATURAL_SPAWNS;
+    public static final ModConfigSpec.BooleanValue ENABLE_PARRY;
 
     static {
         ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
@@ -89,6 +90,15 @@ public final class RenegadesConfig {
         PERSISTENT_NATURAL_SPAWNS = builder
                 .comment("If true, renegades from natural spawns, spawn eggs and commands never despawn. Renegades from (trial) spawners always despawn like monsters.")
                 .define("persistentNaturalSpawns", true);
+
+        builder.pop();
+
+        builder.comment("Combat behaviour of renegades. Timings, ranges and cooldowns are defined per class.")
+                .push("combat");
+
+        ENABLE_PARRY = builder
+                .comment("If true, renegades that can parry (e.g. the warrior) sometimes parry close melee hits: half damage and a counter-strike.")
+                .define("enableParry", true);
 
         builder.pop();
         SPEC = builder.build();

@@ -99,6 +99,20 @@ Each class has its own base attributes (warrior: 60 health, 6 attack damage, 0.3
 `healthMultiplier` and `damageMultiplier` (default `1.0`) multiply the base values of all renegades when they spawn,
 before level scaling such as Dynamic Difficulty is applied on top. Renegades that already exist keep their values.
 
+## Combat AI
+
+Renegades fight with telegraphed attacks: every attack has a windup, an active window and a recovery, and damage is
+only dealt in the active window, when the weapon actually swings through its target. A hit is a regular mob melee hit
+(attack damage incl. weapon and level bonuses, weapon enchantments such as Sharpness and Fire Aspect, blockable with a
+shield) and needs line of sight, so attacks never go through walls.
+
+**Warrior:** alternates heavy sweeps right-to-left and left-to-right; closes gaps with a dash that chains into a rising
+dash cut; strafes and backs off around its target between attacks. When hit in melee from close range while not
+attacking, it sometimes parries: half damage and an immediate counter-strike (`enableParry` in `[combat]`, default
+`true`). `/renegades nearby` shows stance, combat state and the running action with its phase.
+
+Combat system based on ANARCHY – RPG Minibosses by cleannrooster (CC0-1.0).
+
 ## Spawn groups (datapack)
 
 When a renegade spawns naturally, it can bring company. Templates live in

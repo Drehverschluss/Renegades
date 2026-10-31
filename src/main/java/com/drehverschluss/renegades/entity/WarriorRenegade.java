@@ -1,10 +1,15 @@
 package com.drehverschluss.renegades.entity;
 
-import net.minecraft.world.entity.Entity;
+import com.drehverschluss.renegades.combat.brain.MobBrain;
+import com.drehverschluss.renegades.combat.brain.WarriorBrain;
+import com.drehverschluss.renegades.config.RenegadesConfig;
+import javax.annotation.Nullable;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.level.Level;
 import software.bernie.geckolib.animation.AnimatableManager;
@@ -13,12 +18,13 @@ import software.bernie.geckolib.animation.PlayState;
 import software.bernie.geckolib.animation.RawAnimation;
 
 public class WarriorRenegade extends RenegadeEntity {
-    private static final String ATTACK_CONTROLLER = "attack";
-    private static final String SWEEP_ANIMATION = "sweep";
-
     private static final RawAnimation WALK = RawAnimation.begin().thenLoop("animation.mob.walk_templar");
     private static final RawAnimation IDLE = RawAnimation.begin().thenLoop("animation.mob.idle");
-    private static final RawAnimation SWEEP = RawAnimation.begin().thenPlay("animation.v2.templar.sweep_rl");
+    private static final RawAnimation STANCE = RawAnimation.begin().thenLoop("animation.v2.templar.stance");
+    private static final RawAnimation ADVANCE = RawAnimation.begin().thenLoop("animation.v2.templar.advance");
+    private static final RawAnimation LATERAL_LEFT = RawAnimation.begin().thenLoop("animation.v2.templar.lateral_left");
+    private static final RawAnimation LATERAL_RIGHT = RawAnimation.begin().thenLoop("animation.v2.templar.lateral_right");
+    private static final RawAnimation BACKSTEP = RawAnimation.begin().thenLoop("animation.v2.templar.backstep");
 
     public WarriorRenegade(EntityType<? extends WarriorRenegade> entityType, Level level) {
         super(entityType, level);
@@ -34,24 +40,54 @@ public class WarriorRenegade extends RenegadeEntity {
                 .add(Attributes.ARMOR, 0.0D);
     }
 
+    @Nullable
     @Override
-    protected void registerGoals() {
-        super.registerGoals();
-        this.goalSelector.addGoal(2, new MeleeAttackGoal(this, 1.0D, false));
+    protected MobBrain createBrain() {
+        return new WarriorBrain(this);
     }
 
+    /**
+     * Parry (ANARCHY's TemplarEntity#hurt): a direct melee hit from close range while no action is running is parried
+     * when the parry is off cooldown: parry animation, counter-strike on the attacker and half damage.
+     */
     @Override
-    public boolean doHurtTarget(Entity target) {
-        // Purely visual; damage is still dealt by the vanilla logic below.
-        this.triggerAnim(ATTACK_CONTROLLER, SWEEP_ANIMATION);
-        return super.doHurtTarget(target);
+    public boolean hurt(DamageSource source, float amount) {
+        if (!this.level().isClientSide()
+                && RenegadesConfig.ENABLE_PARRY.get()
+                && !this.isPerforming()
+                && this.invulnerableTime <= 10
+                && source.isDirect()
+                && source.getEntity() instanceof LivingEntity attacker
+                && attacker.distanceTo(this) < WarriorBrain.PARRY_RANGE
+                && this.getCombatBrain() instanceof WarriorBrain warriorBrain
+                && warriorBrain.tryParry()) {
+            this.doHurtTarget(attacker);
+            amount *= 0.5F;
+            this.level().playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.ANVIL_PLACE, this.getSoundSource(), 1.0F, 1.0F);
+        }
+        return super.hurt(source, amount);
     }
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        controllers.add(new AnimationController<>(this, "movement", 5,
-                state -> state.setAndContinue(state.isMoving() ? WALK : IDLE)));
-        controllers.add(new AnimationController<>(this, ATTACK_CONTROLLER, 0, state -> PlayState.STOP)
-                .triggerableAnim(SWEEP_ANIMATION, SWEEP));
+        controllers.add(new AnimationController<>(this, "movement", 5, state -> {
+            if (this.isAggressive()) {
+                return state.setAndContinue(switch (this.getCombatMoveState()) {
+                    case STANCE -> STANCE;
+                    case ADVANCE -> ADVANCE;
+                    case LATERAL_LEFT -> LATERAL_LEFT;
+                    case LATERAL_RIGHT -> LATERAL_RIGHT;
+                    case BACKSTEP -> BACKSTEP;
+                });
+            }
+            return state.setAndContinue(state.isMoving() ? WALK : IDLE);
+        }).setAnimationSpeedHandler(warrior -> warrior.isAggressive() && warrior.getCombatMoveState() != CombatMoveState.STANCE
+                ? (double) warrior.getCombatMoveSpeed() : 1.0D));
+
+        AnimationController<WarriorRenegade> actions = new AnimationController<>(this, ACTION_CONTROLLER, 0, state -> PlayState.STOP);
+        for (String animation : WarriorBrain.ACTION_ANIMATIONS) {
+            actions.triggerableAnim(animation, RawAnimation.begin().thenPlay(animation));
+        }
+        controllers.add(actions);
     }
 }
