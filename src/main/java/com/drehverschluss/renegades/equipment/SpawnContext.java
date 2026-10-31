@@ -14,7 +14,10 @@ import net.minecraft.world.entity.Mob;
  */
 public record SpawnContext(ResourceLocation dimension, BlockPos pos, double distance, OptionalInt level) {
     public static SpawnContext of(Mob mob, ServerLevel level, OptionalInt mobLevel) {
-        BlockPos pos = mob.blockPosition();
+        return at(level, mob.blockPosition(), mobLevel);
+    }
+
+    public static SpawnContext at(ServerLevel level, BlockPos pos, OptionalInt mobLevel) {
         BlockPos worldSpawn = level.getServer().overworld().getSharedSpawnPos();
         double dx = pos.getX() - worldSpawn.getX();
         double dz = pos.getZ() - worldSpawn.getZ();

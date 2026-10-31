@@ -4,14 +4,20 @@ import com.drehverschluss.renegades.command.RenegadesCommand;
 import com.drehverschluss.renegades.compat.dynamicdifficulty.DynamicDifficultyCompat;
 import com.drehverschluss.renegades.compat.dynamicdifficulty.DynamicDifficultyLevelProvider;
 import com.drehverschluss.renegades.config.RenegadesConfig;
+import com.drehverschluss.renegades.entity.RenegadeEntity;
 import com.drehverschluss.renegades.entity.WarriorRenegade;
 import com.drehverschluss.renegades.equipment.EquipmentPoolLoader;
 import com.drehverschluss.renegades.equipment.EquipmentPools;
+import com.drehverschluss.renegades.group.RenegadeSpawner;
+import com.drehverschluss.renegades.group.SpawnGroupLoader;
+import com.drehverschluss.renegades.group.SpawnStats;
 import com.drehverschluss.renegades.level.RenegadeLevels;
 import com.drehverschluss.renegades.registry.ModEntityTypes;
 import com.drehverschluss.renegades.registry.ModItems;
 import com.mojang.logging.LogUtils;
+import net.minecraft.world.entity.SpawnPlacementTypes;
 import net.minecraft.world.item.CreativeModeTabs;
+import net.minecraft.world.level.levelgen.Heightmap;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
@@ -22,6 +28,8 @@ import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.TagsUpdatedEvent;
 import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
+import net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent;
+import net.neoforged.neoforge.event.server.ServerStartedEvent;
 import org.slf4j.Logger;
 
 @Mod(Renegades.MODID)
@@ -35,11 +43,14 @@ public class Renegades {
         modContainer.registerConfig(ModConfig.Type.SERVER, RenegadesConfig.SPEC);
 
         modEventBus.addListener(Renegades::registerAttributes);
+        modEventBus.addListener(Renegades::registerSpawnPlacements);
         modEventBus.addListener(Renegades::addCreativeTabContents);
 
         NeoForge.EVENT_BUS.addListener(Renegades::addReloadListeners);
         NeoForge.EVENT_BUS.addListener(Renegades::onTagsUpdated);
         NeoForge.EVENT_BUS.addListener(Renegades::registerCommands);
+        NeoForge.EVENT_BUS.addListener((ServerStartedEvent event) -> SpawnStats.reset(event.getServer().getTickCount()));
+        NeoForge.EVENT_BUS.addListener(RenegadeSpawner::onServerTick);
 
         if (DynamicDifficultyCompat.isLoaded()) {
             RenegadeLevels.setProvider(new DynamicDifficultyLevelProvider());
@@ -51,6 +62,11 @@ public class Renegades {
         event.put(ModEntityTypes.WARRIOR.get(), WarriorRenegade.createAttributes().build());
     }
 
+    private static void registerSpawnPlacements(RegisterSpawnPlacementsEvent event) {
+        event.register(ModEntityTypes.WARRIOR.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+                RenegadeEntity::checkRenegadeSpawnRules, RegisterSpawnPlacementsEvent.Operation.REPLACE);
+    }
+
     private static void addCreativeTabContents(BuildCreativeModeTabContentsEvent event) {
         if (event.getTabKey() == CreativeModeTabs.SPAWN_EGGS) {
             event.accept(ModItems.WARRIOR_SPAWN_EGG);
@@ -59,6 +75,7 @@ public class Renegades {
 
     private static void addReloadListeners(AddReloadListenerEvent event) {
         event.addListener(new EquipmentPoolLoader());
+        event.addListener(new SpawnGroupLoader());
     }
 
     private static void onTagsUpdated(TagsUpdatedEvent event) {

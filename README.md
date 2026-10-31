@@ -68,6 +68,74 @@ level conditions are ignored.
 **Debug commands** (permission level 2): `/renegades pools <entity>` lists the loaded entries, `/renegades reequip <targets>`
 rolls the equipment again at the mob's current position and shows which entry was chosen and why.
 
+## Natural spawns
+
+Renegades do not use the vanilla monster spawning (whose mob cap is usually full). They have their own spawn timer:
+every `spawnIntervalSeconds` each player gets one attempt that succeeds with `spawnChance`. A successful attempt looks
+for a free spot with solid ground `minDistance`–`maxDistance` blocks around the player, on the surface or (with
+`allowUnderground`) in a cave, picks a spawn group (see below) whose leader may spawn in that biome, and spawns it as a
+natural spawn. No attempts on Peaceful, with `doMobSpawning` off or for spectators.
+
+Which biomes a class may spawn in is set by the biome tag `#renegades:spawns/<class>`, e.g. `#renegades:spawns/warrior`
+(default: `#minecraft:is_overworld`, `#minecraft:is_nether`, `#minecraft:is_end`). Override the tag in a datapack to
+change it.
+
+Options in `[spawns]` of `renegades-server.toml`:
+
+| Option | Default | Effect |
+|---|---|---|
+| `spawnIntervalSeconds` | `60` | Seconds between two attempts per player. |
+| `spawnChance` | `0.03` | Chance per attempt (60 attempts per hour × 0.03 ≈ 1.8 spawns per hour and player). |
+| `minDistance` / `maxDistance` | `24` / `64` | Horizontal distance from the player in blocks. |
+| `allowUnderground` | `true` | Half of the attempts look for a cave spot within 32 blocks of the player's height. |
+| `requireDarkness` | `false` | `true` uses the normal monster light rules. |
+| `maxNearby` | `3` | No spawn (and no further group members) if this many renegades are within `capRadius` of the spawn position or of the nearest player. |
+| `capRadius` | `128` | Radius in blocks for `maxNearby`. |
+| `persistentNaturalSpawns` | `true` | Renegades from natural spawns, spawn eggs and commands never despawn. Renegades from (trial) spawners always despawn like monsters. |
+
+## Strength
+
+Each class has its own base attributes (warrior: 60 health, 6 attack damage, 0.3 knockback resistance). In `[strength]`,
+`healthMultiplier` and `damageMultiplier` (default `1.0`) multiply the base values of all renegades when they spawn,
+before level scaling such as Dynamic Difficulty is applied on top. Renegades that already exist keep their values.
+
+## Spawn groups (datapack)
+
+When a renegade spawns naturally, it can bring company. Templates live in
+`data/<namespace>/renegades/spawn_groups/<any path>.json` (one template per file; same override, `neoforge:conditions`
+and error handling as the equipment pools; the file id, e.g. `renegades:warrior_pair`, is the template id).
+
+```json
+{
+  "leader": "renegades:warrior",
+  "weight": 2,
+  "conditions": { "dimensions": ["minecraft:overworld"], "min_distance": 500 },
+  "members": [
+    { "entity": "renegades:warrior", "min": 1, "max": 1 }
+  ]
+}
+```
+
+- `leader`: the mob whose natural spawn can create this group. `weight` (default `1`).
+- `conditions` (optional): same conditions as in equipment pools, checked at the leader's position.
+- `members` (optional): entity, `min` (default `1`) and `max` (default `min`) per member type. No members = the
+  leader spawns alone.
+
+The spawn timer picks a template by weight among all templates whose leader may spawn in the biome (see
+"Natural spawns") and whose conditions match; that decides which class spawns. The spawned leader then picks its final
+template among its own templates, now with its mob level known (none matching = alone). Members spawn on
+free ground next to the leader, roll their own equipment and never start a group of their own; members that do not
+fit (no valid spot, `maxNearby` reached) are left out. Spawn eggs always spawn a single renegade.
+
+All members share a group id: if a player attacks one, the members within 32 blocks attack that player; without a
+target, members walk back to the group when they are more than 12 blocks away. Bundled: `warrior_solo` (weight 8)
+and `warrior_pair` (weight 2).
+
+**Debug commands**: `/renegades groups <leader>` lists the templates, `/renegades spawngroup <id>` spawns one at your
+position like a natural spawn, `/renegades nearby` lists the renegades within `capRadius` with group, spawn type,
+persistence, health and attack damage, `/renegades stats [reset]` shows the spawn timer's attempts, failures by reason
+and spawns since server start (extrapolated per hour).
+
 ### Drop rules
 
 Configured in the server config `config/renegades-server.toml`. To override it for a single world, put a copy into

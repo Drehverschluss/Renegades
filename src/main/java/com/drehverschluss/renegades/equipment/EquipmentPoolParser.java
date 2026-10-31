@@ -6,7 +6,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import java.util.ArrayList;
 import java.util.EnumMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -26,7 +25,6 @@ import org.slf4j.Logger;
 final class EquipmentPoolParser {
     private static final Set<String> FILE_KEYS = Set.of("entity", "fallback", "entries", "neoforge:conditions");
     private static final Set<String> ENTRY_KEYS = Set.of("id", "weight", "conditions", "equipment");
-    private static final Set<String> CONDITION_KEYS = Set.of("dimensions", "min_distance", "max_distance", "min_y", "max_y", "min_level", "max_level");
     private static final Map<String, EquipmentSlot> SLOTS = Map.of(
             "head", EquipmentSlot.HEAD,
             "chest", EquipmentSlot.CHEST,
@@ -74,7 +72,7 @@ final class EquipmentPoolParser {
         }
 
         EquipmentConditions conditions = json.has("conditions")
-                ? parseConditions(GsonHelper.getAsJsonObject(json, "conditions"))
+                ? EquipmentConditions.fromJson(GsonHelper.getAsJsonObject(json, "conditions"))
                 : EquipmentConditions.NONE;
 
         JsonObject equipmentJson = GsonHelper.getAsJsonObject(json, "equipment");
@@ -88,35 +86,6 @@ final class EquipmentPoolParser {
         }
 
         return new EquipmentPoolEntry(id, fileId, fallback, weight, conditions, Map.copyOf(equipment));
-    }
-
-    private static EquipmentConditions parseConditions(JsonObject json) {
-        for (String key : json.keySet()) {
-            if (!CONDITION_KEYS.contains(key)) {
-                throw new JsonParseException("Unknown condition '" + key + "', expected one of " + CONDITION_KEYS);
-            }
-        }
-
-        Set<ResourceLocation> dimensions = new HashSet<>();
-        if (json.has("dimensions")) {
-            for (JsonElement dimension : GsonHelper.getAsJsonArray(json, "dimensions")) {
-                dimensions.add(parseId(GsonHelper.convertToString(dimension, "dimension"), "dimension"));
-            }
-        }
-
-        return new EquipmentConditions(Set.copyOf(dimensions),
-                parseBounds(json, "min_distance", "max_distance"),
-                parseBounds(json, "min_y", "max_y"),
-                parseBounds(json, "min_level", "max_level"));
-    }
-
-    private static IntBounds parseBounds(JsonObject json, String minKey, String maxKey) {
-        Integer min = json.has(minKey) ? GsonHelper.getAsInt(json, minKey) : null;
-        Integer max = json.has(maxKey) ? GsonHelper.getAsInt(json, maxKey) : null;
-        if (min != null && max != null && min > max) {
-            throw new JsonParseException(minKey + " (" + min + ") is greater than " + maxKey + " (" + max + ")");
-        }
-        return min == null && max == null ? IntBounds.ANY : new IntBounds(min, max);
     }
 
     private static ItemChoice parseChoice(JsonElement json, String slotName) {
