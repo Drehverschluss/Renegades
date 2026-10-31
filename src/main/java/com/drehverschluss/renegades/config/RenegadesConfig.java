@@ -11,7 +11,8 @@ public final class RenegadesConfig {
     public static final ModConfigSpec.DoubleValue ARMOR_DROP_CHANCE;
     public static final ModConfigSpec.DoubleValue WEAPON_DROP_CHANCE;
     public static final ModConfigSpec.BooleanValue REQUIRE_PLAYER_KILL;
-    public static final ModConfigSpec.BooleanValue DROP_UNDAMAGED;
+    public static final ModConfigSpec.DoubleValue DROP_DURABILITY_MIN;
+    public static final ModConfigSpec.DoubleValue DROP_DURABILITY_MAX;
     public static final ModConfigSpec.DoubleValue HEALTH_MULTIPLIER;
     public static final ModConfigSpec.DoubleValue DAMAGE_MULTIPLIER;
     public static final ModConfigSpec.IntValue SPAWN_INTERVAL_SECONDS;
@@ -49,9 +50,13 @@ public final class RenegadesConfig {
         REQUIRE_PLAYER_KILL = builder
                 .comment("If true, equipment only drops when a player killed the renegade or hit it shortly before its death (like vanilla).")
                 .define("requirePlayerKill", true);
-        DROP_UNDAMAGED = builder
-                .comment("If true, dropped equipment keeps its durability; if false, it gets random damage like vanilla mob equipment.")
-                .define("dropUndamaged", true);
+        DROP_DURABILITY_MIN = builder
+                .comment("Lowest remaining durability of a dropped damageable item, as a fraction of its max durability (rolled per item).",
+                        "Items without durability or that are unbreakable are not changed; a dropped item never breaks. min = max = 1.0 drops everything undamaged.")
+                .defineInRange("dropDurabilityMin", 0.25D, 0.0D, 1.0D);
+        DROP_DURABILITY_MAX = builder
+                .comment("Highest remaining durability of a dropped damageable item, as a fraction of its max durability.")
+                .defineInRange("dropDurabilityMax", 0.75D, 0.0D, 1.0D);
 
         builder.pop();
 

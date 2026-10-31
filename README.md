@@ -322,7 +322,7 @@ Configured in the server config `config/renegades-server.toml`. To override it f
 | `armorDropChance` | `1.0` | Chance for each armor piece to drop. |
 | `weaponDropChance` | `1.0` | Chance for each held item (main and off hand) to drop. |
 | `requirePlayerKill` | `true` | Equipment only drops if a player killed the mob or hit it shortly before. |
-| `dropUndamaged` | `true` | Dropped equipment keeps its durability (otherwise random damage like vanilla). |
+| `dropDurabilityMin` / `dropDurabilityMax` | `0.25` / `0.75` | Each dropped item with durability keeps a random share of its max durability in this range (rolled per item; wear from the fight does not matter). Items without durability or unbreakable items are unchanged; nothing drops broken. `1.0` / `1.0` drops everything undamaged. |
 
 Items with Curse of Vanishing (or any `prevent_equipment_drop` effect) never drop; Looting raises the chance like for
 vanilla mob equipment. The regular loot tables (`renegades:entities/<class>`) are empty by default and can be filled

@@ -33,8 +33,6 @@ import software.bernie.geckolib.animation.RawAnimation;
  * Piercing) apply, it cannot be picked up, and the archer is its owner (projectile bonuses of mob levels apply).
  */
 public class ArcherRenegade extends RenegadeEntity implements RangedAttackMob, CrossbowAttackMob {
-    private static final RawAnimation WALK = RawAnimation.begin().thenLoop("animation.mob.walk_templar");
-    private static final RawAnimation IDLE = RawAnimation.begin().thenLoop("animation.mob.idle");
     private static final RawAnimation STANCE = RawAnimation.begin().thenLoop("animation.v2.merc.stance");
     private static final RawAnimation ADVANCE = RawAnimation.begin().thenLoop("animation.v2.merc.advance");
     private static final RawAnimation LATERAL_LEFT = RawAnimation.begin().thenLoop("animation.v2.merc.lateral_left");
@@ -127,7 +125,7 @@ public class ArcherRenegade extends RenegadeEntity implements RangedAttackMob, C
         this.lookAt(target, 30.0F, 30.0F);
         if (this.hasCrossbow()) {
             ItemStack weapon = this.getMainHandItem();
-            // Vanilla wears the crossbow down with every shot; renegades keep their gear intact (see dropUndamaged).
+            // Vanilla wears the crossbow down with every shot; renegades keep their gear intact (the drop durability is rolled on death).
             int damage = weapon.getDamageValue();
             if (!CrossbowItem.isCharged(weapon)) {
                 CrossbowLoader.load(this, weapon);
@@ -211,9 +209,8 @@ public class ArcherRenegade extends RenegadeEntity implements RangedAttackMob, C
                     case BACKSTEP -> bow ? BOW_BACKSTEP : BACKSTEP;
                 });
             }
-            return state.setAndContinue(state.isMoving() ? WALK : IDLE);
-        }).setAnimationSpeedHandler(archer -> archer.isAggressive() && archer.getCombatMoveState() != CombatMoveState.STANCE
-                ? (double) archer.getCombatMoveSpeed() : 1.0D));
+            return state.setAndContinue(this.isWalking() ? WALK : IDLE);
+        }).setAnimationSpeedHandler(RenegadeEntity::movementAnimationSpeed));
 
         AnimationController<ArcherRenegade> actions = new AnimationController<>(this, ACTION_CONTROLLER, 0, state -> PlayState.STOP);
         for (String animation : ArcherBrain.ACTION_ANIMATIONS) {

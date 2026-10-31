@@ -24,8 +24,6 @@ import software.bernie.geckolib.animation.RawAnimation;
  * Healer that keeps its group alive: heals and shields wounded allies, attacks with holy bolts when nobody needs it.
  */
 public class PriestRenegade extends RenegadeEntity implements HealingCaster {
-    private static final RawAnimation WALK = RawAnimation.begin().thenLoop("animation.mob.walk_templar");
-    private static final RawAnimation IDLE = RawAnimation.begin().thenLoop("animation.mob.idle");
     private static final RawAnimation STANCE = RawAnimation.begin().thenLoop("animation.v2.mage.stance");
     private static final RawAnimation ADVANCE = RawAnimation.begin().thenLoop("animation.v2.mage.advance");
     private static final RawAnimation LATERAL_LEFT = RawAnimation.begin().thenLoop("animation.v2.mage.lateral_left");
@@ -88,9 +86,8 @@ public class PriestRenegade extends RenegadeEntity implements HealingCaster {
                     case BACKSTEP -> BACKSTEP;
                 });
             }
-            return state.setAndContinue(state.isMoving() ? WALK : IDLE);
-        }).setAnimationSpeedHandler(priest -> priest.isAggressive() && priest.getCombatMoveState() != CombatMoveState.STANCE
-                ? (double) priest.getCombatMoveSpeed() : 1.0D));
+            return state.setAndContinue(this.isWalking() ? WALK : IDLE);
+        }).setAnimationSpeedHandler(RenegadeEntity::movementAnimationSpeed));
 
         AnimationController<PriestRenegade> actions = new AnimationController<>(this, ACTION_CONTROLLER, 0, state -> PlayState.STOP);
         for (String animation : PriestBrain.ACTION_ANIMATIONS) {

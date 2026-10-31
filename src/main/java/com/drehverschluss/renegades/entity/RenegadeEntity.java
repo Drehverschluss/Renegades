@@ -50,6 +50,7 @@ import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.phys.Vec3;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.animation.RawAnimation;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 /**
@@ -90,6 +91,21 @@ public abstract class RenegadeEntity extends Monster implements GeoEntity {
     private int combatMoveCandidateTicks;
     private float combatMoveSpeed = 1.0F;
     private float smoothedSpeed;
+    // Client only: walking (out of combat) with hysteresis, see updateWalkState.
+    private boolean walking;
+
+    /**
+     * Out-of-combat animations shared by all classes.
+     */
+    protected static final RawAnimation WALK = RawAnimation.begin().thenLoop("animation.mob.walk");
+    protected static final RawAnimation IDLE = RawAnimation.begin().thenLoop("animation.mob.idle");
+    // Horizontal speed (blocks per tick, smoothed) from which a renegade counts as walking, and below which it stops.
+    private static final float WALK_START_SPEED = 0.02F;
+    private static final float WALK_STOP_SPEED = 0.01F;
+    // Speed at which animation.mob.walk plays at its normal tempo; the tempo follows the real speed within 0.6-1.6.
+    private static final float WALK_REFERENCE_SPEED = 0.075F;
+    // Length of the idle and walk loops in ticks: the per-renegade animation time offset lies within one loop.
+    private static final int IDLE_LOOP_TICKS = 40;
 
     /**
      * Movement animation while in combat: standing in stance, advancing, strafing or backing off.
@@ -285,6 +301,43 @@ public abstract class RenegadeEntity extends Monster implements GeoEntity {
     }
 
     /**
+     * Client: whether the renegade walks, from its own smoothed position change instead of GeckoLib's isMoving() (which
+     * needs a client-side delta movement that slowly wandering mobs rarely have). Starts above 0.02 and stops below 0.01
+     * blocks per tick, so it does not flicker between idle and walk.
+     */
+    private void updateWalkState() {
+        if (this.walking ? this.smoothedSpeed < WALK_STOP_SPEED : this.smoothedSpeed > WALK_START_SPEED) {
+            this.walking = !this.walking;
+        }
+    }
+
+    public boolean isWalking() {
+        return this.walking;
+    }
+
+    /**
+     * Tempo of the movement controller: in combat the combat movement speed (unchanged), out of combat the walk tempo
+     * coupled to the real speed (0.6-1.6 x) and a small fixed tempo difference per renegade, so they do not move in step.
+     */
+    public double movementAnimationSpeed() {
+        if (this.isAggressive()) {
+            return this.combatMoveState != CombatMoveState.STANCE ? this.combatMoveSpeed : 1.0D;
+        }
+        double tempo = 0.95D + 0.1D * ((this.getUUID().getMostSignificantBits() >>> 1) % 1000L) / 1000.0D;
+        return this.walking ? Mth.clamp(this.smoothedSpeed / WALK_REFERENCE_SPEED, 0.6D, 1.6D) * tempo : tempo;
+    }
+
+    /**
+     * GeckoLib's animation time is the client tickCount, which starts at 0 for every renegade loaded together, so their
+     * loops would run in step. A fixed offset from the UUID (stable across reloads) spreads them out; triggered
+     * animations are timed relative to their start and are not affected.
+     */
+    @Override
+    public double getTick(Object entity) {
+        return this.tickCount + Math.floorMod(this.getUUID().getLeastSignificantBits(), IDLE_LOOP_TICKS);
+    }
+
+    /**
      * Client: picks the combat movement animation from the actual movement relative to the body, with a two-tick
      * hysteresis between directions (ANARCHY's MinibossEntity#animTick).
      */
@@ -294,6 +347,7 @@ public abstract class RenegadeEntity extends Monster implements GeoEntity {
         float horizontalSpeed = (float) Math.sqrt(dx * dx + dz * dz);
         float alpha = horizontalSpeed > this.smoothedSpeed ? 0.6F : 0.2F;
         this.smoothedSpeed = Mth.lerp(alpha, this.smoothedSpeed, horizontalSpeed);
+        this.updateWalkState();
         boolean moving = this.smoothedSpeed > 0.012F;
         CombatMoveState newState = moving ? this.combatDirection(dx, dz, horizontalSpeed) : CombatMoveState.STANCE;
         this.combatMoveSpeed = Mth.clamp(this.smoothedSpeed / 0.16F, 0.55F, 1.9F);
@@ -527,9 +581,14 @@ public abstract class RenegadeEntity extends Monster implements GeoEntity {
                 continue;
             }
 
-            if (!RenegadesConfig.DROP_UNDAMAGED.get() && stack.isDamageableItem()) {
-                // Vanilla's random durability loss for mob equipment.
-                stack.setDamageValue(stack.getMaxDamage() - this.random.nextInt(1 + this.random.nextInt(Math.max(stack.getMaxDamage() - 3, 1))));
+            if (stack.isDamageableItem()) {
+                // Random remaining durability between dropDurabilityMin and dropDurabilityMax, never 0. Wear from the
+                // fight (e.g. a shield that blocked) does not count, only this roll.
+                double min = RenegadesConfig.DROP_DURABILITY_MIN.get();
+                double max = RenegadesConfig.DROP_DURABILITY_MAX.get();
+                double fraction = Math.min(min, max) + this.random.nextDouble() * Math.abs(max - min);
+                int remaining = Mth.clamp((int) Math.round(stack.getMaxDamage() * fraction), 1, stack.getMaxDamage());
+                stack.setDamageValue(stack.getMaxDamage() - remaining);
             }
             this.spawnAtLocation(stack);
             this.setItemSlot(slot, ItemStack.EMPTY);

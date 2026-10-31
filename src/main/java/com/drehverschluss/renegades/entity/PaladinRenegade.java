@@ -16,8 +16,6 @@ import software.bernie.geckolib.animation.PlayState;
 import software.bernie.geckolib.animation.RawAnimation;
 
 public class PaladinRenegade extends RenegadeEntity {
-    private static final RawAnimation WALK = RawAnimation.begin().thenLoop("animation.mob.walk_templar");
-    private static final RawAnimation IDLE = RawAnimation.begin().thenLoop("animation.mob.idle");
     private static final RawAnimation STANCE = RawAnimation.begin().thenLoop("animation.v2.jugg.stance");
     private static final RawAnimation ADVANCE = RawAnimation.begin().thenLoop("animation.v2.jugg.advance");
     private static final RawAnimation LATERAL_LEFT = RawAnimation.begin().thenLoop("animation.v2.jugg.lateral_left");
@@ -111,9 +109,8 @@ public class PaladinRenegade extends RenegadeEntity {
                     case BACKSTEP -> BACKSTEP;
                 });
             }
-            return state.setAndContinue(state.isMoving() ? WALK : IDLE);
-        }).setAnimationSpeedHandler(paladin -> paladin.isAggressive() && paladin.getCombatMoveState() != CombatMoveState.STANCE
-                ? (double) paladin.getCombatMoveSpeed() : 1.0D));
+            return state.setAndContinue(this.isWalking() ? WALK : IDLE);
+        }).setAnimationSpeedHandler(RenegadeEntity::movementAnimationSpeed));
 
         AnimationController<PaladinRenegade> actions = new AnimationController<>(this, ACTION_CONTROLLER, 0, state -> PlayState.STOP);
         for (String animation : PaladinBrain.ACTION_ANIMATIONS) {
