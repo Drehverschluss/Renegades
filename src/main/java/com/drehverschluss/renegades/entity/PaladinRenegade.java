@@ -99,7 +99,7 @@ public class PaladinRenegade extends RenegadeEntity {
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        controllers.add(new AnimationController<>(this, "movement", 5, state -> {
+        controllers.add(new MovementAnimationController<>(this, "movement", 5, state -> {
             if (this.isAggressive()) {
                 return state.setAndContinue(switch (this.getCombatMoveState()) {
                     case STANCE -> STANCE;

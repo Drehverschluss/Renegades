@@ -95,17 +95,18 @@ public abstract class RenegadeEntity extends Monster implements GeoEntity {
     private boolean walking;
 
     /**
-     * Out-of-combat animations shared by all classes.
+     * Out-of-combat animations shared by all classes: a calm stand and a plain walk with swinging arms.
      */
-    protected static final RawAnimation WALK = RawAnimation.begin().thenLoop("animation.mob.walk");
-    protected static final RawAnimation IDLE = RawAnimation.begin().thenLoop("animation.mob.idle");
+    protected static final RawAnimation WALK = RawAnimation.begin().thenLoop("walking");
+    protected static final RawAnimation IDLE = RawAnimation.begin().thenLoop("idle");
     // Horizontal speed (blocks per tick, smoothed) from which a renegade counts as walking, and below which it stops.
     private static final float WALK_START_SPEED = 0.02F;
     private static final float WALK_STOP_SPEED = 0.01F;
-    // Speed at which animation.mob.walk plays at its normal tempo; the tempo follows the real speed within 0.6-1.6.
-    private static final float WALK_REFERENCE_SPEED = 0.075F;
-    // Length of the idle and walk loops in ticks: the per-renegade animation time offset lies within one loop.
-    private static final int IDLE_LOOP_TICKS = 40;
+    // Speed at which "walking" (one step every second) plays at its normal tempo; the tempo follows the real speed
+    // within 0.6-2.0, so wandering (about 0.1 blocks per tick) gets about one step every half second.
+    private static final float WALK_REFERENCE_SPEED = 0.05F;
+    // Range of the per-renegade start phase of the idle and walk loops, in ticks.
+    private static final int ANIMATION_PHASE_TICKS = 40;
 
     /**
      * Movement animation while in combat: standing in stance, advancing, strafing or backing off.
@@ -317,24 +318,22 @@ public abstract class RenegadeEntity extends Monster implements GeoEntity {
 
     /**
      * Tempo of the movement controller: in combat the combat movement speed (unchanged), out of combat the walk tempo
-     * coupled to the real speed (0.6-1.6 x) and a small fixed tempo difference per renegade, so they do not move in step.
+     * coupled to the real speed (0.6-2.0 x) and a small fixed tempo difference per renegade, so they do not move in step.
      */
     public double movementAnimationSpeed() {
         if (this.isAggressive()) {
             return this.combatMoveState != CombatMoveState.STANCE ? this.combatMoveSpeed : 1.0D;
         }
         double tempo = 0.95D + 0.1D * ((this.getUUID().getMostSignificantBits() >>> 1) % 1000L) / 1000.0D;
-        return this.walking ? Mth.clamp(this.smoothedSpeed / WALK_REFERENCE_SPEED, 0.6D, 1.6D) * tempo : tempo;
+        return this.walking ? Mth.clamp(this.smoothedSpeed / WALK_REFERENCE_SPEED, 0.6D, 2.0D) * tempo : tempo;
     }
 
     /**
-     * GeckoLib's animation time is the client tickCount, which starts at 0 for every renegade loaded together, so their
-     * loops would run in step. A fixed offset from the UUID (stable across reloads) spreads them out; triggered
-     * animations are timed relative to their start and are not affected.
+     * Fixed start phase (from the UUID, stable across reloads) of the idle and walk loops; see
+     * MovementAnimationController.
      */
-    @Override
-    public double getTick(Object entity) {
-        return this.tickCount + Math.floorMod(this.getUUID().getLeastSignificantBits(), IDLE_LOOP_TICKS);
+    public double animationPhaseTicks() {
+        return Math.floorMod(this.getUUID().getLeastSignificantBits(), ANIMATION_PHASE_TICKS);
     }
 
     /**

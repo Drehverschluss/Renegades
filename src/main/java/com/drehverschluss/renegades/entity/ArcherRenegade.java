@@ -198,7 +198,7 @@ public class ArcherRenegade extends RenegadeEntity implements RangedAttackMob, C
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        controllers.add(new AnimationController<>(this, "movement", 5, state -> {
+        controllers.add(new MovementAnimationController<>(this, "movement", 5, state -> {
             if (this.isAggressive()) {
                 boolean bow = this.getMainHandItem().getItem() instanceof BowItem;
                 return state.setAndContinue(switch (this.getCombatMoveState()) {
