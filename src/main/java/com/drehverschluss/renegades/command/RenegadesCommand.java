@@ -1,5 +1,6 @@
 package com.drehverschluss.renegades.command;
 
+import com.drehverschluss.renegades.combat.CombatProfiler;
 import com.drehverschluss.renegades.config.RenegadesConfig;
 import com.drehverschluss.renegades.entity.RenegadeEntity;
 import com.drehverschluss.renegades.equipment.EquipmentPoolEntry;
@@ -35,7 +36,7 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.event.EventHooks;
 
 /**
- * Debug commands (permission level 2): /renegades pools|reequip|groups|spawngroup|nearby.
+ * Debug commands (permission level 2): /renegades pools|reequip|groups|spawngroup|nearby|stats|profile.
  */
 public final class RenegadesCommand {
     private RenegadesCommand() {
@@ -64,6 +65,19 @@ public final class RenegadesCommand {
                                 .executes(context -> spawnGroup(context.getSource(), ResourceLocationArgument.getId(context, "id")))))
                 .then(Commands.literal("nearby")
                         .executes(context -> listNearby(context.getSource())))
+                .then(Commands.literal("profile")
+                        .then(Commands.literal("start")
+                                .executes(context -> {
+                                    CombatProfiler.begin(context.getSource().getServer().getTickCount());
+                                    context.getSource().sendSuccess(() -> Component.literal("Renegade AI profiling started"), false);
+                                    return 1;
+                                }))
+                        .then(Commands.literal("stop")
+                                .executes(context -> {
+                                    String report = CombatProfiler.finish(context.getSource().getServer().getTickCount());
+                                    context.getSource().sendSuccess(() -> Component.literal(report), false);
+                                    return 1;
+                                })))
                 .then(Commands.literal("stats")
                         .executes(context -> showStats(context.getSource()))
                         .then(Commands.literal("reset")

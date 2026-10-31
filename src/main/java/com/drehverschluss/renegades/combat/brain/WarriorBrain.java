@@ -229,7 +229,7 @@ public class WarriorBrain extends MobBrain {
             return false;
         }
 
-        this.cooldowns.trigger(PARRY_COOLDOWN, Math.max(160, 320 - (int) (320.0 * this.entity.getCooldownCoeff())));
+        this.cooldowns.trigger(PARRY_COOLDOWN, this.entity.scaledCooldown(320, 1.0, 160));
         this.entity.playActionAnimation(RenegadeEntity.ACTION_CONTROLLER, PARRY);
         return true;
     }

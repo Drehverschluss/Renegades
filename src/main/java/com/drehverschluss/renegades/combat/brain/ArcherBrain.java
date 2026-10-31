@@ -307,7 +307,7 @@ public class ArcherBrain extends MobBrain {
             this.cooldowns.trigger(REPOSITION_COOLDOWN, 40);
             return;
         }
-        this.cooldowns.trigger(REPOSITION_COOLDOWN, REPOSITION_CD - (int) (REPOSITION_CD * this.entity.getCooldownCoeff() * 0.4));
+        this.cooldowns.trigger(REPOSITION_COOLDOWN, this.entity.scaledCooldown(REPOSITION_CD, 0.4, 1));
         this.relocateGoal = destination;
         this.relocateTicks = 0;
         this.relocateRecomputed = false;

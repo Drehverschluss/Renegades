@@ -1,6 +1,7 @@
 package com.drehverschluss.renegades.entity;
 
 import com.drehverschluss.renegades.Renegades;
+import com.drehverschluss.renegades.combat.CombatProfiler;
 import com.drehverschluss.renegades.combat.MovementOwner;
 import com.drehverschluss.renegades.combat.brain.MobBrain;
 import com.drehverschluss.renegades.combat.brain.MobBrainGoal;
@@ -62,6 +63,7 @@ public abstract class RenegadeEntity extends Monster implements GeoEntity {
     public static final String ACTION_CONTROLLER = "action";
     private static final String TAG_GROUP = "RenegadesGroup";
     private static final double COOLDOWN_ALLY_RADIUS = 32.0D;
+    private static final int MIN_SCALED_COOLDOWN = 20;
     private static final int MAX_FALL_DISTANCE = 3;
     private static final EquipmentSlot[] DROPPABLE_SLOTS = {
             EquipmentSlot.MAINHAND, EquipmentSlot.OFFHAND, EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET
@@ -75,6 +77,9 @@ public abstract class RenegadeEntity extends Monster implements GeoEntity {
     private SpawnGroupTemplate pendingGroup;
     // Whether the pending group comes from a real natural spawn (counted in SpawnStats) rather than a command.
     private boolean countGroupInStats;
+    // Set on spawn: worn gear can raise max health (e.g. Paladins armor), but vanilla applies equipment attributes only
+    // in the first tick, after finalizeSpawn already set the health.
+    private boolean fillHealthAfterFirstTick;
     // Server only: created in registerGoals, which the Mob constructor calls only on the server.
     @Nullable
     private MobBrain brain;
@@ -144,15 +149,42 @@ public abstract class RenegadeEntity extends Monster implements GeoEntity {
     }
 
     /**
-     * Factor for combat cooldowns, higher with more renegades fighting nearby (ANARCHY's MinibossEntity#getCooldownCoeff).
+     * A combat cooldown, shortened like in ANARCHY (MinibossEntity#getCooldownCoeff): cooldown = base - base x strength x
+     * coefficient, with coefficient = max(1, renegades^0.585) + 0.5 x gaussian noise, where renegades counts this one and
+     * the renegades within 32 blocks while it has a target. Alone (coefficient ~1) this stays exactly as in ANARCHY (with
+     * strength 0.4 about 60 % of the base on average). The extra shortening by nearby renegades is limited: at most 25 %
+     * below the solo value of the same roll, and never below 20 ticks (or the base, if that is shorter);
+     * cooldownGroupScaling = false drops the group part (always the solo value).
+     *
+     * @param strength how strongly the coefficient shortens the base (0.4 for actions)
+     * @param floor    lowest cooldown of the original formula (e.g. 160 for the warrior's parry)
      */
-    public double getCooldownCoeff() {
-        double renegades = 1.0D;
+    public int scaledCooldown(int base, double strength, int floor) {
+        if (base <= 0) {
+            return base;
+        }
+        double noise = 0.5D * this.getRandom().nextGaussian();
+        int lowest = Math.max(1, floor);
+        int solo = Math.max(lowest, base - (int) (base * Math.max(0.1D, 1.0D + noise) * strength));
+        int result = solo;
+        if (RenegadesConfig.COOLDOWN_GROUP_SCALING.get()) {
+            double group = Math.max(0.1D, Math.max(1.0D, Math.pow(this.renegadesFightingNearby(), 0.58496250072D)) + noise);
+            int grouped = Math.max(lowest, base - (int) (base * group * strength));
+            result = Math.max(grouped, (int) Math.ceil(solo * 0.75D));
+        }
+        return Math.max(result, Math.min(base, MIN_SCALED_COOLDOWN));
+    }
+
+    /**
+     * This renegade plus the renegades within 32 blocks, counted only while it has a target (1 otherwise).
+     */
+    private int renegadesFightingNearby() {
+        int renegades = 1;
         if (!this.level().isClientSide() && this.getTarget() != null) {
             renegades += this.level().getEntitiesOfClass(RenegadeEntity.class, this.getBoundingBox().inflate(COOLDOWN_ALLY_RADIUS),
                     other -> other != this && other.distanceTo(this) < COOLDOWN_ALLY_RADIUS).size();
         }
-        return Math.max(0.1D, Math.max(1.0D, Math.pow(renegades, 0.58496250072D)) + 0.5D * this.getRandom().nextGaussian());
+        return renegades;
     }
 
     /**
@@ -320,6 +352,7 @@ public abstract class RenegadeEntity extends Monster implements GeoEntity {
         this.applyStrengthMultipliers();
         EquipmentSelector.equipOnSpawn(this, level.getLevel());
         this.setHealth(this.getMaxHealth());
+        this.fillHealthAfterFirstTick = true;
 
         // Group members already carry their group id and never roll a group of their own.
         if (spawnType == MobSpawnType.NATURAL && this.groupId == null && this.pendingGroup == null) {
@@ -384,12 +417,22 @@ public abstract class RenegadeEntity extends Monster implements GeoEntity {
 
     @Override
     public void tick() {
+        long start = CombatProfiler.start();
         super.tick();
         if (this.level().isClientSide) {
             this.updateCombatMoveState();
-        } else if (this.pendingGroup != null) {
-            this.spawnPendingGroup();
+        } else {
+            if (this.fillHealthAfterFirstTick) {
+                this.fillHealthAfterFirstTick = false;
+                if (this.getHealth() < this.getMaxHealth()) {
+                    this.setHealth(this.getMaxHealth());
+                }
+            }
+            if (this.pendingGroup != null) {
+                this.spawnPendingGroup();
+            }
         }
+        CombatProfiler.end(CombatProfiler.Section.ENTITY_TICK, start);
     }
 
     /**
@@ -424,6 +467,10 @@ public abstract class RenegadeEntity extends Monster implements GeoEntity {
             }
             if (this.groupId != null && source.getEntity() instanceof Player player) {
                 RenegadeGroups.alertGroup(this, player);
+            }
+            if (source.getEntity() instanceof RenegadeEntity attacker && attacker != this) {
+                // Should never happen (renegades never harm each other unless one targets the other); debug aid.
+                Renegades.LOGGER.debug("Renegade {} was hit by renegade {} ({}, {} damage)", this, attacker, source.getMsgId(), amount);
             }
         }
         return hurt;

@@ -390,7 +390,7 @@ public class RogueBrain extends MobBrain {
             return false;
         }
 
-        this.cooldowns.trigger(DODGE_COOLDOWN, Math.max(80, 160 - (int) (160.0 * this.entity.getCooldownCoeff())));
+        this.cooldowns.trigger(DODGE_COOLDOWN, this.entity.scaledCooldown(160, 1.0, 80));
         Vec3 toTarget = GroundLocomotion.horizontal(target.position().subtract(this.entity.position()));
         if (toTarget.lengthSqr() < 1.0E-4) {
             toTarget = this.locomotion.facing();

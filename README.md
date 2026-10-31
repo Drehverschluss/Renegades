@@ -148,6 +148,15 @@ only dealt in the active window, when the weapon actually swings through its tar
 (attack damage incl. weapon and level bonuses, weapon enchantments such as Sharpness and Fire Aspect, blockable with a
 shield) and needs line of sight, so attacks never go through walls.
 
+**Cooldowns:** each attack has a cooldown, shortened at random like in ANARCHY – about 40 % on average for a renegade
+fighting alone. Renegades fighting near other renegades (within 32 blocks) get somewhat shorter cooldowns, but at most
+25 % shorter than alone, and no cooldown is ever shorter than 1 second (`cooldownGroupScaling` in `[combat]`,
+default `true`; `false` = always like alone). The priest's support spells always use their full cooldown.
+
+**Performance:** measured on a dev server, 20 renegades fighting at once cost about 0.8–1.0 ms per server tick
+(about 40 µs per renegade incl. vanilla movement); renegades without a target only run the normal mob AI.
+`/renegades profile start|stop` shows where the time goes.
+
 **Warrior:** alternates heavy sweeps right-to-left and left-to-right; closes gaps with a dash that chains into a rising
 dash cut; strafes and backs off around its target between attacks. When hit in melee from close range while not
 attacking, it sometimes parries: half damage and an immediate counter-strike (`enableParry` in `[combat]`, default
@@ -177,7 +186,8 @@ the front; an axe disables the shield for 5 seconds and ends the brace), without
 bracing it is hardly pushed back. Below 20 % health it makes its last stand: no more bracing, faster, and its big
 attacks are ready again at once. Its equipment is either a two-handed weapon or a one-handed weapon with a shield.
 
-**Archer:** fights with a bow or a crossbow and keeps 8–13 blocks from its target. Standing still, it shoots aimed
+**Archer:** fights with a bow or a crossbow and keeps 8–13 blocks from its target (with a bow it stands turned sideways,
+bow arm towards the target; with a crossbow it holds it with both hands). Standing still, it shoots aimed
 shots and four-arrow volleys; when the target gets too close, too far or out of sight, or an ally stands in the line of
 fire, it runs to a new firing position with a clear view (circling around the target instead of past it), snap-shooting
 and throwing traps on the way. When the target lowers its guard (stops attacking, lands, drinks or eats, is low on
@@ -281,7 +291,8 @@ left out first).
 **Debug commands**: `/renegades groups <leader>` lists the templates, `/renegades spawngroup <id>` spawns one at your
 position like a natural spawn, `/renegades nearby` lists the renegades within `capRadius` with group, spawn type,
 persistence, health, attack damage, invisibility and the combat state, `/renegades stats [reset]` shows the spawn timer's attempts, failures by reason
-and spawns since server start (extrapolated per hour).
+and spawns since server start (extrapolated per hour), `/renegades profile start|stop` measures the time the renegade
+AI takes per server tick (entity tick, brain, line of sight, decisions, attacks, hazard and path checks).
 
 ### Drop rules
 

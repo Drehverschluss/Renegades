@@ -32,6 +32,7 @@ public final class RenegadesConfig {
     public static final ModConfigSpec.BooleanValue ENABLE_NOVA;
     public static final ModConfigSpec.BooleanValue ENABLE_PRIEST_HEALING;
     public static final ModConfigSpec.DoubleValue HEALING_MULTIPLIER;
+    public static final ModConfigSpec.BooleanValue COOLDOWN_GROUP_SCALING;
 
     static {
         ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
@@ -139,6 +140,11 @@ public final class RenegadesConfig {
         HEALING_MULTIPLIER = builder
                 .comment("Multiplier for all healing done by renegades. The caps per heal (e.g. at most 25 % of the target's max health) still apply.")
                 .defineInRange("healingMultiplier", 1.0D, 0.0D, 5.0D);
+
+        COOLDOWN_GROUP_SCALING = builder
+                .comment("If true, renegades fighting near other renegades get somewhat shorter attack cooldowns: at most 25 % shorter than alone, never below 1 second.",
+                        "If false, cooldowns are always as for a renegade fighting alone.")
+                .define("cooldownGroupScaling", true);
 
         builder.pop();
         SPEC = builder.build();

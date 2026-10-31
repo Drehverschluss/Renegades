@@ -40,6 +40,10 @@ public class ArcherRenegade extends RenegadeEntity implements RangedAttackMob, C
     private static final RawAnimation LATERAL_LEFT = RawAnimation.begin().thenLoop("animation.v2.merc.lateral_left");
     private static final RawAnimation LATERAL_RIGHT = RawAnimation.begin().thenLoop("animation.v2.merc.lateral_right");
     private static final RawAnimation BACKSTEP = RawAnimation.begin().thenLoop("animation.v2.merc.backstep");
+    // Older ANARCHY bow poses (body turned sideways, bow arm stretched towards the target), used with a bow.
+    private static final RawAnimation BOW_STANCE = RawAnimation.begin().thenLoop("animation.mob.idleshoot");
+    private static final RawAnimation BOW_WALK = RawAnimation.begin().thenLoop("animation.mob.shootwalk");
+    private static final RawAnimation BOW_BACKSTEP = RawAnimation.begin().thenLoop("animation.unknown.walk_backwards_shoot");
     // Same as skeletons and pillagers: arrow speed 1.6, spread 14 - 4 x difficulty.
     private static final float SHOT_VELOCITY = 1.6F;
     // Full draw of a bow (BowItem#getPowerForTime at 20 ticks); vanilla base arrow damage is 2 x this.
@@ -198,12 +202,13 @@ public class ArcherRenegade extends RenegadeEntity implements RangedAttackMob, C
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
         controllers.add(new AnimationController<>(this, "movement", 5, state -> {
             if (this.isAggressive()) {
+                boolean bow = this.getMainHandItem().getItem() instanceof BowItem;
                 return state.setAndContinue(switch (this.getCombatMoveState()) {
-                    case STANCE -> STANCE;
-                    case ADVANCE -> ADVANCE;
-                    case LATERAL_LEFT -> LATERAL_LEFT;
-                    case LATERAL_RIGHT -> LATERAL_RIGHT;
-                    case BACKSTEP -> BACKSTEP;
+                    case STANCE -> bow ? BOW_STANCE : STANCE;
+                    case ADVANCE -> bow ? BOW_WALK : ADVANCE;
+                    case LATERAL_LEFT -> bow ? BOW_WALK : LATERAL_LEFT;
+                    case LATERAL_RIGHT -> bow ? BOW_WALK : LATERAL_RIGHT;
+                    case BACKSTEP -> bow ? BOW_BACKSTEP : BACKSTEP;
                 });
             }
             return state.setAndContinue(state.isMoving() ? WALK : IDLE);

@@ -396,6 +396,13 @@ public final class GroundLocomotion {
      * both front corners of the hitbox.
      */
     private boolean isSafeStep(Vec3 velocity) {
+        long start = CombatProfiler.start();
+        boolean safe = this.checkSafeStep(velocity);
+        CombatProfiler.end(CombatProfiler.Section.HAZARD, start);
+        return safe;
+    }
+
+    private boolean checkSafeStep(Vec3 velocity) {
         Vec3 flat = horizontal(velocity);
         double length = flat.length();
         if (length < REST_EPSILON) {

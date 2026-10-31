@@ -334,8 +334,8 @@ public class PriestBrain extends MobBrain {
     }
 
     /**
-     * Support spells keep their full cooldown: the usual shortening with more renegades nearby (up to 100 %, see
-     * RenegadeEntity#getCooldownCoeff) would let a priest in a group heal almost without pause.
+     * Support spells keep their full cooldown: the usual shortening (see RenegadeEntity#scaledCooldown, about 40 %
+     * alone and more in groups) would let a priest heal almost without pause.
      */
     private void startSupport(CombatAction action) {
         if (this.startAction(action)) {

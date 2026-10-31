@@ -6,6 +6,7 @@ import com.drehverschluss.renegades.combat.ActionRunner;
 import com.drehverschluss.renegades.combat.AttackPhase;
 import com.drehverschluss.renegades.combat.CombatAction;
 import com.drehverschluss.renegades.combat.CombatDebug;
+import com.drehverschluss.renegades.combat.CombatProfiler;
 import com.drehverschluss.renegades.combat.GroundLocomotion;
 import com.drehverschluss.renegades.combat.MovementProfile;
 import com.drehverschluss.renegades.combat.SlashVisual;
@@ -79,11 +80,16 @@ public abstract class MobBrain {
 
     public void tick() {
         if (!this.entity.level().isClientSide()) {
+            long brainStart = CombatProfiler.start();
             this.cooldowns.tick();
+            long stimulusStart = CombatProfiler.start();
             this.stimulus.refresh();
+            CombatProfiler.end(CombatProfiler.Section.STIMULUS, stimulusStart);
             this.checkPhaseTransitions();
             this.locomotion.beginTick();
+            long actionsStart = CombatProfiler.start();
             this.actions.tick();
+            CombatProfiler.end(CombatProfiler.Section.ACTIONS, actionsStart);
             this.entity.setPerforming(this.actions.isBusy());
             this.applyActionTracking();
             if (--this.stanceEvalCountdown <= 0) {
@@ -96,9 +102,12 @@ public abstract class MobBrain {
                 this.evaluateLayer(this.combatStateTransitions(), false);
             }
 
+            long decideStart = CombatProfiler.start();
             this.executeCurrentCombatState();
             this.locomotion.endTick();
+            CombatProfiler.end(CombatProfiler.Section.DECIDE, decideStart);
             CombatDebug.verify(this.entity, this.locomotion, this.actions);
+            CombatProfiler.end(CombatProfiler.Section.BRAIN, brainStart);
         }
     }
 
@@ -126,7 +135,7 @@ public abstract class MobBrain {
             }
 
             int base = (int) (action.cooldownTicks() * cooldownScale);
-            this.cooldowns.trigger(action.id(), Math.max(1, base - (int) (base * this.entity.getCooldownCoeff() * 0.4)));
+            this.cooldowns.trigger(action.id(), this.entity.scaledCooldown(base, 0.4, 1));
             this.onActionStarted(action);
             return true;
         } else {
@@ -326,7 +335,9 @@ public abstract class MobBrain {
 
         if (!this.unreachable || --this.pathCheckCountdown <= 0) {
             this.pathCheckCountdown = PATH_CHECK_INTERVAL;
+            long pathStart = CombatProfiler.start();
             Path path = this.entity.getNavigation().createPath(target, 0);
+            CombatProfiler.end(CombatProfiler.Section.PATH, pathStart);
             this.pathReachesTarget = path != null && path.canReach();
         }
         this.unreachable = true;
