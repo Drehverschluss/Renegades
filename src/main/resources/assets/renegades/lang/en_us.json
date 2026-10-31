@@ -1,4 +1,7 @@
 {
   "entity.renegades.warrior": "Warrior Renegade",
-  "item.renegades.warrior_spawn_egg": "Warrior Renegade Spawn Egg"
+  "item.renegades.warrior_spawn_egg": "Warrior Renegade Spawn Egg",
+  "entity.renegades.rogue": "Rogue Renegade",
+  "item.renegades.rogue_spawn_egg": "Rogue Renegade Spawn Egg",
+  "entity.renegades.throwing_knife": "Throwing Knife"
 }

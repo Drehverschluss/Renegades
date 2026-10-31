@@ -12,6 +12,9 @@ public final class ModItems {
     public static final DeferredItem<DeferredSpawnEggItem> WARRIOR_SPAWN_EGG = ITEMS.register("warrior_spawn_egg",
             () -> new DeferredSpawnEggItem(ModEntityTypes.WARRIOR, 0x9A9A9A, 0x5C3A21, new Item.Properties()));
 
+    public static final DeferredItem<DeferredSpawnEggItem> ROGUE_SPAWN_EGG = ITEMS.register("rogue_spawn_egg",
+            () -> new DeferredSpawnEggItem(ModEntityTypes.ROGUE, 0x2E2A33, 0x7A1E1E, new Item.Properties()));
+
     private ModItems() {
     }
 }

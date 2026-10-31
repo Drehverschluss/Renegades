@@ -23,6 +23,8 @@ public class RenegadeRenderer extends GeoEntityRenderer<RenegadeEntity> {
     private final ArmorModelApiRenderer armorModelApiRenderer;
     @Nullable
     private BakedGeoModel currentModel;
+    // True while the bones of a fully invisible renegade are walked only for its armor and held items.
+    private boolean hideBody;
 
     public RenegadeRenderer(EntityRendererProvider.Context context) {
         super(context, new RenegadeModel());
@@ -47,6 +49,20 @@ public class RenegadeRenderer extends GeoEntityRenderer<RenegadeEntity> {
         }
     }
 
+    /**
+     * GeckoLib skips the whole bone pass for an invisible entity (null render type), which would also hide armor and
+     * held items. Like vanilla mobs, a renegade under Invisibility keeps showing its armor and items: the bones are
+     * still walked with a buffer that discards the body's vertices.
+     */
+    @Override
+    public void actuallyRender(PoseStack poseStack, RenegadeEntity animatable, BakedGeoModel model, @Nullable RenderType renderType,
+                               MultiBufferSource bufferSource, @Nullable VertexConsumer buffer, boolean isReRender, float partialTick,
+                               int packedLight, int packedOverlay, int colour) {
+        this.hideBody = !isReRender && buffer == null && renderType == null && animatable.isInvisible();
+        super.actuallyRender(poseStack, animatable, model, renderType, bufferSource, this.hideBody ? DiscardingVertexConsumer.INSTANCE : buffer,
+                isReRender, partialTick, packedLight, packedOverlay, colour);
+    }
+
     @Override
     public void renderRecursively(PoseStack poseStack, RenegadeEntity animatable, GeoBone bone, RenderType renderType, MultiBufferSource bufferSource,
                                   VertexConsumer buffer, boolean isReRender, float partialTick, int packedLight, int packedOverlay, int colour) {
@@ -63,7 +79,7 @@ public class RenegadeRenderer extends GeoEntityRenderer<RenegadeEntity> {
     public void renderCubesOfBone(PoseStack poseStack, GeoBone bone, VertexConsumer buffer, int packedLight, int packedOverlay, int colour) {
         // Reference bones stay fully processed (transforms, matrix tracking, render layers); only their cubes are skipped.
         // This does not rely on the "neverRender" flag in the geo file, which Blockbench may drop on re-export.
-        if (RenegadeBones.REFERENCE_ONLY.contains(bone.getName())) {
+        if (this.hideBody || RenegadeBones.REFERENCE_ONLY.contains(bone.getName())) {
             return;
         }
 
@@ -74,5 +90,40 @@ public class RenegadeRenderer extends GeoEntityRenderer<RenegadeEntity> {
     public void doPostRenderCleanup() {
         super.doPostRenderCleanup();
         this.currentModel = null;
+        this.hideBody = false;
+    }
+
+    private enum DiscardingVertexConsumer implements VertexConsumer {
+        INSTANCE;
+
+        @Override
+        public VertexConsumer addVertex(float x, float y, float z) {
+            return this;
+        }
+
+        @Override
+        public VertexConsumer setColor(int red, int green, int blue, int alpha) {
+            return this;
+        }
+
+        @Override
+        public VertexConsumer setUv(float u, float v) {
+            return this;
+        }
+
+        @Override
+        public VertexConsumer setUv1(int u, int v) {
+            return this;
+        }
+
+        @Override
+        public VertexConsumer setUv2(int u, int v) {
+            return this;
+        }
+
+        @Override
+        public VertexConsumer setNormal(float x, float y, float z) {
+            return this;
+        }
     }
 }

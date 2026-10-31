@@ -24,6 +24,8 @@ public final class RenegadesConfig {
     public static final ModConfigSpec.IntValue CAP_RADIUS;
     public static final ModConfigSpec.BooleanValue PERSISTENT_NATURAL_SPAWNS;
     public static final ModConfigSpec.BooleanValue ENABLE_PARRY;
+    public static final ModConfigSpec.BooleanValue ENABLE_DODGE;
+    public static final ModConfigSpec.BooleanValue ENABLE_STEALTH;
 
     static {
         ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
@@ -99,6 +101,14 @@ public final class RenegadesConfig {
         ENABLE_PARRY = builder
                 .comment("If true, renegades that can parry (e.g. the warrior) sometimes parry close melee hits: half damage and a counter-strike.")
                 .define("enableParry", true);
+
+        ENABLE_DODGE = builder
+                .comment("If true, renegades that can dodge (e.g. the rogue) sometimes evade a heavy hit (more than 4 damage) completely with a sidestep.")
+                .define("enableDodge", true);
+
+        ENABLE_STEALTH = builder
+                .comment("If true, renegades that use stealth (e.g. the rogue) turn invisible while stalking their target. Armor and held items stay visible.")
+                .define("enableStealth", true);
 
         builder.pop();
         SPEC = builder.build();

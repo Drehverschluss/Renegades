@@ -1,6 +1,7 @@
 package com.drehverschluss.renegades;
 
 import com.drehverschluss.renegades.client.renderer.RenegadeRenderer;
+import com.drehverschluss.renegades.client.renderer.ThrowingKnifeRenderer;
 import com.drehverschluss.renegades.registry.ModEntityTypes;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
@@ -15,5 +16,7 @@ public class RenegadesClient {
 
     private static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerEntityRenderer(ModEntityTypes.WARRIOR.get(), RenegadeRenderer::new);
+        event.registerEntityRenderer(ModEntityTypes.ROGUE.get(), RenegadeRenderer::new);
+        event.registerEntityRenderer(ModEntityTypes.THROWING_KNIFE.get(), ThrowingKnifeRenderer::new);
     }
 }

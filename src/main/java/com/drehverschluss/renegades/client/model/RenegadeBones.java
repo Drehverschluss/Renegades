@@ -16,6 +16,7 @@ public final class RenegadeBones {
     public static final String ARMOR_RIGHT_BOOT = "armorRightBoot";
     public static final String ARMOR_LEFT_BOOT = "armorLeftBoot";
     public static final String ITEM = "itemBone";
+    public static final String LEFT_ITEM = "leftItemBone";
 
     /**
      * Bones whose cubes only serve as size reference for armor rendering and must never be drawn.

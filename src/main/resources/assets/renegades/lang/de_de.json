@@ -1,4 +1,7 @@
 {
   "entity.renegades.warrior": "Abtrünniger Krieger",
-  "item.renegades.warrior_spawn_egg": "Spawn-Ei (Abtrünniger Krieger)"
+  "item.renegades.warrior_spawn_egg": "Spawn-Ei (Abtrünniger Krieger)",
+  "entity.renegades.rogue": "Abtrünniger Schurke",
+  "item.renegades.rogue_spawn_egg": "Spawn-Ei (Abtrünniger Schurke)",
+  "entity.renegades.throwing_knife": "Wurfmesser"
 }

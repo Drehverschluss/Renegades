@@ -14,6 +14,8 @@ Combat system based on [ANARCHY - RPG Minibosses](https://github.com/cleannroost
 - `com.drehverschluss.renegades.combat` (actions, action runner, swing execution, ground locomotion, attack geometry) and
   `combat.brain` (mob brain, brain goal, stimulus): ported from `entity.combat` and `entity.brain`, adapted to GeckoLib.
 - `WarriorBrain`: based on `TemplarBrain`.
+- `RogueBrain`: based on `RogueBrain` (knife throw as an own projectile instead of the ability system).
+- `RogueNavigation`: based on `TricksterEntity$TricksterNavigation` and `RogueNodeMaker`.
 
 ## Optional integrations
 

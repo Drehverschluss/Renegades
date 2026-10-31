@@ -111,6 +111,12 @@
 					]
 				},
 				{
+					"name": "leftItemBone",
+					"parent": "leftArm",
+					"pivot": [6, 14, 0],
+					"rotation": [45, 0, 0]
+				},
+				{
 					"name": "leftLeg",
 					"parent": "body",
 					"pivot": [1.9, 12, 0]

@@ -1,0 +1,86 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "rogues"
+    }
+  ],
+  "entity": "renegades:rogue",
+  "fallback": false,
+  "entries": [
+    {
+      "id": "rogues_tier1",
+      "conditions": {
+        "dimensions": ["minecraft:overworld"],
+        "max_distance": 1500
+      },
+      "equipment": {
+        "head": "rogues:rogue_armor_head",
+        "chest": "rogues:rogue_armor_chest",
+        "legs": "rogues:rogue_armor_legs",
+        "feet": "rogues:rogue_armor_feet",
+        "mainhand": ["rogues:iron_dagger", "rogues:iron_sickle"],
+        "offhand": "rogues:iron_dagger"
+      }
+    },
+    {
+      "id": "rogues_tier2",
+      "conditions": {
+        "dimensions": ["minecraft:overworld"],
+        "min_distance": 1500,
+        "max_distance": 4000
+      },
+      "equipment": {
+        "head": "rogues:assassin_armor_head",
+        "chest": "rogues:assassin_armor_chest",
+        "legs": "rogues:assassin_armor_legs",
+        "feet": "rogues:assassin_armor_feet",
+        "mainhand": ["rogues:diamond_dagger", "rogues:diamond_sickle"],
+        "offhand": "rogues:diamond_dagger"
+      }
+    },
+    {
+      "id": "rogues_tier2_nether",
+      "conditions": {
+        "dimensions": ["minecraft:the_nether"]
+      },
+      "equipment": {
+        "head": "rogues:assassin_armor_head",
+        "chest": "rogues:assassin_armor_chest",
+        "legs": "rogues:assassin_armor_legs",
+        "feet": "rogues:assassin_armor_feet",
+        "mainhand": ["rogues:diamond_dagger", "rogues:diamond_sickle"],
+        "offhand": "rogues:diamond_dagger"
+      }
+    },
+    {
+      "id": "rogues_tier3",
+      "conditions": {
+        "dimensions": ["minecraft:overworld"],
+        "min_distance": 4000
+      },
+      "equipment": {
+        "head": "rogues:netherite_assassin_armor_head",
+        "chest": "rogues:netherite_assassin_armor_chest",
+        "legs": "rogues:netherite_assassin_armor_legs",
+        "feet": "rogues:netherite_assassin_armor_feet",
+        "mainhand": ["rogues:netherite_dagger", "rogues:netherite_sickle"],
+        "offhand": "rogues:netherite_dagger"
+      }
+    },
+    {
+      "id": "rogues_tier3_end",
+      "conditions": {
+        "dimensions": ["minecraft:the_end"]
+      },
+      "equipment": {
+        "head": "rogues:netherite_assassin_armor_head",
+        "chest": "rogues:netherite_assassin_armor_chest",
+        "legs": "rogues:netherite_assassin_armor_legs",
+        "feet": "rogues:netherite_assassin_armor_feet",
+        "mainhand": ["rogues:netherite_dagger", "rogues:netherite_sickle"],
+        "offhand": "rogues:netherite_dagger"
+      }
+    }
+  ]
+}
