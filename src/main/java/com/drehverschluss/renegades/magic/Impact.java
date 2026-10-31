@@ -1,0 +1,120 @@
+// Based on Impact from ANARCHY - RPG Minibosses by cleannrooster (CC0-1.0).
+package com.drehverschluss.renegades.magic;
+
+import javax.annotation.Nullable;
+import net.minecraft.core.Holder;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.phys.Vec3;
+
+/**
+ * What a spell does to each target it reaches.
+ */
+public sealed interface Impact permits Impact.Damage, Impact.Ignite, Impact.ApplyEffect, Impact.ApplyToCaster, Impact.Knockback, Impact.Heal {
+    void apply(ImpactContext context, LivingEntity target);
+
+    /**
+     * Status effect on the target (e.g. slowness of frost spells).
+     */
+    record ApplyEffect(Holder<MobEffect> effect, int durationTicks, int amplifier) implements Impact {
+        @Override
+        public void apply(ImpactContext context, LivingEntity target) {
+            target.addEffect(new MobEffectInstance(this.effect, this.durationTicks, this.amplifier), context.caster());
+        }
+    }
+
+    /**
+     * Status effect on the caster (e.g. a buff when the spell lands).
+     */
+    record ApplyToCaster(Holder<MobEffect> effect, int durationTicks, int amplifier) implements Impact {
+        @Override
+        public void apply(ImpactContext context, LivingEntity target) {
+            context.caster().addEffect(new MobEffectInstance(this.effect, this.durationTicks, this.amplifier, false, false));
+        }
+    }
+
+    /**
+     * Spell damage: the caster's power for the school (see MagicBackend) times the coefficient.
+     *
+     * @param bypassIframes hits even right after another hit (rapid bolts and bursts)
+     * @param school        overrides the spell's school for the damage type (null = the spell's school)
+     */
+    record Damage(float coefficient, float knockback, boolean bypassIframes, @Nullable MagicSchool school) implements Impact {
+        public Damage(float coefficient, float knockback, boolean bypassIframes) {
+            this(coefficient, knockback, bypassIframes, null);
+        }
+
+        public static Damage of(float coefficient) {
+            return new Damage(coefficient, 1.0F, true);
+        }
+
+        public static Damage as(MagicSchool school, float coefficient, float knockback) {
+            return new Damage(coefficient, knockback, true, school);
+        }
+
+        @Override
+        public void apply(ImpactContext context, LivingEntity target) {
+            MagicBackend backend = MagicBackends.active();
+            double amount = backend.roll(context.caster(), context.school(), context.basePower(), target) * this.coefficient * context.scale();
+            if (amount <= 0.0) {
+                return;
+            }
+            if (this.bypassIframes) {
+                target.invulnerableTime = 0;
+            }
+            MagicSchool dealt = this.school != null ? this.school : context.school();
+            DamageSource source = backend.damageSource(context.caster(), dealt, context.direct());
+            if (target.hurt(source, (float) amount) && this.knockback > 0.0F) {
+                Knockback.push(context, target, 0.4 * this.knockback, 0.0);
+            }
+        }
+    }
+
+    /**
+     * Healing by the caster's power for the school times the coefficient (for supporting classes).
+     */
+    record Heal(float coefficient) implements Impact {
+        @Override
+        public void apply(ImpactContext context, LivingEntity target) {
+            double amount = MagicBackends.active().roll(context.caster(), context.school(), context.basePower(), null) * this.coefficient * context.scale();
+            if (amount > 0.0) {
+                target.heal((float) amount);
+            }
+        }
+    }
+
+    /**
+     * Sets the target (never blocks) on fire.
+     */
+    record Ignite(float seconds) implements Impact {
+        @Override
+        public void apply(ImpactContext context, LivingEntity target) {
+            target.igniteForSeconds(this.seconds);
+        }
+    }
+
+    record Knockback(double horizontal, double vertical) implements Impact {
+        @Override
+        public void apply(ImpactContext context, LivingEntity target) {
+            push(context, target, this.horizontal, this.vertical);
+        }
+
+        static void push(ImpactContext context, LivingEntity target, double horizontal, double vertical) {
+            Vec3 away = target.position().subtract(context.origin());
+            double dx = away.x;
+            double dz = away.z;
+            if (dx * dx + dz * dz < 1.0E-6) {
+                Vec3 facing = context.caster().getLookAngle();
+                dx = facing.x;
+                dz = facing.z;
+            }
+            target.knockback(horizontal, -dx, -dz);
+            if (vertical != 0.0) {
+                target.push(0.0, vertical, 0.0);
+                target.hurtMarked = true;
+            }
+        }
+    }
+}

@@ -27,7 +27,13 @@
         "chest": "minecraft:iron_chestplate",
         "legs": "minecraft:iron_leggings",
         "feet": "minecraft:iron_boots",
-        "mainhand": "minecraft:iron_sword"
+        "mainhand": {
+          "item": "minecraft:iron_sword",
+          "enchant_with_levels": {
+            "min": 5,
+            "max": 15
+          }
+        }
       }
     },
     {
@@ -42,7 +48,13 @@
         "chest": "minecraft:diamond_chestplate",
         "legs": "minecraft:diamond_leggings",
         "feet": "minecraft:diamond_boots",
-        "mainhand": "minecraft:diamond_sword"
+        "mainhand": {
+          "item": "minecraft:diamond_sword",
+          "enchant_with_levels": {
+            "min": 5,
+            "max": 15
+          }
+        }
       }
     },
     {
@@ -55,7 +67,13 @@
         "chest": "minecraft:diamond_chestplate",
         "legs": "minecraft:diamond_leggings",
         "feet": "minecraft:diamond_boots",
-        "mainhand": "minecraft:diamond_sword"
+        "mainhand": {
+          "item": "minecraft:diamond_sword",
+          "enchant_with_levels": {
+            "min": 15,
+            "max": 25
+          }
+        }
       }
     }
   ]

@@ -55,19 +55,41 @@ in `data/renegades/renegades/equipment_pools/warrior/`). `/reload` applies chang
   - `conditions` (all optional, all given ones must match, ranges inclusive): `dimensions`; `min_distance` /
     `max_distance` (horizontal distance in blocks from the world spawn); `min_y` / `max_y`; `min_level` / `max_level`.
   - `equipment`: slots `head`, `chest`, `legs`, `feet`, `mainhand`, `offhand`. A value is an item id, a `#tag`
-    (random item of the tag) or a list of these (one is picked at random). Missing slots stay empty.
+    (random item of the tag), an item object (see below) or a list of these (one is picked at random). Missing slots
+    stay empty.
+  - `variant` (optional): a class variant the mob takes when this entry is chosen (wizard: `fire`, `frost` or
+    `arcane`; without it, or with an unknown value, the variant is random). Other classes ignore it.
 - Invalid files or entries (broken JSON, unknown items, empty tags) are skipped with a warning in the log.
 
-Bundled pools (per class in `warrior/`, `rogue/`, `paladin/` and `archer/`): a vanilla fallback by distance only, valid in every dimension
+An item object adds enchantments to an item or tag:
+
+```json
+"mainhand": [
+  { "item": "minecraft:diamond_sword", "enchantments": { "minecraft:sharpness": 3 } },
+  { "item": "minecraft:bow", "enchant_with_levels": { "min": 15, "max": 25 } }
+]
+```
+
+- `item`: item id or `#tag`.
+- `enchantments` (optional): fixed enchantments with their levels.
+- `enchant_with_levels` (optional): random enchantments like an enchanting table with a level between `min` and `max`
+  (applied first; fixed enchantments are added on top).
+- Unknown enchantment ids are ignored with a warning in the log; the rest of the entry stays valid.
+
+Bundled pools (per class in `warrior/`, `rogue/`, `paladin/`, `archer/` and `wizard/`): a vanilla fallback by distance only, valid in every dimension
 (warrior: iron, then iron or diamond, then diamond; rogue: leather with an iron sword, then chainmail with two iron
 swords, then iron with two diamond swords; paladin: chainmail, then iron, then diamond, each either with an axe or with
-a sword and a shield; archer: leather, then chainmail, then iron, each with a bow or a crossbow), and the class sets in
+a sword and a shield; archer: leather, then chainmail, then iron, each with a bow or a crossbow; wizard: leather dyed in
+the school's color, then chainmail, then iron, with a blaze rod (fire), breeze rod (frost) or end rod (arcane); weapons
+of the middle tier get random enchantments of level 5–15, those of the far tier of level 15–25), and the class sets in
 three tiers from the matching mods (warrior with Rogues: warrior /
 berserker / netherite berserker armor with double axes or glaives; rogue with Rogues: rogue / assassin / netherite
 assassin armor with a dagger or sickle and a dagger in the off hand; paladin with Paladins: paladin / crusader /
 netherite crusader armor with a claymore or great hammer, or a mace with a kite shield; archer with Archers: archer /
 ranger / netherite ranger armor with the bows or crossbows of the tier, plus, with Archers Expansion, the tundra hunter,
-war archer and deadeye sets in tiers 2 and 3).
+war archer and deadeye sets in tiers 2 and 3; wizard with Wizards: wizard robe with a novice wand or wizard staff
+(random variant), then the fire, frost or arcane robes with the wand and staff of their school, then the netherite
+versions; for the wizard sets, the Nether always uses tier 2 and the End tier 3).
 
 Equipment is chosen when the mob spawns naturally, from a spawn egg or spawner, or via `/summon` without NBT
 (`/summon` with NBT keeps vanilla behavior: no equipment is chosen).
@@ -108,7 +130,8 @@ Options in `[spawns]` of `renegades-server.toml`:
 
 Each class has its own base attributes (warrior: 60 health, 6 attack damage, 0.3 knockback resistance, speed 0.25;
 rogue: 45 health, 5 attack damage, 0.1 knockback resistance, speed 0.30; paladin: 75 health, 6 attack damage, 0.6
-knockback resistance, speed 0.23; archer: 40 health, 4 attack damage, no knockback resistance, speed 0.28). In `[strength]`,
+knockback resistance, speed 0.23; archer: 40 health, 4 attack damage, no knockback resistance, speed 0.28; wizard: 35
+health, 3 attack damage, no knockback resistance, speed 0.26). In `[strength]`,
 `healthMultiplier` and `damageMultiplier` (default `1.0`) multiply the base values of all renegades when they spawn,
 before level scaling such as Dynamic Difficulty is applied on top; `damageMultiplier` also scales the archer's arrows.
 Renegades that already exist keep their values.
@@ -162,12 +185,27 @@ Traps (three per throw, `enableTraps` in `[combat]`, default `true`) arm after 2
 within 2 blocks: radius 2.5 and 3 blocks high, attack damage × 1.5. They vanish after 8 seconds or when the archer dies,
 are not saved and drop nothing.
 
+**Wizard:** a caster of one school (`fire`, `frost` or `arcane`, set by its equipment entry or random; leather armor
+is dyed in the school's color). It circles its target at about 7.5 blocks and casts from up to 24 blocks: two quick
+bolts per cast (attack power × 0.4 each), and against a target that stands still a volley of four homing bolts that
+burst on impact (radius 4, × 0.2). A target that comes closer than about 5 blocks is hit by a nova around the wizard (radius 6,
+× 0.6, `enableNova` in `[combat]`, default `true`), followed by a jump back, or by a short sweep of its staff. Fire
+spells set targets on fire, frost spells slow them (Slowness II), arcane bolts fly 25 % faster. Spells need line of
+sight, never hurt other renegades, never set blocks on fire and never break blocks. Spell damage is magic damage
+(`renegades:<school>` damage types, tagged `c:is_magic`): it ignores armor and shields, and witches resist it.
+
+**Magic power:** without other mods, a wizard's spell power is its attack damage (incl. level bonuses). With
+[Spell Power](https://modrinth.com/mod/spell-power) installed, the spell power of its school from its equipment (e.g.
+Wizards robes and staffs) is added, with critical strikes and the target's resistances; the log line
+`Magic backend: vanilla|spell_power` shows which one is active. `/renegades nearby` shows a wizard's variant, backend
+and current bolt damage.
+
 **Hazards:** the combat movement steers directly instead of using pathfinding. Before every step (walking, strafing,
 backing off, circling, attack advances, dashes and rolls) the ground ahead is checked: renegades never step into lava,
 fire, magma, cactus, powder snow, sweet berries or water, nor off a drop deeper than 3 blocks. At such an edge they
 move only along it and then walk to their goal with normal pathfinding, which finds the way around.
 
-Combat system based on ANARCHY – RPG Minibosses by cleannrooster (CC0-1.0).
+Combat and magic system based on ANARCHY – RPG Minibosses by cleannrooster (CC0-1.0).
 
 ## Spawn groups (datapack)
 
@@ -201,7 +239,9 @@ All members share a group id: if a player attacks one, the members within 32 blo
 target, members walk back to the group when they are more than 12 blocks away. Bundled: `warrior_solo` (weight 8),
 `warrior_pair` (weight 2), `rogue_solo` (weight 6), `warrior_rogue` (a warrior leading a rogue, weight 2),
 `paladin_solo` (weight 5), `paladin_warrior` (a paladin leading a warrior, weight 2), `archer_solo` (weight 5),
-`warrior_archer` (a warrior leading an archer, weight 2) and `paladin_archer` (a paladin leading an archer, weight 1).
+`warrior_archer` (a warrior leading an archer, weight 2), `paladin_archer` (a paladin leading an archer, weight 1),
+`wizard_solo` (weight 4), `warrior_wizard` (a warrior leading a wizard, weight 2) and `paladin_wizard` (a paladin
+leading a wizard, weight 1).
 
 **Debug commands**: `/renegades groups <leader>` lists the templates, `/renegades spawngroup <id>` spawns one at your
 position like a natural spawn, `/renegades nearby` lists the renegades within `capRadius` with group, spawn type,

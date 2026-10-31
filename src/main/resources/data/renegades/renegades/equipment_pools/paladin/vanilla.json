@@ -40,7 +40,22 @@
         "chest": "minecraft:iron_chestplate",
         "legs": "minecraft:iron_leggings",
         "feet": "minecraft:iron_boots",
-        "mainhand": ["minecraft:iron_axe", "minecraft:diamond_axe"]
+        "mainhand": [
+          {
+            "item": "minecraft:iron_axe",
+            "enchant_with_levels": {
+              "min": 5,
+              "max": 15
+            }
+          },
+          {
+            "item": "minecraft:diamond_axe",
+            "enchant_with_levels": {
+              "min": 5,
+              "max": 15
+            }
+          }
+        ]
       }
     },
     {
@@ -54,8 +69,29 @@
         "chest": "minecraft:iron_chestplate",
         "legs": "minecraft:iron_leggings",
         "feet": "minecraft:iron_boots",
-        "mainhand": ["minecraft:iron_sword", "minecraft:diamond_sword"],
-        "offhand": "minecraft:shield"
+        "mainhand": [
+          {
+            "item": "minecraft:iron_sword",
+            "enchant_with_levels": {
+              "min": 5,
+              "max": 15
+            }
+          },
+          {
+            "item": "minecraft:diamond_sword",
+            "enchant_with_levels": {
+              "min": 5,
+              "max": 15
+            }
+          }
+        ],
+        "offhand": {
+          "item": "minecraft:shield",
+          "enchant_with_levels": {
+            "min": 5,
+            "max": 15
+          }
+        }
       }
     },
     {
@@ -68,7 +104,13 @@
         "chest": "minecraft:diamond_chestplate",
         "legs": "minecraft:diamond_leggings",
         "feet": "minecraft:diamond_boots",
-        "mainhand": "minecraft:diamond_axe"
+        "mainhand": {
+          "item": "minecraft:diamond_axe",
+          "enchant_with_levels": {
+            "min": 15,
+            "max": 25
+          }
+        }
       }
     },
     {
@@ -81,8 +123,20 @@
         "chest": "minecraft:diamond_chestplate",
         "legs": "minecraft:diamond_leggings",
         "feet": "minecraft:diamond_boots",
-        "mainhand": "minecraft:diamond_sword",
-        "offhand": "minecraft:shield"
+        "mainhand": {
+          "item": "minecraft:diamond_sword",
+          "enchant_with_levels": {
+            "min": 15,
+            "max": 25
+          }
+        },
+        "offhand": {
+          "item": "minecraft:shield",
+          "enchant_with_levels": {
+            "min": 15,
+            "max": 25
+          }
+        }
       }
     }
   ]

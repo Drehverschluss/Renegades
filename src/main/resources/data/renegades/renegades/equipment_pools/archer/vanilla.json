@@ -39,7 +39,13 @@
         "chest": "minecraft:chainmail_chestplate",
         "legs": "minecraft:chainmail_leggings",
         "feet": "minecraft:chainmail_boots",
-        "mainhand": "minecraft:bow"
+        "mainhand": {
+          "item": "minecraft:bow",
+          "enchant_with_levels": {
+            "min": 5,
+            "max": 15
+          }
+        }
       }
     },
     {
@@ -53,7 +59,13 @@
         "chest": "minecraft:chainmail_chestplate",
         "legs": "minecraft:chainmail_leggings",
         "feet": "minecraft:chainmail_boots",
-        "mainhand": "minecraft:crossbow"
+        "mainhand": {
+          "item": "minecraft:crossbow",
+          "enchant_with_levels": {
+            "min": 5,
+            "max": 15
+          }
+        }
       }
     },
     {
@@ -66,7 +78,13 @@
         "chest": "minecraft:iron_chestplate",
         "legs": "minecraft:iron_leggings",
         "feet": "minecraft:iron_boots",
-        "mainhand": "minecraft:bow"
+        "mainhand": {
+          "item": "minecraft:bow",
+          "enchant_with_levels": {
+            "min": 15,
+            "max": 25
+          }
+        }
       }
     },
     {
@@ -79,7 +97,13 @@
         "chest": "minecraft:iron_chestplate",
         "legs": "minecraft:iron_leggings",
         "feet": "minecraft:iron_boots",
-        "mainhand": "minecraft:crossbow"
+        "mainhand": {
+          "item": "minecraft:crossbow",
+          "enchant_with_levels": {
+            "min": 15,
+            "max": 25
+          }
+        }
       }
     }
   ]

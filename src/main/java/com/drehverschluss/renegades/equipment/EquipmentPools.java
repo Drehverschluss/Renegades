@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.annotation.Nullable;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
@@ -47,16 +48,17 @@ public final class EquipmentPools {
 
     /**
      * Item tags are bound only after all reload listeners ran, so empty tags are checked afterwards (TagsUpdatedEvent).
-     * Tag options without items are removed; an entry with a slot that has no option left is skipped.
+     * Tag options without items are removed; an entry with a slot that has no option left is skipped. Unknown fixed
+     * enchantments (the enchantment registry is data-driven) are dropped with a warning.
      */
-    public static void validateTagsAndLog() {
+    public static void validateTagsAndLog(RegistryAccess registries) {
         Map<EntityType<?>, Pool> validated = new LinkedHashMap<>();
         boolean usesLevelBounds = false;
 
         for (Map.Entry<EntityType<?>, Pool> poolEntry : pools.entrySet()) {
             List<EquipmentPoolEntry> entries = new ArrayList<>();
             for (EquipmentPoolEntry entry : poolEntry.getValue().entries()) {
-                EquipmentPoolEntry checked = withoutEmptyTags(entry);
+                EquipmentPoolEntry checked = withoutEmptyTags(entry, registries);
                 if (checked != null) {
                     entries.add(checked);
                     usesLevelBounds |= checked.conditions().hasLevelBounds();
@@ -77,7 +79,7 @@ public final class EquipmentPools {
     }
 
     @Nullable
-    private static EquipmentPoolEntry withoutEmptyTags(EquipmentPoolEntry entry) {
+    private static EquipmentPoolEntry withoutEmptyTags(EquipmentPoolEntry entry, RegistryAccess registries) {
         Map<EquipmentSlot, ItemChoice> equipment = new LinkedHashMap<>();
 
         for (Map.Entry<EquipmentSlot, ItemChoice> slot : entry.equipment().entrySet()) {
@@ -86,6 +88,11 @@ public final class EquipmentPools {
                 if (option instanceof ItemChoice.TagOption tagOption && tagOption.isEmpty()) {
                     Renegades.LOGGER.warn("Equipment pool entry '{}' in {}: item tag {} is empty or unknown", entry.id(), entry.source(), tagOption);
                 } else {
+                    List<ResourceLocation> unknown = option.enchanting().unknownIds(registries);
+                    if (!unknown.isEmpty()) {
+                        Renegades.LOGGER.warn("Equipment pool entry '{}' in {}: unknown enchantment(s) {} are ignored", entry.id(), entry.source(), unknown);
+                        option = option.withEnchanting(option.enchanting().withoutIds(unknown));
+                    }
                     options.add(option);
                 }
             }
@@ -97,6 +104,6 @@ public final class EquipmentPools {
             equipment.put(slot.getKey(), new ItemChoice(List.copyOf(options)));
         }
 
-        return new EquipmentPoolEntry(entry.id(), entry.source(), entry.fallback(), entry.weight(), entry.conditions(), Map.copyOf(equipment));
+        return entry.withEquipment(Map.copyOf(equipment));
     }
 }

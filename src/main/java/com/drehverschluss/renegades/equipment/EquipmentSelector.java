@@ -1,6 +1,7 @@
 package com.drehverschluss.renegades.equipment;
 
 import com.drehverschluss.renegades.Renegades;
+import com.drehverschluss.renegades.entity.RenegadeEntity;
 import com.drehverschluss.renegades.level.RenegadeLevels;
 import java.util.List;
 import java.util.Optional;
@@ -76,12 +77,16 @@ public final class EquipmentSelector {
     }
 
     /**
-     * Replaces all hand and armor slots with the entry's equipment; slots the entry does not define are cleared.
+     * Replaces all hand and armor slots with the entry's equipment (with its enchantments); slots the entry does not
+     * define are cleared. A renegade also gets the entry's variant (random if the entry has none).
      */
     public static void apply(Mob mob, EquipmentPoolEntry entry, RandomSource random) {
         for (EquipmentSlot slot : SLOTS) {
             ItemChoice choice = entry.equipment().get(slot);
-            mob.setItemSlot(slot, choice == null ? ItemStack.EMPTY : choice.pick(random));
+            mob.setItemSlot(slot, choice == null ? ItemStack.EMPTY : choice.pick(random, mob.level().registryAccess()));
+        }
+        if (mob instanceof RenegadeEntity renegade) {
+            renegade.applyPoolVariant(entry.variant());
         }
     }
 

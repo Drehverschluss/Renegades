@@ -29,6 +29,7 @@ public final class RenegadesConfig {
     public static final ModConfigSpec.BooleanValue ENABLE_BRACE;
     public static final ModConfigSpec.BooleanValue ENABLE_LEAP;
     public static final ModConfigSpec.BooleanValue ENABLE_TRAPS;
+    public static final ModConfigSpec.BooleanValue ENABLE_NOVA;
 
     static {
         ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
@@ -124,6 +125,10 @@ public final class RenegadesConfig {
         ENABLE_TRAPS = builder
                 .comment("If true, renegades that set traps (e.g. the archer) throw traps that go off when an enemy comes close.")
                 .define("enableTraps", true);
+
+        ENABLE_NOVA = builder
+                .comment("If true, renegades that cast novas (e.g. the wizard) blast an area around them when an enemy comes close.")
+                .define("enableNova", true);
 
         builder.pop();
         SPEC = builder.build();

@@ -18,6 +18,16 @@ Combat system based on [ANARCHY - RPG Minibosses](https://github.com/cleannroost
 - `RogueNavigation`: based on `TricksterEntity$TricksterNavigation` and `RogueNodeMaker`.
 - `PaladinBrain`: based on `JuggernautBrain` (ground impact as an area strike instead of the ability system; shield bracing added).
 - `ArcherBrain`: based on `MercenaryBrain` (shots with the held bow or crossbow, traps as an own entity instead of the ability system).
+- `WizardBrain`: based on `FireMageBrain` (spells per school variant; nova can be switched off).
+
+## Magic system
+
+Magic system based on [ANARCHY - RPG Minibosses](https://github.com/cleannrooster/rpg-minibosses) by cleannrooster (CC0-1.0).
+
+- `com.drehverschluss.renegades.magic` (ability specs, deliveries, impacts, area shapes, ability executor, tick scheduler,
+  magic projectile and cloud): ported from ANARCHY's magic package, without the ability registry, debug command, AtlasVFX
+  cues and boss-only systems; effects use vanilla particles and sounds.
+- `SpellPowerMagicBackend`: based on ANARCHY's Spell Power backend.
 
 ## Trap model
 
@@ -28,3 +38,4 @@ Combat system based on [ANARCHY - RPG Minibosses](https://github.com/cleannroost
 ## Optional integrations
 
 - [Armor Model API](https://modrinth.com/mod/armor-model-api) by Daedelus (MIT): optional; when installed, armor that uses it (e.g. RPG Series armor) is rendered on renegades through its API. Not bundled.
+- [Spell Power](https://modrinth.com/mod/spell-power) by Daedelus (GPL-3.0): optional; when installed, wizard spells use its spell power attributes, critical strikes and damage sources. Not bundled.

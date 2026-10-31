@@ -185,6 +185,7 @@ public final class RenegadesCommand {
                     .collect(Collectors.joining(", "));
             source.sendSuccess(() -> Component.literal("- " + entry.id() + (entry.fallback() ? " [fallback]" : "")
                     + " | weight " + entry.weight() + " | " + entry.conditions().describe()
+                    + (entry.variant() == null ? "" : " | variant " + entry.variant())
                     + " | " + slots + " | file " + entry.source()), false);
         }
         return pool.entries().size();

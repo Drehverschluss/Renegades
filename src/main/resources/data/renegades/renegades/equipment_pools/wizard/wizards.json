@@ -1,0 +1,203 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "wizards"
+    }
+  ],
+  "entity": "renegades:wizard",
+  "fallback": false,
+  "entries": [
+    {
+      "id": "wizards_tier1",
+      "conditions": {
+        "dimensions": ["minecraft:overworld"],
+        "max_distance": 1500
+      },
+      "equipment": {
+        "head": "wizards:wizard_robe_head",
+        "chest": "wizards:wizard_robe_chest",
+        "legs": "wizards:wizard_robe_legs",
+        "feet": "wizards:wizard_robe_feet",
+        "mainhand": ["wizards:staff_wizard", "wizards:wand_novice"]
+      }
+    },
+    {
+      "id": "wizards_tier2_fire",
+      "conditions": {
+        "dimensions": ["minecraft:overworld"],
+        "min_distance": 1500,
+        "max_distance": 4000
+      },
+      "equipment": {
+        "head": "wizards:fire_robe_head",
+        "chest": "wizards:fire_robe_chest",
+        "legs": "wizards:fire_robe_legs",
+        "feet": "wizards:fire_robe_feet",
+        "mainhand": ["wizards:wand_fire", "wizards:staff_fire"]
+      },
+      "variant": "fire"
+    },
+    {
+      "id": "wizards_tier2_frost",
+      "conditions": {
+        "dimensions": ["minecraft:overworld"],
+        "min_distance": 1500,
+        "max_distance": 4000
+      },
+      "equipment": {
+        "head": "wizards:frost_robe_head",
+        "chest": "wizards:frost_robe_chest",
+        "legs": "wizards:frost_robe_legs",
+        "feet": "wizards:frost_robe_feet",
+        "mainhand": ["wizards:wand_frost", "wizards:staff_frost"]
+      },
+      "variant": "frost"
+    },
+    {
+      "id": "wizards_tier2_arcane",
+      "conditions": {
+        "dimensions": ["minecraft:overworld"],
+        "min_distance": 1500,
+        "max_distance": 4000
+      },
+      "equipment": {
+        "head": "wizards:arcane_robe_head",
+        "chest": "wizards:arcane_robe_chest",
+        "legs": "wizards:arcane_robe_legs",
+        "feet": "wizards:arcane_robe_feet",
+        "mainhand": ["wizards:wand_arcane", "wizards:staff_arcane"]
+      },
+      "variant": "arcane"
+    },
+    {
+      "id": "wizards_tier2_nether_fire",
+      "conditions": {
+        "dimensions": ["minecraft:the_nether"]
+      },
+      "equipment": {
+        "head": "wizards:fire_robe_head",
+        "chest": "wizards:fire_robe_chest",
+        "legs": "wizards:fire_robe_legs",
+        "feet": "wizards:fire_robe_feet",
+        "mainhand": ["wizards:wand_fire", "wizards:staff_fire"]
+      },
+      "variant": "fire"
+    },
+    {
+      "id": "wizards_tier2_nether_frost",
+      "conditions": {
+        "dimensions": ["minecraft:the_nether"]
+      },
+      "equipment": {
+        "head": "wizards:frost_robe_head",
+        "chest": "wizards:frost_robe_chest",
+        "legs": "wizards:frost_robe_legs",
+        "feet": "wizards:frost_robe_feet",
+        "mainhand": ["wizards:wand_frost", "wizards:staff_frost"]
+      },
+      "variant": "frost"
+    },
+    {
+      "id": "wizards_tier2_nether_arcane",
+      "conditions": {
+        "dimensions": ["minecraft:the_nether"]
+      },
+      "equipment": {
+        "head": "wizards:arcane_robe_head",
+        "chest": "wizards:arcane_robe_chest",
+        "legs": "wizards:arcane_robe_legs",
+        "feet": "wizards:arcane_robe_feet",
+        "mainhand": ["wizards:wand_arcane", "wizards:staff_arcane"]
+      },
+      "variant": "arcane"
+    },
+    {
+      "id": "wizards_tier3_fire",
+      "conditions": {
+        "dimensions": ["minecraft:overworld"],
+        "min_distance": 4000
+      },
+      "equipment": {
+        "head": "wizards:netherite_fire_robe_head",
+        "chest": "wizards:netherite_fire_robe_chest",
+        "legs": "wizards:netherite_fire_robe_legs",
+        "feet": "wizards:netherite_fire_robe_feet",
+        "mainhand": ["wizards:wand_netherite_fire", "wizards:staff_netherite_fire"]
+      },
+      "variant": "fire"
+    },
+    {
+      "id": "wizards_tier3_frost",
+      "conditions": {
+        "dimensions": ["minecraft:overworld"],
+        "min_distance": 4000
+      },
+      "equipment": {
+        "head": "wizards:netherite_frost_robe_head",
+        "chest": "wizards:netherite_frost_robe_chest",
+        "legs": "wizards:netherite_frost_robe_legs",
+        "feet": "wizards:netherite_frost_robe_feet",
+        "mainhand": ["wizards:wand_netherite_frost", "wizards:staff_netherite_frost"]
+      },
+      "variant": "frost"
+    },
+    {
+      "id": "wizards_tier3_arcane",
+      "conditions": {
+        "dimensions": ["minecraft:overworld"],
+        "min_distance": 4000
+      },
+      "equipment": {
+        "head": "wizards:netherite_arcane_robe_head",
+        "chest": "wizards:netherite_arcane_robe_chest",
+        "legs": "wizards:netherite_arcane_robe_legs",
+        "feet": "wizards:netherite_arcane_robe_feet",
+        "mainhand": ["wizards:wand_netherite_arcane", "wizards:staff_netherite_arcane"]
+      },
+      "variant": "arcane"
+    },
+    {
+      "id": "wizards_tier3_end_fire",
+      "conditions": {
+        "dimensions": ["minecraft:the_end"]
+      },
+      "equipment": {
+        "head": "wizards:netherite_fire_robe_head",
+        "chest": "wizards:netherite_fire_robe_chest",
+        "legs": "wizards:netherite_fire_robe_legs",
+        "feet": "wizards:netherite_fire_robe_feet",
+        "mainhand": ["wizards:wand_netherite_fire", "wizards:staff_netherite_fire"]
+      },
+      "variant": "fire"
+    },
+    {
+      "id": "wizards_tier3_end_frost",
+      "conditions": {
+        "dimensions": ["minecraft:the_end"]
+      },
+      "equipment": {
+        "head": "wizards:netherite_frost_robe_head",
+        "chest": "wizards:netherite_frost_robe_chest",
+        "legs": "wizards:netherite_frost_robe_legs",
+        "feet": "wizards:netherite_frost_robe_feet",
+        "mainhand": ["wizards:wand_netherite_frost", "wizards:staff_netherite_frost"]
+      },
+      "variant": "frost"
+    },
+    {
+      "id": "wizards_tier3_end_arcane",
+      "conditions": {
+        "dimensions": ["minecraft:the_end"]
+      },
+      "equipment": {
+        "head": "wizards:netherite_arcane_robe_head",
+        "chest": "wizards:netherite_arcane_robe_chest",
+        "legs": "wizards:netherite_arcane_robe_legs",
+        "feet": "wizards:netherite_arcane_robe_feet",
+        "mainhand": ["wizards:wand_netherite_arcane", "wizards:staff_netherite_arcane"]
+      },
+      "variant": "arcane"
+    }
+  ]
+}

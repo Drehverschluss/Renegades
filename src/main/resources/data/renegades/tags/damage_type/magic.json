@@ -1,0 +1,11 @@
+{
+  "values": [
+    "renegades:generic",
+    "renegades:arcane",
+    "renegades:fire",
+    "renegades:frost",
+    "renegades:healing",
+    "renegades:lightning",
+    "renegades:soul"
+  ]
+}

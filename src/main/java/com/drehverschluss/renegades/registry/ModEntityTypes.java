@@ -7,6 +7,9 @@ import com.drehverschluss.renegades.entity.PaladinRenegade;
 import com.drehverschluss.renegades.entity.RogueRenegade;
 import com.drehverschluss.renegades.entity.ThrowingKnife;
 import com.drehverschluss.renegades.entity.WarriorRenegade;
+import com.drehverschluss.renegades.entity.WizardRenegade;
+import com.drehverschluss.renegades.magic.entity.MagicCloud;
+import com.drehverschluss.renegades.magic.entity.MagicProjectile;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
@@ -51,6 +54,29 @@ public final class ModEntityTypes {
                     .updateInterval(2)
                     .noSave()
                     .build("archer_trap"));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<WizardRenegade>> WIZARD = ENTITY_TYPES.register("wizard",
+            () -> EntityType.Builder.of(WizardRenegade::new, MobCategory.MONSTER)
+                    .sized(0.6F, 1.8F)
+                    .eyeHeight(1.62F)
+                    .clientTrackingRange(8)
+                    .build("wizard"));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<MagicProjectile>> MAGIC_PROJECTILE = ENTITY_TYPES.register("magic_projectile",
+            () -> EntityType.Builder.<MagicProjectile>of(MagicProjectile::new, MobCategory.MISC)
+                    .sized(0.4F, 0.4F)
+                    .clientTrackingRange(8)
+                    .updateInterval(1)
+                    .noSave()
+                    .build("magic_projectile"));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<MagicCloud>> MAGIC_CLOUD = ENTITY_TYPES.register("magic_cloud",
+            () -> EntityType.Builder.<MagicCloud>of(MagicCloud::new, MobCategory.MISC)
+                    .sized(0.5F, 0.25F)
+                    .clientTrackingRange(8)
+                    .updateInterval(10)
+                    .noSave()
+                    .build("magic_cloud"));
 
     public static final DeferredHolder<EntityType<?>, EntityType<ThrowingKnife>> THROWING_KNIFE = ENTITY_TYPES.register("throwing_knife",
             () -> EntityType.Builder.<ThrowingKnife>of(ThrowingKnife::new, MobCategory.MISC)

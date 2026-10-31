@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -24,7 +25,8 @@ import org.slf4j.Logger;
  */
 final class EquipmentPoolParser {
     private static final Set<String> FILE_KEYS = Set.of("entity", "fallback", "entries", "neoforge:conditions");
-    private static final Set<String> ENTRY_KEYS = Set.of("id", "weight", "conditions", "equipment");
+    private static final Set<String> ENTRY_KEYS = Set.of("id", "weight", "conditions", "equipment", "variant");
+    private static final Set<String> OPTION_KEYS = Set.of("item", "enchantments", "enchant_with_levels");
     private static final Map<String, EquipmentSlot> SLOTS = Map.of(
             "head", EquipmentSlot.HEAD,
             "chest", EquipmentSlot.CHEST,
@@ -85,17 +87,18 @@ final class EquipmentPoolParser {
             equipment.put(slot, parseChoice(slotEntry.getValue(), slotEntry.getKey()));
         }
 
-        return new EquipmentPoolEntry(id, fileId, fallback, weight, conditions, Map.copyOf(equipment));
+        String variant = json.has("variant") ? GsonHelper.getAsString(json, "variant") : null;
+        return new EquipmentPoolEntry(id, fileId, fallback, weight, conditions, Map.copyOf(equipment), variant);
     }
 
     private static ItemChoice parseChoice(JsonElement json, String slotName) {
         List<ItemChoice.Option> options = new ArrayList<>();
         if (json.isJsonArray()) {
             for (JsonElement element : json.getAsJsonArray()) {
-                options.add(parseOption(GsonHelper.convertToString(element, slotName)));
+                options.add(parseOptionElement(element, slotName));
             }
         } else {
-            options.add(parseOption(GsonHelper.convertToString(json, slotName)));
+            options.add(parseOptionElement(json, slotName));
         }
 
         if (options.isEmpty()) {
@@ -104,15 +107,55 @@ final class EquipmentPoolParser {
         return new ItemChoice(List.copyOf(options));
     }
 
-    private static ItemChoice.Option parseOption(String value) {
+    /**
+     * An option is either an item id / #tag string or an object {"item": ..., "enchantments": {id: level},
+     * "enchant_with_levels": {"min": .., "max": ..}}.
+     */
+    private static ItemChoice.Option parseOptionElement(JsonElement element, String slotName) {
+        if (!element.isJsonObject()) {
+            return parseOption(GsonHelper.convertToString(element, slotName), Enchanting.NONE);
+        }
+        JsonObject json = element.getAsJsonObject();
+        for (String key : json.keySet()) {
+            if (!OPTION_KEYS.contains(key)) {
+                throw new JsonParseException("Unknown key '" + key + "' in item of slot '" + slotName + "', expected " + OPTION_KEYS);
+            }
+        }
+
+        Map<ResourceLocation, Integer> fixed = new LinkedHashMap<>();
+        if (json.has("enchantments")) {
+            for (Map.Entry<String, JsonElement> entry : GsonHelper.getAsJsonObject(json, "enchantments").entrySet()) {
+                int level = GsonHelper.convertToInt(entry.getValue(), "enchantment level");
+                if (level < 1 || level > 255) {
+                    throw new JsonParseException("Enchantment level of '" + entry.getKey() + "' must be 1..255, got " + level);
+                }
+                fixed.put(parseId(entry.getKey(), "enchantment"), level);
+            }
+        }
+
+        Enchanting.Range tableLevels = null;
+        if (json.has("enchant_with_levels")) {
+            JsonObject levels = GsonHelper.getAsJsonObject(json, "enchant_with_levels");
+            int min = GsonHelper.getAsInt(levels, "min");
+            int max = GsonHelper.getAsInt(levels, "max", min);
+            if (min < 1 || max < min) {
+                throw new JsonParseException("enchant_with_levels needs 1 <= min <= max, got " + min + ".." + max);
+            }
+            tableLevels = new Enchanting.Range(min, max);
+        }
+
+        return parseOption(GsonHelper.getAsString(json, "item"), new Enchanting(Map.copyOf(fixed), tableLevels));
+    }
+
+    private static ItemChoice.Option parseOption(String value, Enchanting enchanting) {
         if (value.startsWith("#")) {
-            return new ItemChoice.TagOption(TagKey.create(Registries.ITEM, parseId(value.substring(1), "item tag")));
+            return new ItemChoice.TagOption(TagKey.create(Registries.ITEM, parseId(value.substring(1), "item tag")), enchanting);
         }
 
         ResourceLocation itemId = parseId(value, "item");
         Item item = BuiltInRegistries.ITEM.getOptional(itemId)
                 .orElseThrow(() -> new JsonParseException("Unknown item '" + itemId + "'"));
-        return new ItemChoice.ItemOption(item);
+        return new ItemChoice.ItemOption(item, enchanting);
     }
 
     private static ResourceLocation parseId(String value, String what) {

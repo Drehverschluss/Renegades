@@ -97,8 +97,7 @@ public class ArcherTrap extends Entity implements GeoEntity {
         float damage = (float) attacker.getAttributeValue(Attributes.ATTACK_DAMAGE) * BLAST_DAMAGE;
         DamageSource source = this.damageSources().mobProjectile(this, attacker);
         for (LivingEntity victim : AreaStrike.victims(attacker, centre, BLAST_RADIUS, BLAST_HEIGHT)) {
-            // Like ANARCHY's trap blast: not held back by the victim's invulnerability ticks.
-            victim.invulnerableTime = 0;
+            // Normal invulnerability ticks apply: traps going off at the same moment hit only once.
             if (victim.hurt(source, damage)) {
                 AreaStrike.knockAway(victim, centre, BLAST_KNOCKBACK);
             }

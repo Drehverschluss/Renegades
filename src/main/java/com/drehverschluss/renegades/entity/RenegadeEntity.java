@@ -293,6 +293,13 @@ public abstract class RenegadeEntity extends Monster implements GeoEntity {
     }
 
     /**
+     * Called after the equipment was rolled from a pool entry; classes with variants (e.g. the wizard's school) take
+     * the entry's variant, or pick one at random if it is null or unknown.
+     */
+    public void applyPoolVariant(@Nullable String variant) {
+    }
+
+    /**
      * Never more than 3 blocks, also while chasing a target (vanilla allows much deeper drops then), matching the
      * hazard check of the direct combat movement.
      */
