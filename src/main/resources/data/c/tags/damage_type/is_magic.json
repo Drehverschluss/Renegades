@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
-    "#renegades:magic"
+    "#renegades:magic",
+    "#renegades:spell_projectile"
   ]
 }

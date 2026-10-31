@@ -420,7 +420,7 @@ public abstract class RenegadeEntity extends Monster implements GeoEntity {
         boolean hurt = super.hurt(source, amount);
         if (hurt && !this.level().isClientSide) {
             if (this.brain != null) {
-                this.brain.onDamageTaken(amount);
+                this.brain.onDamageTaken(source, amount);
             }
             if (this.groupId != null && source.getEntity() instanceof Player player) {
                 RenegadeGroups.alertGroup(this, player);

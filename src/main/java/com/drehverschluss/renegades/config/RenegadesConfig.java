@@ -30,6 +30,8 @@ public final class RenegadesConfig {
     public static final ModConfigSpec.BooleanValue ENABLE_LEAP;
     public static final ModConfigSpec.BooleanValue ENABLE_TRAPS;
     public static final ModConfigSpec.BooleanValue ENABLE_NOVA;
+    public static final ModConfigSpec.BooleanValue ENABLE_PRIEST_HEALING;
+    public static final ModConfigSpec.DoubleValue HEALING_MULTIPLIER;
 
     static {
         ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
@@ -129,6 +131,14 @@ public final class RenegadesConfig {
         ENABLE_NOVA = builder
                 .comment("If true, renegades that cast novas (e.g. the wizard) blast an area around them when an enemy comes close.")
                 .define("enableNova", true);
+
+        ENABLE_PRIEST_HEALING = builder
+                .comment("If true, renegades that heal (e.g. the priest) heal and shield their allies. If false, they only protect and attack.")
+                .define("enablePriestHealing", true);
+
+        HEALING_MULTIPLIER = builder
+                .comment("Multiplier for all healing done by renegades. The caps per heal (e.g. at most 25 % of the target's max health) still apply.")
+                .defineInRange("healingMultiplier", 1.0D, 0.0D, 5.0D);
 
         builder.pop();
         SPEC = builder.build();

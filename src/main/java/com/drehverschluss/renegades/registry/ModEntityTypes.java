@@ -4,6 +4,7 @@ import com.drehverschluss.renegades.Renegades;
 import com.drehverschluss.renegades.entity.ArcherRenegade;
 import com.drehverschluss.renegades.entity.ArcherTrap;
 import com.drehverschluss.renegades.entity.PaladinRenegade;
+import com.drehverschluss.renegades.entity.PriestRenegade;
 import com.drehverschluss.renegades.entity.RogueRenegade;
 import com.drehverschluss.renegades.entity.ThrowingKnife;
 import com.drehverschluss.renegades.entity.WarriorRenegade;
@@ -61,6 +62,13 @@ public final class ModEntityTypes {
                     .eyeHeight(1.62F)
                     .clientTrackingRange(8)
                     .build("wizard"));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<PriestRenegade>> PRIEST = ENTITY_TYPES.register("priest",
+            () -> EntityType.Builder.of(PriestRenegade::new, MobCategory.MONSTER)
+                    .sized(0.6F, 1.8F)
+                    .eyeHeight(1.62F)
+                    .clientTrackingRange(8)
+                    .build("priest"));
 
     public static final DeferredHolder<EntityType<?>, EntityType<MagicProjectile>> MAGIC_PROJECTILE = ENTITY_TYPES.register("magic_projectile",
             () -> EntityType.Builder.<MagicProjectile>of(MagicProjectile::new, MobCategory.MISC)

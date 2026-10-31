@@ -1,6 +1,7 @@
 // Based on Impact from ANARCHY - RPG Minibosses by cleannrooster (CC0-1.0).
 package com.drehverschluss.renegades.magic;
 
+import com.drehverschluss.renegades.config.RenegadesConfig;
 import javax.annotation.Nullable;
 import net.minecraft.core.Holder;
 import net.minecraft.world.damagesource.DamageSource;
@@ -70,17 +71,40 @@ public sealed interface Impact permits Impact.Damage, Impact.Ignite, Impact.Appl
                 Knockback.push(context, target, 0.4 * this.knockback, 0.0);
             }
         }
+
+        /**
+         * The damage without critical strikes or the target's resistances (e.g. how hard a blocked bolt hits the shield).
+         */
+        public double expected(ImpactContext context) {
+            return context.basePower() * this.coefficient * context.scale();
+        }
     }
 
     /**
-     * Healing by the caster's power for the school times the coefficient (for supporting classes).
+     * Healing by the caster's power for the school times the coefficient and the healingMultiplier config (for
+     * supporting classes), never above maxFraction of the target's max health per application (0 = no cap) and never
+     * above max health. A caster that is a HealingCaster is told how much was actually healed.
      */
-    record Heal(float coefficient) implements Impact {
+    record Heal(float coefficient, float maxFraction) implements Impact {
+        public Heal(float coefficient) {
+            this(coefficient, 0.0F);
+        }
+
         @Override
         public void apply(ImpactContext context, LivingEntity target) {
-            double amount = MagicBackends.active().roll(context.caster(), context.school(), context.basePower(), null) * this.coefficient * context.scale();
-            if (amount > 0.0) {
-                target.heal((float) amount);
+            double amount = MagicBackends.active().roll(context.caster(), context.school(), context.basePower(), null) * this.coefficient * context.scale()
+                    * RenegadesConfig.HEALING_MULTIPLIER.get();
+            if (this.maxFraction > 0.0F) {
+                amount = Math.min(amount, target.getMaxHealth() * this.maxFraction);
+            }
+            if (amount <= 0.0 || target.getHealth() >= target.getMaxHealth()) {
+                return;
+            }
+            float before = target.getHealth();
+            target.heal((float) amount);
+            float healed = target.getHealth() - before;
+            if (healed > 0.0F && context.caster() instanceof HealingCaster healer) {
+                healer.onHealed(target, healed);
             }
         }
     }

@@ -15,7 +15,9 @@ import org.joml.Vector3f;
 /**
  * Schools of magic (the same as the Spell Power schools) plus the two physical kinds. Magical schools have their own
  * damage type (renegades:&lt;school&gt;), which counts as magic (c:is_magic) and bypasses armor and shields like
- * Spell Power's spell damage.
+ * Spell Power's spell damage. Spell projectiles are the exception: a raised shield blocks them from the front, checked
+ * and dealt with SPELL_PROJECTILE_DAMAGE (magic, but not in bypasses_armor, because vanilla's bypasses_shield contains
+ * bypasses_armor; it is only used for the blocked hit, unblocked hits keep the school's damage type).
  */
 public enum MagicSchool {
     GENERIC("generic", 0xFFFFFF, true),
@@ -27,6 +29,9 @@ public enum MagicSchool {
     SOUL("soul", 0x2DD4DA, true),
     PHYSICAL_MELEE("physical_melee", 0xB3B3B3, false),
     PHYSICAL_RANGED("physical_ranged", 0x805D4D, false);
+
+    public static final ResourceKey<DamageType> SPELL_PROJECTILE_DAMAGE = ResourceKey.create(Registries.DAMAGE_TYPE,
+            ResourceLocation.fromNamespaceAndPath(Renegades.MODID, "spell_projectile"));
 
     private final String name;
     private final int color;

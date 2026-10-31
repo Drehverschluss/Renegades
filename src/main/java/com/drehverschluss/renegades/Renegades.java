@@ -6,6 +6,7 @@ import com.drehverschluss.renegades.compat.dynamicdifficulty.DynamicDifficultyLe
 import com.drehverschluss.renegades.config.RenegadesConfig;
 import com.drehverschluss.renegades.entity.ArcherRenegade;
 import com.drehverschluss.renegades.entity.PaladinRenegade;
+import com.drehverschluss.renegades.entity.PriestRenegade;
 import com.drehverschluss.renegades.entity.RenegadeEntity;
 import com.drehverschluss.renegades.entity.RenegadeProjectiles;
 import com.drehverschluss.renegades.entity.WizardRenegade;
@@ -72,6 +73,7 @@ public class Renegades {
         event.put(ModEntityTypes.PALADIN.get(), PaladinRenegade.createAttributes().build());
         event.put(ModEntityTypes.ARCHER.get(), ArcherRenegade.createAttributes().build());
         event.put(ModEntityTypes.WIZARD.get(), WizardRenegade.createAttributes().build());
+        event.put(ModEntityTypes.PRIEST.get(), PriestRenegade.createAttributes().build());
     }
 
     private static void registerSpawnPlacements(RegisterSpawnPlacementsEvent event) {
@@ -85,6 +87,8 @@ public class Renegades {
                 RenegadeEntity::checkRenegadeSpawnRules, RegisterSpawnPlacementsEvent.Operation.REPLACE);
         event.register(ModEntityTypes.WIZARD.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
                 RenegadeEntity::checkRenegadeSpawnRules, RegisterSpawnPlacementsEvent.Operation.REPLACE);
+        event.register(ModEntityTypes.PRIEST.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+                RenegadeEntity::checkRenegadeSpawnRules, RegisterSpawnPlacementsEvent.Operation.REPLACE);
     }
 
     private static void addCreativeTabContents(BuildCreativeModeTabContentsEvent event) {
@@ -94,6 +98,7 @@ public class Renegades {
             event.accept(ModItems.PALADIN_SPAWN_EGG);
             event.accept(ModItems.ARCHER_SPAWN_EGG);
             event.accept(ModItems.WIZARD_SPAWN_EGG);
+            event.accept(ModItems.PRIEST_SPAWN_EGG);
         }
     }
 

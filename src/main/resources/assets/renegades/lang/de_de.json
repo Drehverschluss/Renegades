@@ -11,6 +11,8 @@
   "entity.renegades.archer_trap": "Falle",
   "entity.renegades.wizard": "Abtrünniger Zauberer",
   "item.renegades.wizard_spawn_egg": "Spawn-Ei (Abtrünniger Zauberer)",
+  "entity.renegades.priest": "Abtrünniger Priester",
+  "item.renegades.priest_spawn_egg": "Spawn-Ei (Abtrünniger Priester)",
   "entity.renegades.magic_projectile": "Zauber",
   "entity.renegades.magic_cloud": "Zauberwolke",
   "death.attack.renegades.generic": "%1$s wurde von Magie getötet",
@@ -26,5 +28,7 @@
   "death.attack.renegades.lightning": "%1$s wurde von Blitzmagie getroffen",
   "death.attack.renegades.lightning.player": "%1$s wurde von Blitzmagie getroffen, gewirkt von %2$s",
   "death.attack.renegades.soul": "%1$s wurde von Seelenmagie verzehrt",
-  "death.attack.renegades.soul.player": "%1$s wurde von Seelenmagie verzehrt, gewirkt von %2$s"
+  "death.attack.renegades.soul.player": "%1$s wurde von Seelenmagie verzehrt, gewirkt von %2$s",
+  "death.attack.renegades.spell_projectile": "%1$s wurde von einem Zauber getroffen",
+  "death.attack.renegades.spell_projectile.player": "%1$s wurde von einem Zauber getroffen, gewirkt von %2$s"
 }

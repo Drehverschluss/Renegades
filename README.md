@@ -76,12 +76,14 @@ An item object adds enchantments to an item or tag:
   (applied first; fixed enchantments are added on top).
 - Unknown enchantment ids are ignored with a warning in the log; the rest of the entry stays valid.
 
-Bundled pools (per class in `warrior/`, `rogue/`, `paladin/`, `archer/` and `wizard/`): a vanilla fallback by distance only, valid in every dimension
+Bundled pools (per class in `warrior/`, `rogue/`, `paladin/`, `archer/`, `wizard/` and `priest/`): a vanilla fallback by distance only, valid in every dimension
 (warrior: iron, then iron or diamond, then diamond; rogue: leather with an iron sword, then chainmail with two iron
 swords, then iron with two diamond swords; paladin: chainmail, then iron, then diamond, each either with an axe or with
 a sword and a shield; archer: leather, then chainmail, then iron, each with a bow or a crossbow; wizard: leather dyed in
-the school's color, then chainmail, then iron, with a blaze rod (fire), breeze rod (frost) or end rod (arcane); weapons
-of the middle tier get random enchantments of level 5–15, those of the far tier of level 15–25), and the class sets in
+the school's color, then chainmail, then iron, with a blaze rod (fire), breeze rod (frost) or end rod (arcane); priest:
+leather dyed white with golden hood and shoes, then chainmail, then iron, with a golden hoe as its staff; weapons
+of the middle tier get random enchantments of level 5–15, those of the far tier of level 15–25 – for the priest, whose
+hoe does nothing in combat, the chest piece instead), and the class sets in
 three tiers from the matching mods (warrior with Rogues: warrior /
 berserker / netherite berserker armor with double axes or glaives; rogue with Rogues: rogue / assassin / netherite
 assassin armor with a dagger or sickle and a dagger in the off hand; paladin with Paladins: paladin / crusader /
@@ -89,7 +91,9 @@ netherite crusader armor with a claymore or great hammer, or a mace with a kite 
 ranger / netherite ranger armor with the bows or crossbows of the tier, plus, with Archers Expansion, the tundra hunter,
 war archer and deadeye sets in tiers 2 and 3; wizard with Wizards: wizard robe with a novice wand or wizard staff
 (random variant), then the fire, frost or arcane robes with the wand and staff of their school, then the netherite
-versions; for the wizard sets, the Nether always uses tier 2 and the End tier 3).
+versions; priest with Paladins: priest robe with an acolyte wand, holy wand or holy staff, then the prior robe with a
+diamond holy wand or staff, then the netherite versions; for the wizard and priest sets, the Nether always uses tier 2
+and the End tier 3).
 
 Equipment is chosen when the mob spawns naturally, from a spawn egg or spawner, or via `/summon` without NBT
 (`/summon` with NBT keeps vanilla behavior: no equipment is chosen).
@@ -131,7 +135,8 @@ Options in `[spawns]` of `renegades-server.toml`:
 Each class has its own base attributes (warrior: 60 health, 6 attack damage, 0.3 knockback resistance, speed 0.25;
 rogue: 45 health, 5 attack damage, 0.1 knockback resistance, speed 0.30; paladin: 75 health, 6 attack damage, 0.6
 knockback resistance, speed 0.23; archer: 40 health, 4 attack damage, no knockback resistance, speed 0.28; wizard: 35
-health, 3 attack damage, no knockback resistance, speed 0.26). In `[strength]`,
+health, 3 attack damage, no knockback resistance, speed 0.26; priest: 40 health, 3 attack damage, no knockback
+resistance, speed 0.26). In `[strength]`,
 `healthMultiplier` and `damageMultiplier` (default `1.0`) multiply the base values of all renegades when they spawn,
 before level scaling such as Dynamic Difficulty is applied on top; `damageMultiplier` also scales the archer's arrows.
 Renegades that already exist keep their values.
@@ -192,13 +197,40 @@ burst on impact (radius 4, × 0.2). A target that comes closer than about 5 bloc
 × 0.6, `enableNova` in `[combat]`, default `true`), followed by a jump back, or by a short sweep of its staff. Fire
 spells set targets on fire, frost spells slow them (Slowness II), arcane bolts fly 25 % faster. Spells need line of
 sight, never hurt other renegades, never set blocks on fire and never break blocks. Spell damage is magic damage
-(`renegades:<school>` damage types, tagged `c:is_magic`): it ignores armor and shields, and witches resist it.
+(`renegades:<school>` damage types, tagged `c:is_magic`): it ignores armor, and witches resist it. Shields only stop
+spell **projectiles** (the wizard's and priest's bolts, the volley bolts): raised and facing the bolt, a shield blocks
+it like an arrow – no damage, no fire or slowness, the shield loses durability. Area spells (nova, the burst of a
+volley bolt, clouds) go through shields.
 
-**Magic power:** without other mods, a wizard's spell power is its attack damage (incl. level bonuses). With
+**Priest:** a healer that keeps its group alive. It keeps 8–14 blocks from its target, if possible behind an ally (the
+ally between it and the target), and backs off or jumps back when the target comes closer than 4 blocks. Its spells,
+by priority:
+
+- **Self heal** when alone and below 40 % health (cooldown 20 s).
+- **Healing cloud** when at least two allies within 8 blocks of each other are below 60 %: a cloud (radius 4) at their
+  middle that heals allies in it for 5 seconds; it never heals players or other mobs (cooldown 25 s).
+- **Heal** the ally with the lowest health below 70 % within 16 blocks and in sight: holy light from the priest to the
+  ally (attack power × 2.5, cooldown 8 s).
+- **Protection:** an ally that was just hit gets Absorption I for 10 seconds (cooldown 20 s).
+- **Holy bolt** (attack power × 0.35, cooldown 4 s, blocked by shields) – only when nobody needs healing or when
+  alone.
+
+Heal, self heal and cloud have a visible windup (raised hands and healing particles, 1.5 s; the cloud 2.7 s) in which
+the priest stands still. A hit of 4 or more damage, or any melee hit, during the windup **interrupts** the spell, and
+its cooldown restarts at half length – attacking the priest first is the way to beat a group. Caps: one heal restores
+at most 25 % of the target's max health, a cloud at most 30 % per target in total, and nothing heals beyond max health.
+Healing reaches group members and other renegades, never players or other mobs. The cooldowns of its support spells are
+not shortened by nearby renegades (unlike other attacks). In `[combat]`: `enablePriestHealing` (default `true`; `false`
+= the priest only protects and attacks) and `healingMultiplier` (default `1.0`, `0.0`–`5.0`, multiplies all healing by
+renegades; the caps still apply). `/renegades nearby` shows what a priest is doing (whom it heals), its cooldowns,
+interruptions and the health it has healed so far.
+
+**Magic power:** without other mods, a caster's spell power is its attack damage (incl. level bonuses). With
 [Spell Power](https://modrinth.com/mod/spell-power) installed, the spell power of its school from its equipment (e.g.
-Wizards robes and staffs) is added, with critical strikes and the target's resistances; the log line
+Wizards robes and staffs, or the healing power of Paladins priest robes and holy wands for the priest) is added, with
+critical strikes and the target's resistances; the log line
 `Magic backend: vanilla|spell_power` shows which one is active. `/renegades nearby` shows a wizard's variant, backend
-and current bolt damage.
+and current bolt damage, and a priest's heal power.
 
 **Hazards:** the combat movement steers directly instead of using pathfinding. Before every step (walking, strafing,
 backing off, circling, attack advances, dashes and rolls) the ground ahead is checked: renegades never step into lava,
@@ -240,8 +272,11 @@ target, members walk back to the group when they are more than 12 blocks away. B
 `warrior_pair` (weight 2), `rogue_solo` (weight 6), `warrior_rogue` (a warrior leading a rogue, weight 2),
 `paladin_solo` (weight 5), `paladin_warrior` (a paladin leading a warrior, weight 2), `archer_solo` (weight 5),
 `warrior_archer` (a warrior leading an archer, weight 2), `paladin_archer` (a paladin leading an archer, weight 1),
-`wizard_solo` (weight 4), `warrior_wizard` (a warrior leading a wizard, weight 2) and `paladin_wizard` (a paladin
-leading a wizard, weight 1).
+`wizard_solo` (weight 4), `warrior_wizard` (a warrior leading a wizard, weight 2), `paladin_wizard` (a paladin
+leading a wizard, weight 1), `priest_solo` (weight 2), `warrior_priest` (a warrior leading a priest, weight 3),
+`paladin_priest` (a paladin leading a priest, weight 2) and `warrior_archer_priest` (a warrior leading a priest and an
+archer, weight 1; with `maxNearby` 3 it only spawns complete when no other renegade is near, otherwise the archer is
+left out first).
 
 **Debug commands**: `/renegades groups <leader>` lists the templates, `/renegades spawngroup <id>` spawns one at your
 position like a natural spawn, `/renegades nearby` lists the renegades within `capRadius` with group, spawn type,

@@ -1,0 +1,81 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "paladins"
+    }
+  ],
+  "entity": "renegades:priest",
+  "fallback": false,
+  "entries": [
+    {
+      "id": "paladins_priest_tier1",
+      "conditions": {
+        "dimensions": ["minecraft:overworld"],
+        "max_distance": 1500
+      },
+      "equipment": {
+        "head": "paladins:priest_robe_head",
+        "chest": "paladins:priest_robe_chest",
+        "legs": "paladins:priest_robe_legs",
+        "feet": "paladins:priest_robe_feet",
+        "mainhand": ["paladins:acolyte_wand", "paladins:holy_wand", "paladins:holy_staff"]
+      }
+    },
+    {
+      "id": "paladins_priest_tier2",
+      "conditions": {
+        "dimensions": ["minecraft:overworld"],
+        "min_distance": 1500,
+        "max_distance": 4000
+      },
+      "equipment": {
+        "head": "paladins:prior_robe_head",
+        "chest": "paladins:prior_robe_chest",
+        "legs": "paladins:prior_robe_legs",
+        "feet": "paladins:prior_robe_feet",
+        "mainhand": ["paladins:diamond_holy_wand", "paladins:diamond_holy_staff"]
+      }
+    },
+    {
+      "id": "paladins_priest_tier2_nether",
+      "conditions": {
+        "dimensions": ["minecraft:the_nether"]
+      },
+      "equipment": {
+        "head": "paladins:prior_robe_head",
+        "chest": "paladins:prior_robe_chest",
+        "legs": "paladins:prior_robe_legs",
+        "feet": "paladins:prior_robe_feet",
+        "mainhand": ["paladins:diamond_holy_wand", "paladins:diamond_holy_staff"]
+      }
+    },
+    {
+      "id": "paladins_priest_tier3",
+      "conditions": {
+        "dimensions": ["minecraft:overworld"],
+        "min_distance": 4000
+      },
+      "equipment": {
+        "head": "paladins:netherite_prior_robe_head",
+        "chest": "paladins:netherite_prior_robe_chest",
+        "legs": "paladins:netherite_prior_robe_legs",
+        "feet": "paladins:netherite_prior_robe_feet",
+        "mainhand": ["paladins:netherite_holy_wand", "paladins:netherite_holy_staff"]
+      }
+    },
+    {
+      "id": "paladins_priest_tier3_end",
+      "conditions": {
+        "dimensions": ["minecraft:the_end"]
+      },
+      "equipment": {
+        "head": "paladins:netherite_prior_robe_head",
+        "chest": "paladins:netherite_prior_robe_chest",
+        "legs": "paladins:netherite_prior_robe_legs",
+        "feet": "paladins:netherite_prior_robe_feet",
+        "mainhand": ["paladins:netherite_holy_wand", "paladins:netherite_holy_staff"]
+      }
+    }
+  ]
+}

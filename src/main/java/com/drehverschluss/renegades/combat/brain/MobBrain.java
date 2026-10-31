@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Set;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.entity.EntityTypeTest;
 import net.minecraft.world.level.pathfinder.Path;
@@ -265,6 +266,14 @@ public abstract class MobBrain {
 
     public void onDamageTaken(float amount) {
         this.stimulus.notifyDamage(amount);
+    }
+
+    /**
+     * Called by the renegade when it took damage; classes that react to the kind of hit (e.g. interrupting a cast)
+     * override this.
+     */
+    public void onDamageTaken(DamageSource source, float amount) {
+        this.onDamageTaken(amount);
     }
 
     public BrainState getCurrentStance() {

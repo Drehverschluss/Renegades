@@ -1,6 +1,6 @@
 // Based on BossProjectile from ANARCHY - RPG Minibosses by cleannrooster (CC0-1.0).
 // Changes: client look is a particle trail in the school's colours instead of AtlasVFX; never saved; hits only what
-// the caster may harm and stops (bursting there) at the first block.
+// the caster may harm and stops (bursting there) at the first block; a raised shield blocks it like an arrow.
 package com.drehverschluss.renegades.magic.entity;
 
 import com.drehverschluss.renegades.magic.AbilityExecutor;
@@ -8,6 +8,7 @@ import com.drehverschluss.renegades.magic.AbilityPresentation;
 import com.drehverschluss.renegades.magic.AbilitySpec;
 import com.drehverschluss.renegades.magic.CastTarget;
 import com.drehverschluss.renegades.magic.Delivery;
+import com.drehverschluss.renegades.magic.Impact;
 import com.drehverschluss.renegades.magic.ImpactContext;
 import com.drehverschluss.renegades.magic.MagicSchool;
 import com.drehverschluss.renegades.registry.ModEntityTypes;
@@ -15,12 +16,16 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Consumer;
 import javax.annotation.Nullable;
+import net.minecraft.core.Holder;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -190,15 +195,50 @@ public class MagicProjectile extends Entity implements TraceableEntity {
             return;
         }
         this.struck.add(target);
+        ImpactContext context = this.context.withOrigin(this.position()).withDirect(this);
+        if (this.blockedByShield(target, context)) {
+            this.land(level, target);
+            return;
+        }
         if (this.onHit != null) {
             this.onHit.accept(target);
         }
-        AbilityExecutor.applyAll(this.ability, this.context.withOrigin(this.position()).withDirect(this), target);
+        AbilityExecutor.applyAll(this.ability, context, target);
         if (this.struck.size() > this.spec.pierce()) {
             this.land(level, target);
         } else {
             AbilityPresentation.impact(level, this.ability, this.position(), 0.0F);
         }
+    }
+
+    /**
+     * Harmful spell projectiles can be blocked like arrows: a target with a raised shield facing the projectile takes
+     * no damage and none of the spell's other effects. The check and the blocked hit use renegades:spell_projectile
+     * (magic, not bypassing shields), so vanilla does the blocking: shield sound, shield durability by the expected
+     * damage, the shield block event. Area damage (bursts, novas, clouds) still goes through shields.
+     */
+    private boolean blockedByShield(LivingEntity target, ImpactContext context) {
+        if (this.ability == null || this.ability.intent() != AbilitySpec.Intent.HARMFUL || !target.isBlocking()) {
+            return false;
+        }
+        Holder<DamageType> type = this.level().registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(MagicSchool.SPELL_PROJECTILE_DAMAGE);
+        DamageSource source = new DamageSource(type, this, context.caster());
+        if (!target.isDamageSourceBlocked(source)) {
+            return false;
+        }
+        double amount = 0.0;
+        boolean bypassIframes = false;
+        for (Impact impact : this.ability.impacts()) {
+            if (impact instanceof Impact.Damage damage) {
+                amount += damage.expected(context);
+                bypassIframes |= damage.bypassIframes();
+            }
+        }
+        if (bypassIframes) {
+            target.invulnerableTime = 0;
+        }
+        target.hurt(source, (float) Math.max(amount, 0.1));
+        return true;
     }
 
     private void onBlockHit(BlockHitResult hitResult) {

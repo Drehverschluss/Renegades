@@ -1,0 +1,46 @@
+{
+  "entity": "renegades:priest",
+  "fallback": true,
+  "entries": [
+    {
+      "id": "vanilla_near_leather",
+      "conditions": {
+        "max_distance": 1500
+      },
+      "equipment": {
+        "head": "minecraft:leather_helmet",
+        "chest": "minecraft:leather_chestplate",
+        "legs": "minecraft:leather_leggings",
+        "feet": "minecraft:leather_boots",
+        "mainhand": "minecraft:golden_hoe"
+      }
+    },
+    {
+      "id": "vanilla_mid_chain",
+      "conditions": {
+        "min_distance": 1500,
+        "max_distance": 4000
+      },
+      "equipment": {
+        "head": "minecraft:chainmail_helmet",
+        "chest": { "item": "minecraft:chainmail_chestplate", "enchant_with_levels": { "min": 5, "max": 15 } },
+        "legs": "minecraft:chainmail_leggings",
+        "feet": "minecraft:chainmail_boots",
+        "mainhand": "minecraft:golden_hoe"
+      }
+    },
+    {
+      "id": "vanilla_far_iron",
+      "conditions": {
+        "min_distance": 4000
+      },
+      "equipment": {
+        "head": "minecraft:iron_helmet",
+        "chest": { "item": "minecraft:iron_chestplate", "enchant_with_levels": { "min": 15, "max": 25 } },
+        "legs": "minecraft:iron_leggings",
+        "feet": "minecraft:iron_boots",
+        "mainhand": "minecraft:golden_hoe"
+      }
+    }
+  ]
+}
