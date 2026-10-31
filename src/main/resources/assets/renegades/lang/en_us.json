@@ -3,5 +3,7 @@
   "item.renegades.warrior_spawn_egg": "Warrior Renegade Spawn Egg",
   "entity.renegades.rogue": "Rogue Renegade",
   "item.renegades.rogue_spawn_egg": "Rogue Renegade Spawn Egg",
-  "entity.renegades.throwing_knife": "Throwing Knife"
+  "entity.renegades.throwing_knife": "Throwing Knife",
+  "entity.renegades.paladin": "Paladin Renegade",
+  "item.renegades.paladin_spawn_egg": "Paladin Renegade Spawn Egg"
 }

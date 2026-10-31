@@ -26,6 +26,8 @@ public final class RenegadesConfig {
     public static final ModConfigSpec.BooleanValue ENABLE_PARRY;
     public static final ModConfigSpec.BooleanValue ENABLE_DODGE;
     public static final ModConfigSpec.BooleanValue ENABLE_STEALTH;
+    public static final ModConfigSpec.BooleanValue ENABLE_BRACE;
+    public static final ModConfigSpec.BooleanValue ENABLE_LEAP;
 
     static {
         ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
@@ -109,6 +111,14 @@ public final class RenegadesConfig {
         ENABLE_STEALTH = builder
                 .comment("If true, renegades that use stealth (e.g. the rogue) turn invisible while stalking their target. Armor and held items stay visible.")
                 .define("enableStealth", true);
+
+        ENABLE_BRACE = builder
+                .comment("If true, renegades that brace (e.g. the paladin) sometimes stop to brace after a heavy hit: with a shield they block like a player, without one they take half damage.")
+                .define("enableBrace", true);
+
+        ENABLE_LEAP = builder
+                .comment("If true, renegades that leap (e.g. the paladin) jump at distant targets and land with a ground impact.")
+                .define("enableLeap", true);
 
         builder.pop();
         SPEC = builder.build();

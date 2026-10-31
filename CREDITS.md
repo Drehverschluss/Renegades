@@ -16,6 +16,7 @@ Combat system based on [ANARCHY - RPG Minibosses](https://github.com/cleannroost
 - `WarriorBrain`: based on `TemplarBrain`.
 - `RogueBrain`: based on `RogueBrain` (knife throw as an own projectile instead of the ability system).
 - `RogueNavigation`: based on `TricksterEntity$TricksterNavigation` and `RogueNodeMaker`.
+- `PaladinBrain`: based on `JuggernautBrain` (ground impact as a radial strike instead of the ability system; shield bracing added).
 
 ## Optional integrations
 

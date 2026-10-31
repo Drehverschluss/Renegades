@@ -3,5 +3,7 @@
   "item.renegades.warrior_spawn_egg": "Spawn-Ei (Abtrünniger Krieger)",
   "entity.renegades.rogue": "Abtrünniger Schurke",
   "item.renegades.rogue_spawn_egg": "Spawn-Ei (Abtrünniger Schurke)",
-  "entity.renegades.throwing_knife": "Wurfmesser"
+  "entity.renegades.throwing_knife": "Wurfmesser",
+  "entity.renegades.paladin": "Abtrünniger Paladin",
+  "item.renegades.paladin_spawn_egg": "Spawn-Ei (Abtrünniger Paladin)"
 }

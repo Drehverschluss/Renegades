@@ -58,11 +58,13 @@ in `data/renegades/renegades/equipment_pools/warrior/`). `/reload` applies chang
     (random item of the tag) or a list of these (one is picked at random). Missing slots stay empty.
 - Invalid files or entries (broken JSON, unknown items, empty tags) are skipped with a warning in the log.
 
-Bundled pools (per class in `warrior/` and `rogue/`): a vanilla fallback by distance only, valid in every dimension
+Bundled pools (per class in `warrior/`, `rogue/` and `paladin/`): a vanilla fallback by distance only, valid in every dimension
 (warrior: iron, then iron or diamond, then diamond; rogue: leather with an iron sword, then chainmail with two iron
-swords, then iron with two diamond swords), and, with the Rogues mod, the class sets in three tiers (warrior:
-warrior / berserker / netherite berserker armor with double axes or glaives; rogue: rogue / assassin / netherite
-assassin armor with a dagger or sickle and a dagger in the off hand).
+swords, then iron with two diamond swords; paladin: chainmail, then iron, then diamond, each either with an axe or with
+a sword and a shield), and the class sets in three tiers from the matching mods (warrior with Rogues: warrior /
+berserker / netherite berserker armor with double axes or glaives; rogue with Rogues: rogue / assassin / netherite
+assassin armor with a dagger or sickle and a dagger in the off hand; paladin with Paladins: paladin / crusader /
+netherite crusader armor with a claymore or great hammer, or a mace with a kite shield).
 
 Equipment is chosen when the mob spawns naturally, from a spawn egg or spawner, or via `/summon` without NBT
 (`/summon` with NBT keeps vanilla behavior: no equipment is chosen).
@@ -102,7 +104,8 @@ Options in `[spawns]` of `renegades-server.toml`:
 ## Strength
 
 Each class has its own base attributes (warrior: 60 health, 6 attack damage, 0.3 knockback resistance, speed 0.25;
-rogue: 45 health, 5 attack damage, 0.1 knockback resistance, speed 0.30). In `[strength]`,
+rogue: 45 health, 5 attack damage, 0.1 knockback resistance, speed 0.30; paladin: 75 health, 6 attack damage, 0.6
+knockback resistance, speed 0.23). In `[strength]`,
 `healthMultiplier` and `damageMultiplier` (default `1.0`) multiply the base values of all renegades when they spawn,
 before level scaling such as Dynamic Difficulty is applied on top. Renegades that already exist keep their values.
 
@@ -131,6 +134,16 @@ Thrown knives fly straight for up to 2 seconds and deal the rogue's attack damag
 with a shield). They need line of sight, hit only what a melee swing of the rogue could hit and never drop an item;
 they show the rogue's dagger (main or off hand), otherwise an iron sword. With mods that give armor an evasion chance
 (e.g. Spell Engine's `evasion_chance` on Rogues armor), renegades evade hits like players do.
+
+**Paladin:** advances slowly and heavily: a wide overhead swing, a shoulder check up close, a ground slam, a whirlwind
+spin that hits everything around it several times, and a leap at targets 6–14 blocks away that lands with a ground
+impact (radius 6, attack damage × 1.8). It only leaps to safe spots: at most 1.5 blocks higher or lower, no block in
+the way of the arc (walls, ceilings), solid ground under the whole path, no water or lava (`enableLeap` in `[combat]`,
+default `true`). After a heavy hit (8+ damage), and once when its health drops below 40 %, it braces for 2.5 seconds
+(`enableBrace`, default `true`): with a shield in the off hand it raises it and blocks like a player (only hits from
+the front; an axe disables the shield for 5 seconds and ends the brace), without one it takes half damage. While
+bracing it is hardly pushed back. Below 20 % health it makes its last stand: no more bracing, faster, and its big
+attacks are ready again at once. Its equipment is either a two-handed weapon or a one-handed weapon with a shield.
 
 Combat system based on ANARCHY – RPG Minibosses by cleannrooster (CC0-1.0).
 
@@ -164,7 +177,8 @@ fit (no valid spot, `maxNearby` reached) are left out. Spawn eggs always spawn a
 
 All members share a group id: if a player attacks one, the members within 32 blocks attack that player; without a
 target, members walk back to the group when they are more than 12 blocks away. Bundled: `warrior_solo` (weight 8),
-`warrior_pair` (weight 2), `rogue_solo` (weight 6) and `warrior_rogue` (a warrior leading a rogue, weight 2).
+`warrior_pair` (weight 2), `rogue_solo` (weight 6), `warrior_rogue` (a warrior leading a rogue, weight 2),
+`paladin_solo` (weight 5) and `paladin_warrior` (a paladin leading a warrior, weight 2).
 
 **Debug commands**: `/renegades groups <leader>` lists the templates, `/renegades spawngroup <id>` spawns one at your
 position like a natural spawn, `/renegades nearby` lists the renegades within `capRadius` with group, spawn type,
@@ -184,5 +198,5 @@ Configured in the server config `config/renegades-server.toml`. To override it f
 | `dropUndamaged` | `true` | Dropped equipment keeps its durability (otherwise random damage like vanilla). |
 
 Items with Curse of Vanishing (or any `prevent_equipment_drop` effect) never drop; Looting raises the chance like for
-vanilla mob equipment. The regular loot tables (`renegades:entities/warrior`, `renegades:entities/rogue`) are empty by default and can be filled
+vanilla mob equipment. The regular loot tables (`renegades:entities/warrior`, `renegades:entities/rogue`, `renegades:entities/paladin`) are empty by default and can be filled
 by datapacks.

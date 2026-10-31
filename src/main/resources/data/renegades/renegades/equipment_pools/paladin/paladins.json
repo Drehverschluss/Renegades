@@ -1,0 +1,155 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "paladins"
+    }
+  ],
+  "entity": "renegades:paladin",
+  "fallback": false,
+  "entries": [
+    {
+      "id": "paladins_tier1_two_handed",
+      "conditions": {
+        "dimensions": ["minecraft:overworld"],
+        "max_distance": 1500
+      },
+      "equipment": {
+        "head": "paladins:paladin_armor_head",
+        "chest": "paladins:paladin_armor_chest",
+        "legs": "paladins:paladin_armor_legs",
+        "feet": "paladins:paladin_armor_feet",
+        "mainhand": ["paladins:iron_claymore", "paladins:iron_great_hammer"]
+      }
+    },
+    {
+      "id": "paladins_tier1_shield",
+      "conditions": {
+        "dimensions": ["minecraft:overworld"],
+        "max_distance": 1500
+      },
+      "equipment": {
+        "head": "paladins:paladin_armor_head",
+        "chest": "paladins:paladin_armor_chest",
+        "legs": "paladins:paladin_armor_legs",
+        "feet": "paladins:paladin_armor_feet",
+        "mainhand": "paladins:iron_mace",
+        "offhand": "paladins:iron_kite_shield"
+      }
+    },
+    {
+      "id": "paladins_tier2_two_handed",
+      "conditions": {
+        "dimensions": ["minecraft:overworld"],
+        "min_distance": 1500,
+        "max_distance": 4000
+      },
+      "equipment": {
+        "head": "paladins:crusader_armor_head",
+        "chest": "paladins:crusader_armor_chest",
+        "legs": "paladins:crusader_armor_legs",
+        "feet": "paladins:crusader_armor_feet",
+        "mainhand": ["paladins:diamond_claymore", "paladins:diamond_great_hammer"]
+      }
+    },
+    {
+      "id": "paladins_tier2_shield",
+      "conditions": {
+        "dimensions": ["minecraft:overworld"],
+        "min_distance": 1500,
+        "max_distance": 4000
+      },
+      "equipment": {
+        "head": "paladins:crusader_armor_head",
+        "chest": "paladins:crusader_armor_chest",
+        "legs": "paladins:crusader_armor_legs",
+        "feet": "paladins:crusader_armor_feet",
+        "mainhand": "paladins:diamond_mace",
+        "offhand": "paladins:diamond_kite_shield"
+      }
+    },
+    {
+      "id": "paladins_tier2_nether_two_handed",
+      "conditions": {
+        "dimensions": ["minecraft:the_nether"]
+      },
+      "equipment": {
+        "head": "paladins:crusader_armor_head",
+        "chest": "paladins:crusader_armor_chest",
+        "legs": "paladins:crusader_armor_legs",
+        "feet": "paladins:crusader_armor_feet",
+        "mainhand": ["paladins:diamond_claymore", "paladins:diamond_great_hammer"]
+      }
+    },
+    {
+      "id": "paladins_tier2_nether_shield",
+      "conditions": {
+        "dimensions": ["minecraft:the_nether"]
+      },
+      "equipment": {
+        "head": "paladins:crusader_armor_head",
+        "chest": "paladins:crusader_armor_chest",
+        "legs": "paladins:crusader_armor_legs",
+        "feet": "paladins:crusader_armor_feet",
+        "mainhand": "paladins:diamond_mace",
+        "offhand": "paladins:diamond_kite_shield"
+      }
+    },
+    {
+      "id": "paladins_tier3_two_handed",
+      "conditions": {
+        "dimensions": ["minecraft:overworld"],
+        "min_distance": 4000
+      },
+      "equipment": {
+        "head": "paladins:netherite_crusader_armor_head",
+        "chest": "paladins:netherite_crusader_armor_chest",
+        "legs": "paladins:netherite_crusader_armor_legs",
+        "feet": "paladins:netherite_crusader_armor_feet",
+        "mainhand": ["paladins:netherite_claymore", "paladins:netherite_great_hammer"]
+      }
+    },
+    {
+      "id": "paladins_tier3_shield",
+      "conditions": {
+        "dimensions": ["minecraft:overworld"],
+        "min_distance": 4000
+      },
+      "equipment": {
+        "head": "paladins:netherite_crusader_armor_head",
+        "chest": "paladins:netherite_crusader_armor_chest",
+        "legs": "paladins:netherite_crusader_armor_legs",
+        "feet": "paladins:netherite_crusader_armor_feet",
+        "mainhand": "paladins:netherite_mace",
+        "offhand": "paladins:netherite_kite_shield"
+      }
+    },
+    {
+      "id": "paladins_tier3_end_two_handed",
+      "conditions": {
+        "dimensions": ["minecraft:the_end"]
+      },
+      "equipment": {
+        "head": "paladins:netherite_crusader_armor_head",
+        "chest": "paladins:netherite_crusader_armor_chest",
+        "legs": "paladins:netherite_crusader_armor_legs",
+        "feet": "paladins:netherite_crusader_armor_feet",
+        "mainhand": ["paladins:netherite_claymore", "paladins:netherite_great_hammer"]
+      }
+    },
+    {
+      "id": "paladins_tier3_end_shield",
+      "conditions": {
+        "dimensions": ["minecraft:the_end"]
+      },
+      "equipment": {
+        "head": "paladins:netherite_crusader_armor_head",
+        "chest": "paladins:netherite_crusader_armor_chest",
+        "legs": "paladins:netherite_crusader_armor_legs",
+        "feet": "paladins:netherite_crusader_armor_feet",
+        "mainhand": "paladins:netherite_mace",
+        "offhand": "paladins:netherite_kite_shield"
+      }
+    }
+  ]
+}

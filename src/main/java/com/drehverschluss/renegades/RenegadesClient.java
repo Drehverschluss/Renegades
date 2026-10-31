@@ -17,6 +17,7 @@ public class RenegadesClient {
     private static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerEntityRenderer(ModEntityTypes.WARRIOR.get(), RenegadeRenderer::new);
         event.registerEntityRenderer(ModEntityTypes.ROGUE.get(), RenegadeRenderer::new);
+        event.registerEntityRenderer(ModEntityTypes.PALADIN.get(), RenegadeRenderer::new);
         event.registerEntityRenderer(ModEntityTypes.THROWING_KNIFE.get(), ThrowingKnifeRenderer::new);
     }
 }
