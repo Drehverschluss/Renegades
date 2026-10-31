@@ -1,5 +1,6 @@
 package com.drehverschluss.renegades.command;
 
+import com.drehverschluss.renegades.Renegades;
 import com.drehverschluss.renegades.combat.CombatProfiler;
 import com.drehverschluss.renegades.config.RenegadesConfig;
 import com.drehverschluss.renegades.entity.RenegadeEntity;
@@ -12,6 +13,7 @@ import com.drehverschluss.renegades.group.SpawnGroups;
 import com.drehverschluss.renegades.group.SpawnStats;
 import com.mojang.brigadier.CommandDispatcher;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -23,10 +25,16 @@ import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.commands.arguments.ResourceLocationArgument;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.tags.DamageTypeTags;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobSpawnType;
@@ -36,7 +44,7 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.event.EventHooks;
 
 /**
- * Debug commands (permission level 2): /renegades pools|reequip|groups|spawngroup|nearby|stats|profile.
+ * Debug commands (permission level 2): /renegades pools|reequip|groups|spawngroup|nearby|damagetags|stats|profile.
  */
 public final class RenegadesCommand {
     private RenegadesCommand() {
@@ -65,6 +73,8 @@ public final class RenegadesCommand {
                                 .executes(context -> spawnGroup(context.getSource(), ResourceLocationArgument.getId(context, "id")))))
                 .then(Commands.literal("nearby")
                         .executes(context -> listNearby(context.getSource())))
+                .then(Commands.literal("damagetags")
+                        .executes(context -> showDamageTags(context.getSource())))
                 .then(Commands.literal("profile")
                         .then(Commands.literal("start")
                                 .executes(context -> {
@@ -91,8 +101,8 @@ public final class RenegadesCommand {
                 "Renegade spawn timer over %.1f min (%d ticks): %d attempts (%.1f per hour)",
                 stats.ticks() / 1200.0D, stats.ticks(), stats.attempts(), stats.perHour(stats.attempts()))), false);
         source.sendSuccess(() -> Component.literal(String.format(Locale.ROOT,
-                "Failed: chance %d, no valid position %d, no matching biome %d, cap %d",
-                stats.failedChance(), stats.noPosition(), stats.noBiome(), stats.capped())), false);
+                "Failed: chance %d, no valid position %d, no matching biome %d, cap %d, in colony %d (group members left out in colony: %d)",
+                stats.failedChance(), stats.noPosition(), stats.noBiome(), stats.capped(), stats.inColony(), stats.membersInColony())), false);
         source.sendSuccess(() -> Component.literal(String.format(Locale.ROOT,
                 "Spawned: %d (%d leaders + %d group members) = %.1f per hour",
                 spawned, stats.leaders(), stats.members(), stats.perHour(spawned))), false);
@@ -176,6 +186,29 @@ public final class RenegadesCommand {
                     + (renegade.getCombatBrain() == null ? "" : " | " + renegade.getCombatBrain().describe())), false);
         }
         return renegades.size();
+    }
+
+    /**
+     * For our spell damage types (and Spell Power's, if installed): the damage type tags that decide how other mods
+     * treat them (magic and lightning reductions, armor and shield bypass, witch resistance).
+     */
+    private static int showDamageTags(CommandSourceStack source) {
+        List<TagKey<DamageType>> tags = List.of(
+                TagKey.create(Registries.DAMAGE_TYPE, ResourceLocation.fromNamespaceAndPath("c", "is_magic")),
+                TagKey.create(Registries.DAMAGE_TYPE, ResourceLocation.fromNamespaceAndPath("neoforge", "is_magic")),
+                DamageTypeTags.IS_LIGHTNING, DamageTypeTags.IS_PROJECTILE, DamageTypeTags.BYPASSES_ARMOR, DamageTypeTags.BYPASSES_SHIELD,
+                DamageTypeTags.WITCH_RESISTANT_TO);
+        Registry<DamageType> registry = source.getServer().registryAccess().registryOrThrow(Registries.DAMAGE_TYPE);
+        List<Holder.Reference<DamageType>> types = registry.holders()
+                .filter(holder -> holder.key().location().getNamespace().equals(Renegades.MODID)
+                        || holder.key().location().getNamespace().equals("spell_power"))
+                .sorted(Comparator.comparing(holder -> holder.key().location().toString()))
+                .toList();
+        for (Holder.Reference<DamageType> type : types) {
+            String in = tags.stream().filter(type::is).map(tag -> tag.location().toString()).collect(Collectors.joining(", "));
+            source.sendSuccess(() -> Component.literal(type.key().location() + ": " + (in.isEmpty() ? "-" : in)), false);
+        }
+        return types.size();
     }
 
     private static String shortId(UUID id) {

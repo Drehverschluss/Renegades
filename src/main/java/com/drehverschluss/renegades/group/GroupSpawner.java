@@ -1,6 +1,7 @@
 package com.drehverschluss.renegades.group;
 
 import com.drehverschluss.renegades.Renegades;
+import com.drehverschluss.renegades.compat.minecolonies.MineColoniesCompat;
 import com.drehverschluss.renegades.entity.RenegadeEntity;
 import java.util.UUID;
 import javax.annotation.Nullable;
@@ -29,9 +30,11 @@ public final class GroupSpawner {
      * Spawns as many members as fit (valid position, maxNearby cap); missing members are skipped, never the group.
      * Every member runs finalizeSpawn (so it rolls its own equipment) but no group of its own.
      *
+     * @param natural a real natural spawn (not the spawngroup command): members then also avoid colonies
+     *                (noSpawnInColonies)
      * @return number of spawned members
      */
-    public static int spawnMembers(RenegadeEntity leader, SpawnGroupTemplate template) {
+    public static int spawnMembers(RenegadeEntity leader, SpawnGroupTemplate template, boolean natural) {
         if (!(leader.level() instanceof ServerLevel level)) {
             return 0;
         }
@@ -44,7 +47,7 @@ public final class GroupSpawner {
         for (SpawnGroupTemplate.Member member : template.members()) {
             int count = member.min() + random.nextInt(member.max() - member.min() + 1);
             for (int i = 0; i < count && capacity > 0; i++) {
-                if (spawnMember(level, leader, member.entity(), groupId, random)) {
+                if (spawnMember(level, leader, member.entity(), groupId, random, natural)) {
                     spawned++;
                     capacity--;
                 }
@@ -58,9 +61,13 @@ public final class GroupSpawner {
         return spawned;
     }
 
-    private static boolean spawnMember(ServerLevel level, RenegadeEntity leader, EntityType<?> type, UUID groupId, RandomSource random) {
+    private static boolean spawnMember(ServerLevel level, RenegadeEntity leader, EntityType<?> type, UUID groupId, RandomSource random, boolean natural) {
         BlockPos pos = findPosition(level, type, leader.blockPosition(), random);
         if (pos == null) {
+            return false;
+        }
+        if (natural && MineColoniesCompat.blocksNaturalSpawn(level, pos)) {
+            SpawnStats.recordMemberInColony();
             return false;
         }
 

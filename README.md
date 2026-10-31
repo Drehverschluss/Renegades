@@ -129,6 +129,7 @@ Options in `[spawns]` of `renegades-server.toml`:
 | `maxNearby` | `3` | No spawn (and no further group members) if this many renegades are within `capRadius` of the spawn position or of the nearest player. |
 | `capRadius` | `128` | Radius in blocks for `maxNearby`. |
 | `persistentNaturalSpawns` | `true` | Renegades from natural spawns, spawn eggs and commands never despawn. Renegades from (trial) spawners always despawn like monsters. |
+| `noSpawnInColonies` | `true` | With [MineColonies](https://www.curseforge.com/minecraft/mc-mods/minecolonies) installed: no natural spawns (leaders and group members) inside a colony. Spawn eggs, spawners and commands are not affected. The integration is optional; nothing from MineColonies is bundled. |
 
 ## Strength
 
@@ -242,6 +243,23 @@ critical strikes and the target's resistances; the log line
 `Magic backend: vanilla|spell_power` shows which one is active. `/renegades nearby` shows a wizard's variant, backend
 and current bolt damage, and a priest's heal power.
 
+**Damage type tags:** the mod puts its own spell damage types into the tags other mods check: `c:is_magic` (e.g.
+Dynamic Difficulty's magic damage bonus), `neoforge:is_magic` (e.g. Apotheosis "Magic Damage reduced"),
+`minecraft:is_lightning` for `renegades:lightning` (e.g. Apotheosis "Lightning Damage reduced"), plus
+`witch_resistant_to` and `panic_causes`. `/renegades damagetags` lists our damage types (and Spell Power's) with these
+tags. Spell Power's own schools are only in `c:is_magic`; a modpack that wants Apotheosis' reductions to work against
+them (e.g. against players' spells) can add them with a datapack, for example:
+
+```json
+// data/neoforge/tags/damage_type/is_magic.json
+{ "replace": false, "values": [ { "id": "#spell_power:all", "required": false } ] }
+```
+
+```json
+// data/minecraft/tags/damage_type/is_lightning.json
+{ "replace": false, "values": [ { "id": "spell_power:lightning", "required": false } ] }
+```
+
 **Hazards:** the combat movement steers directly instead of using pathfinding. Before every step (walking, strafing,
 backing off, circling, attack advances, dashes and rolls) the ground ahead is checked: renegades never step into lava,
 fire, magma, cactus, powder snow, sweet berries or water, nor off a drop deeper than 3 blocks. At such an edge they
@@ -291,7 +309,7 @@ left out first).
 **Debug commands**: `/renegades groups <leader>` lists the templates, `/renegades spawngroup <id>` spawns one at your
 position like a natural spawn, `/renegades nearby` lists the renegades within `capRadius` with group, spawn type,
 persistence, health, attack damage, invisibility and the combat state, `/renegades stats [reset]` shows the spawn timer's attempts, failures by reason
-and spawns since server start (extrapolated per hour), `/renegades profile start|stop` measures the time the renegade
+(incl. positions in a MineColonies colony) and spawns since server start (extrapolated per hour), `/renegades profile start|stop` measures the time the renegade
 AI takes per server tick (entity tick, brain, line of sight, decisions, attacks, hazard and path checks).
 
 ### Drop rules

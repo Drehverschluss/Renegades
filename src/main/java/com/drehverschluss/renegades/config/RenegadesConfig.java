@@ -23,6 +23,7 @@ public final class RenegadesConfig {
     public static final ModConfigSpec.IntValue MAX_NEARBY;
     public static final ModConfigSpec.IntValue CAP_RADIUS;
     public static final ModConfigSpec.BooleanValue PERSISTENT_NATURAL_SPAWNS;
+    public static final ModConfigSpec.BooleanValue NO_SPAWN_IN_COLONIES;
     public static final ModConfigSpec.BooleanValue ENABLE_PARRY;
     public static final ModConfigSpec.BooleanValue ENABLE_DODGE;
     public static final ModConfigSpec.BooleanValue ENABLE_STEALTH;
@@ -99,6 +100,10 @@ public final class RenegadesConfig {
         PERSISTENT_NATURAL_SPAWNS = builder
                 .comment("If true, renegades from natural spawns, spawn eggs and commands never despawn. Renegades from (trial) spawners always despawn like monsters.")
                 .define("persistentNaturalSpawns", true);
+        NO_SPAWN_IN_COLONIES = builder
+                .comment("If true and MineColonies is installed, renegades never spawn naturally inside a colony (leaders and group members).",
+                        "Spawn eggs, spawners and commands are not affected. Without MineColonies this option does nothing.")
+                .define("noSpawnInColonies", true);
 
         builder.pop();
 

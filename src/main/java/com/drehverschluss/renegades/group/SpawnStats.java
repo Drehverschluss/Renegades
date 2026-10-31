@@ -11,6 +11,8 @@ public final class SpawnStats {
     private static long noPosition;
     private static long noBiome;
     private static long capped;
+    private static long inColony;
+    private static long membersInColony;
     private static long leaders;
     private static long members;
 
@@ -18,7 +20,7 @@ public final class SpawnStats {
     }
 
     public enum Result {
-        FAILED_CHANCE, NO_POSITION, NO_BIOME, CAPPED, SPAWNED
+        FAILED_CHANCE, NO_POSITION, NO_BIOME, CAPPED, IN_COLONY, SPAWNED
     }
 
     public static void reset(long currentTick) {
@@ -28,6 +30,8 @@ public final class SpawnStats {
         noPosition = 0;
         noBiome = 0;
         capped = 0;
+        inColony = 0;
+        membersInColony = 0;
         leaders = 0;
         members = 0;
     }
@@ -39,15 +43,24 @@ public final class SpawnStats {
             case NO_POSITION -> noPosition++;
             case NO_BIOME -> noBiome++;
             case CAPPED -> capped++;
+            case IN_COLONY -> inColony++;
             case SPAWNED -> leaders++;
         }
+    }
+
+    /**
+     * A group member that was left out because its spot lay in a colony (noSpawnInColonies).
+     */
+    public static void recordMemberInColony() {
+        membersInColony++;
     }
 
     public static void recordMembers(int count) {
         members += count;
     }
 
-    public record Snapshot(long ticks, long attempts, long failedChance, long noPosition, long noBiome, long capped, long leaders, long members) {
+    public record Snapshot(long ticks, long attempts, long failedChance, long noPosition, long noBiome, long capped, long inColony, long membersInColony, long leaders,
+                           long members) {
         public double perHour(long value) {
             // 72000 ticks = one hour at 20 TPS
             return this.ticks <= 0 ? 0.0D : value * 72000.0D / this.ticks;
@@ -55,6 +68,6 @@ public final class SpawnStats {
     }
 
     public static Snapshot snapshot(long currentTick) {
-        return new Snapshot(currentTick - startTick, attempts, failedChance, noPosition, noBiome, capped, leaders, members);
+        return new Snapshot(currentTick - startTick, attempts, failedChance, noPosition, noBiome, capped, inColony, membersInColony, leaders, members);
     }
 }

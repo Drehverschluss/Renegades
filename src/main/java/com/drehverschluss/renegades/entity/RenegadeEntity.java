@@ -443,7 +443,7 @@ public abstract class RenegadeEntity extends Monster implements GeoEntity {
     public int spawnPendingGroup() {
         SpawnGroupTemplate template = this.pendingGroup;
         this.pendingGroup = null;
-        int members = template == null ? 0 : GroupSpawner.spawnMembers(this, template);
+        int members = template == null ? 0 : GroupSpawner.spawnMembers(this, template, this.countGroupInStats);
         if (this.countGroupInStats) {
             SpawnStats.recordMembers(members);
             this.countGroupInStats = false;

@@ -39,3 +39,4 @@ Magic system based on [ANARCHY - RPG Minibosses](https://github.com/cleannrooste
 
 - [Armor Model API](https://modrinth.com/mod/armor-model-api) by Daedelus (MIT): optional; when installed, armor that uses it (e.g. RPG Series armor) is rendered on renegades through its API. Not bundled.
 - [Spell Power](https://modrinth.com/mod/spell-power) by Daedelus (GPL-3.0): optional; when installed, wizard spells use its spell power attributes, critical strikes and damage sources. Not bundled.
+- [MineColonies](https://www.curseforge.com/minecraft/mc-mods/minecolonies) by the LDT Team (GPL-3.0): optional; when installed, renegades do not spawn naturally inside colonies (noSpawnInColonies). Only compiled against its API, not bundled.

@@ -52,3 +52,10 @@ description='''${mod_description}'''
     versionRange="${spell_power_version_range}"
     ordering="NONE"
     side="BOTH"
+
+[[dependencies.${mod_id}]]
+    modId="minecolonies"
+    type="optional"
+    versionRange="${minecolonies_version_range}"
+    ordering="NONE"
+    side="BOTH"

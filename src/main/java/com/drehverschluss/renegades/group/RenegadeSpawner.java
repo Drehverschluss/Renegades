@@ -1,6 +1,7 @@
 package com.drehverschluss.renegades.group;
 
 import com.drehverschluss.renegades.Renegades;
+import com.drehverschluss.renegades.compat.minecolonies.MineColoniesCompat;
 import com.drehverschluss.renegades.config.RenegadesConfig;
 import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
@@ -68,10 +69,15 @@ public final class RenegadeSpawner {
 
         boolean anyBiomeAllowed = false;
         boolean anyBiomeRejected = false;
+        boolean anyInColony = false;
 
         for (int i = 0; i < POSITION_ATTEMPTS; i++) {
             BlockPos pos = findCandidate(level, player, random);
             if (pos == null) {
+                continue;
+            }
+            if (MineColoniesCompat.blocksNaturalSpawn(level, pos)) {
+                anyInColony = true;
                 continue;
             }
 
@@ -96,7 +102,8 @@ public final class RenegadeSpawner {
             }
         }
 
-        SpawnStats.recordAttempt(anyBiomeRejected && !anyBiomeAllowed ? SpawnStats.Result.NO_BIOME : SpawnStats.Result.NO_POSITION);
+        SpawnStats.recordAttempt(anyInColony ? SpawnStats.Result.IN_COLONY
+                : anyBiomeRejected && !anyBiomeAllowed ? SpawnStats.Result.NO_BIOME : SpawnStats.Result.NO_POSITION);
     }
 
     /**

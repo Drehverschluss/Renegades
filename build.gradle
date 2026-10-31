@@ -60,6 +60,17 @@ repositories {
             includeGroup 'dev.muon.dynamic_difficulty'
         }
     }
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = 'LDTTeam'
+                url = 'https://ldtteam.jfrog.io/artifactory/modding/'
+            }
+        }
+        filter {
+            includeGroup 'com.ldtteam'
+        }
+    }
 }
 
 base {
@@ -157,6 +168,10 @@ dependencies {
     compileOnly("dev.muon.dynamic_difficulty:dynamic_difficulty-neoforge:${dynamic_difficulty_version}") {
         transitive = false
     }
+    // MineColonies API (optional, GPL-3.0): only compiled against for the noSpawnInColonies check, never bundled.
+    compileOnly("com.ldtteam:minecolonies:${minecolonies_version}") {
+        transitive = false
+    }
 
     // Local test mods (not in the repo) that are only loaded in the dev runs.
     localRuntime fileTree(dir: 'libs/test', include: '*.jar')
@@ -202,6 +217,7 @@ var generateModMetadata = tasks.register("generateModMetadata", ProcessResources
             armor_model_api_version_range: armor_model_api_version_range,
             dynamic_difficulty_version_range: dynamic_difficulty_version_range,
             spell_power_version_range: spell_power_version_range,
+            minecolonies_version_range: minecolonies_version_range,
     ]
     inputs.properties replaceProperties
     expand replaceProperties
