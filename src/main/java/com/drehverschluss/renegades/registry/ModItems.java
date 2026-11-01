@@ -26,6 +26,8 @@ public final class ModItems {
             () -> new RenegadeSpawnEggItem(ModEntityTypes.PRIEST, 0xF4F1E8, 0xE0B23A, new Item.Properties()));
     public static final DeferredItem<RenegadeSpawnEggItem> ELEMENTAL_WIZARD_SPAWN_EGG = ITEMS.register("elemental_wizard_spawn_egg",
             () -> new RenegadeSpawnEggItem(ModEntityTypes.ELEMENTAL_WIZARD, 0x2E6E8E, 0xC9A64B, new Item.Properties()));
+    public static final DeferredItem<RenegadeSpawnEggItem> BERSERKER_SPAWN_EGG = ITEMS.register("berserker_spawn_egg",
+            () -> new RenegadeSpawnEggItem(ModEntityTypes.BERSERKER, 0x6B3A26, 0x9E1B1B, new Item.Properties()));
 
     private ModItems() {
     }

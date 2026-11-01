@@ -1,0 +1,10 @@
+{
+  "neoforge:conditions": [
+    {"type": "neoforge:mod_loaded", "modid": "berserker_rpg"}
+  ],
+  "entity": "renegades:berserker",
+  "slot": "mainhand",
+  "chance": 0.0025,
+  "items": ["berserker_rpg:unique_berserker_axe_1", "berserker_rpg:unique_berserker_axe_2"],
+  "replaces": "#renegades:rare_replace/berserker_axe_t2_t3"
+}

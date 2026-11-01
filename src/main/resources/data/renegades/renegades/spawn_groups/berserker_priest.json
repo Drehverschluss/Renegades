@@ -1,0 +1,10 @@
+{
+  "neoforge:conditions": [
+    {"type": "neoforge:mod_loaded", "modid": "berserker_rpg"}
+  ],
+  "leader": "renegades:berserker",
+  "weight": 1,
+  "members": [
+    { "entity": "renegades:priest", "min": 1, "max": 1 }
+  ]
+}

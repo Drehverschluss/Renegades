@@ -167,7 +167,7 @@ public final class ActionRunner {
             AttackVolume volume = action.volume();
             if (volume != null) {
                 AttackFrame frame = AttackGeometry.capture(volume, this.entity, false, 0.0F);
-                this.swing = new SwingExecution(this.entity, action, volume, frame);
+                this.swing = new SwingExecution(this.entity, action, ctx, volume, frame);
                 ctx.setSwing(this.swing);
             }
 

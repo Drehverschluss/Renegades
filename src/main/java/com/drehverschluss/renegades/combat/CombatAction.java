@@ -6,9 +6,18 @@ package com.drehverschluss.renegades.combat;
 import com.drehverschluss.renegades.combat.geometry.AttackVolume;
 import com.drehverschluss.renegades.entity.RenegadeEntity;
 import java.util.function.Consumer;
+import net.minecraft.world.entity.LivingEntity;
 import org.jetbrains.annotations.Nullable;
 
 public final class CombatAction {
+    /**
+     * Called for every victim a swing of this action hit, with the health (incl. absorption) the hit took away.
+     */
+    @FunctionalInterface
+    public interface HitHook {
+        void onHit(ActionContext context, LivingEntity victim, float dealt);
+    }
+
     private final String id;
     private final String animationController;
     @Nullable
@@ -48,6 +57,8 @@ public final class CombatAction {
     private final Consumer<ActionContext> onRecoveryStart;
     @Nullable
     private final Consumer<ActionContext> onFinish;
+    @Nullable
+    private final HitHook onHit;
 
     private CombatAction(CombatAction.Builder builder) {
         this.id = builder.id;
@@ -81,6 +92,7 @@ public final class CombatAction {
         this.onActiveTick = builder.onActiveTick;
         this.onRecoveryStart = builder.onRecoveryStart;
         this.onFinish = builder.onFinish;
+        this.onHit = builder.onHit;
     }
 
     public static CombatAction.Builder builder(String id) {
@@ -218,6 +230,12 @@ public final class CombatAction {
         }
     }
 
+    void fireHit(ActionContext context, LivingEntity victim, float dealt) {
+        if (this.onHit != null) {
+            this.onHit.onHit(context, victim, dealt);
+        }
+    }
+
     void fireFinish(ActionContext context) {
         if (this.onFinish != null) {
             this.onFinish.accept(context);
@@ -269,6 +287,8 @@ public final class CombatAction {
         private Consumer<ActionContext> onRecoveryStart;
         @Nullable
         private Consumer<ActionContext> onFinish;
+        @Nullable
+        private HitHook onHit;
 
         private Builder(String id) {
             this.id = id;
@@ -399,6 +419,14 @@ public final class CombatAction {
 
         public CombatAction.Builder onFinish(Consumer<ActionContext> hook) {
             this.onFinish = hook;
+            return this;
+        }
+
+        /**
+         * Called for every victim a swing of this action actually hurt.
+         */
+        public CombatAction.Builder onHit(HitHook hook) {
+            this.onHit = hook;
             return this;
         }
 

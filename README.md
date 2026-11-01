@@ -290,12 +290,31 @@ vanilla Slowness instead of the mod's own effect: that effect also pushes target
 thrown by Aeroblast would hover until the server kicks him for flying. Support and control spells (springwater, stone
 skin, impale, aeroblast, windfield) keep their full cooldown.
 
+**Berserker** (requires [Berserker RPG](https://www.curseforge.com/minecraft/mc-mods/berserker-rpg), see "Classes that
+need other mods" below): always presses forward with a two-handed berserker axe and gets more dangerous the more health
+it has lost. It never parries, blocks, dodges or retreats (65 HP, attack 7, knockback resistance 0.4). Between its
+abilities it swings the axe in quick two-handed strikes. Its attacks are its own (no spells cast), modelled on the spells
+of the mod:
+
+| Ability (caster_visuals key) | Effect |
+|---|---|
+| Rage (`rage`, permanent) | Below 50 % health, rising linearly to 10 %: up to +40 % damage, +25 % movement speed and 20 % shorter attack cooldowns. Red rage particles, more the lower its health. Taken back when healed (`enableBerserkerRage` in `[combat]`, default `true`) |
+| Bloody strike (`bloody_strike`) | Heavy overhead blow (attack × 1.3) with Bleed for 5 s. On a hit the berserker hurts itself for 10 % of the damage (never below one heart; then not at all) and gets Blood Sacrifice with 4 absorption (cooldown 5 s) |
+| Apprehend (`apprehend`) | Lunges at a target 4–8 blocks away and swings wide (120°, reach 5, × 0.6): targets hit are pulled up to it (never into lava, fire, water or off a drop, never through walls) and get Apprehend (−4 armor) for 6 s (cooldown 12 s) |
+| Guillotine (`guillotine`) | Against a target 5–10 blocks away: a roar and a ring on the ground mark the landing spot for 0.75 s, then it leaps there (safe landing, free arc, ±1.5 blocks height, like the paladin's leap) and strikes everything within 2 blocks: × 1.5, +20 % per harmful effect on the target (bleed, apprehend, ...), at most +60 %. Step out of the ring to dodge (cooldown 18 s, `enableGuillotine` in `[combat]`, default `true`) |
+| Second wind (`second_wind`, once per life) | Below 30 % health: Blood Reckoning – absorption for missing health (Berserker RPG's config, 60 %, at most 20), and when it ends after 8 s, 40 % of the remaining absorption heals |
+
+The effects (Bleed, Blood Sacrifice, Apprehend, Blood Reckoning) are the real ones from Spell Engine and Berserker RPG.
+Berserker RPG also makes berserker axes disable shields they hit, for the berserker too. Its abilities keep their
+cooldown (only rage shortens it); the plain swings are shortened like other attacks.
+
 Combat and magic system based on ANARCHY – RPG Minibosses by cleannrooster (CC0-1.0).
 
 ## Classes that need other mods
 
 Some classes mirror classes of other mods and only exist with that mod, because without its gear and spells they would
-be a plain copy of another class: the **Elemental Wizard** needs `elemental_wizards_rpg`. Without the mod:
+be a plain copy of another class: the **Elemental Wizard** needs `elemental_wizards_rpg`, the **Berserker** needs
+`berserker_rpg`. Without the mod:
 
 - no natural spawns; spawn groups with the class are left out (`/renegades spawngroup` names the missing mod);
 - its spawn egg is not in the creative tab; an egg from `/give` and the commands (`spawnelite`, `reequip`) report
@@ -347,7 +366,9 @@ leading a wizard, weight 1), `priest_solo` (weight 2), `warrior_priest` (a warri
 archer, weight 1; with `maxNearby` 3 it only spawns complete when no other renegade is near, otherwise the archer is
 left out first). With Elemental Wizards RPG also `elemental_wizard_solo` (weight 3), `warrior_elemental_wizard`
 (weight 2) and `paladin_elemental_wizard` (weight 1), so the elemental wizard is about as common as the wizard; the
-spawn timer still makes one attempt per interval, so the total spawn rate stays the same.
+spawn timer still makes one attempt per interval, so the total spawn rate stays the same. With Berserker RPG also
+`berserker_solo` (weight 4), `berserker_pair` (two berserkers, weight 1), `warrior_berserker` (weight 2) and
+`berserker_priest` (a berserker leading a priest, weight 1): 8 of 62 weight, about as often as the wizard (7).
 
 **Debug commands**: `/renegades groups <leader>` lists the templates, `/renegades spawngroup <id>` spawns one at your
 position like a natural spawn, `/renegades nearby` lists the renegades within `capRadius` with group, spawn type,
@@ -404,7 +425,8 @@ supported; items of mods that are not installed are left out, and an entry witho
 - `allow_affixes` (optional, default `true`): with Apotheosis, rare items get affixes like any other piece of an elite;
   `false` = never (an augment then upgrades another piece).
 
-Included (only with Arsenal from the RPG Series and the class mod; for the Elemental Wizard only Elemental Wizards RPG):
+Included (only with Arsenal from the RPG Series and the class mod; for the Elemental Wizard and the Berserker only their
+class mod):
 the uniques replace the tier 2-3 weapon of the same type (tags `renegades:rare_replace/*`), so about 1 in 400
 renegades with tier 2-3 gear carries one:
 
@@ -418,6 +440,7 @@ renegades with tier 2-3 gear carries one:
 | Wizard | damage staffs with the variant's school | fire/frost/arcane staff (not wands) | 0.5 % |
 | Priest | healing staffs | diamond/netherite holy staff (not wands) | 0.5 % |
 | Elemental Wizard | Crystal Aqua / Ruby Terra / Aeternium Wind staff of its element, or the Valkyrie Elementalist Staff (Elemental Wizards RPG) | aqua/terra/wind staff of tier 2-3 (not wands) | 0.5 % |
+| Berserker | unique berserker axes 1 and 2 (Berserker RPG) | diamond/netherite berserker axe | 0.25 % |
 
 **Debug command**: `/renegades rareitems` lists the loaded entries per class (slot, chance, items, replaces).
 
@@ -490,12 +513,14 @@ are supported. A spell id that does not exist falls back to the built-in look (o
 
 Ability keys: wizard `double_bolt`, `homing_bolts`, `nova` (variants `fire`, `frost`, `arcane`); priest `heal`,
 `healing_cloud`, `absorption`, `holy_bolt`; elemental wizard `water_volley`, `water_whip`, `springwater`, `stone_spear`,
-`impale`, `stone_skin`, `air_cutter`, `aeroblast`, `windfield` (variants `aqua`, `terra`, `wind`). The staff swing keeps
+`impale`, `stone_skin`, `air_cutter`, `aeroblast`, `windfield` (variants `aqua`, `terra`, `wind`); berserker `rage`,
+`bloody_strike`, `apprehend`, `guillotine`, `second_wind` (particles and sounds only). The staff swing keeps
 the built-in look.
 
 Included (only with Spell Engine and the class mod): wizard spells from Wizards (fire, frost, arcane), priest spells
 from Paladins & Priests (heal, circle of healing, divine protection, penance), elemental wizard spells from Elemental
-Wizards RPG (waterball, water whip, springwater, stone spear, impale, stone flesh, air cutter, aeroblast, windfield).
+Wizards RPG (waterball, water whip, springwater, stone spear, impale, stone flesh, air cutter, aeroblast, windfield),
+berserker looks from Berserker RPG (wild rage, bloody strike, apprehend, northerner's guillotine, blood reckoning).
 
 **Debug command**: `/renegades castervisuals` shows the mode and the assigned spells per class and ability, and whether
 each spell exists.

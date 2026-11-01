@@ -10,6 +10,7 @@ import com.drehverschluss.renegades.combat.AreaStrike;
 import com.drehverschluss.renegades.combat.AttackMotion;
 import com.drehverschluss.renegades.combat.CombatAction;
 import com.drehverschluss.renegades.combat.GroundLocomotion;
+import com.drehverschluss.renegades.combat.LeapPath;
 import com.drehverschluss.renegades.combat.MovementProfile;
 import com.drehverschluss.renegades.combat.SlashVisual;
 import com.drehverschluss.renegades.combat.TrackingMode;
@@ -28,9 +29,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.ItemAbilities;
 
@@ -363,49 +362,11 @@ public class PaladinBrain extends MobBrain {
     }
 
     /**
-     * Whether a leap from here to the destination is safe: the destination is 6-14 blocks away and at most 1.5 blocks
-     * higher or lower, the whole arc (body plus the jump height) is free of blocks, so the paladin neither hits a
-     * ceiling nor a wall, and below every point of the path there is solid ground within 3 blocks without water or
-     * lava. Checking the whole path also covers shorter landings (slowness, stopping in front of the target).
+     * Whether a leap from here to the destination is safe (see LeapPath): 6-14 blocks away, at most 1.5 blocks higher or
+     * lower, a free arc and safe ground under the whole path.
      */
     private boolean isSafeLeap(Vec3 destination) {
-        Vec3 from = this.entity.position();
-        Vec3 flat = GroundLocomotion.horizontal(destination.subtract(from));
-        double distance = flat.length();
-        double heightChange = destination.y - from.y;
-        if (distance < LEAP_MIN_DISTANCE - 1.0 || distance > LEAP_MAX_DISTANCE || Math.abs(heightChange) > LEAP_MAX_HEIGHT_CHANGE) {
-            return false;
-        }
-
-        Level level = this.entity.level();
-        AABB body = this.entity.getBoundingBox().move(from.scale(-1.0)).deflate(0.05, 0.0, 0.05);
-        int steps = Mth.ceil(distance * 2.0);
-        for (int i = 1; i <= steps; i++) {
-            double f = (double) i / steps;
-            double arc = 4.0 * LEAP_APEX * f * (1.0 - f);
-            Vec3 point = from.add(flat.scale(f)).add(0.0, heightChange * f, 0.0);
-            // Body at its height on the arc, stretched down to the straight line so the climb is covered as well.
-            AABB box = body.move(point).expandTowards(0.0, arc + 0.1, 0.0).move(0.0, 0.05, 0.0);
-            if (!level.noCollision(this.entity, box) || !this.hasSafeGround(level, point)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private boolean hasSafeGround(Level level, Vec3 point) {
-        BlockPos feet = BlockPos.containing(point.x, point.y + 0.01, point.z);
-        for (int depth = 0; depth <= LEAP_MAX_DROP; depth++) {
-            BlockPos pos = feet.below(depth);
-            if (!level.getFluidState(pos).isEmpty() || !level.getFluidState(pos.above()).isEmpty()) {
-                return false;
-            }
-            BlockState state = level.getBlockState(pos);
-            if (depth > 0 && !state.getCollisionShape(level, pos).isEmpty()) {
-                return true;
-            }
-        }
-        return false;
+        return LeapPath.isSafe(this.entity, destination, LEAP_MIN_DISTANCE - 1.0, LEAP_MAX_DISTANCE, LEAP_APEX, LEAP_MAX_HEIGHT_CHANGE, LEAP_MAX_DROP);
     }
 
     /**

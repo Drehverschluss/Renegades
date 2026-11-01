@@ -44,7 +44,8 @@ public final class RenegadeClasses {
             builtIn(ModEntityTypes.ARCHER, ModItems.ARCHER_SPAWN_EGG),
             builtIn(ModEntityTypes.WIZARD, ModItems.WIZARD_SPAWN_EGG),
             builtIn(ModEntityTypes.PRIEST, ModItems.PRIEST_SPAWN_EGG),
-            new RenegadeClass(ModEntityTypes.ELEMENTAL_WIZARD, ModItems.ELEMENTAL_WIZARD_SPAWN_EGG, List.of("elemental_wizards_rpg"), true));
+            new RenegadeClass(ModEntityTypes.ELEMENTAL_WIZARD, ModItems.ELEMENTAL_WIZARD_SPAWN_EGG, List.of("elemental_wizards_rpg"), true),
+            new RenegadeClass(ModEntityTypes.BERSERKER, ModItems.BERSERKER_SPAWN_EGG, List.of("berserker_rpg"), true));
 
     private RenegadeClasses() {
     }

@@ -37,6 +37,8 @@ public final class RenegadesConfig {
     public static final ModConfigSpec.BooleanValue ENABLE_PRIEST_HEALING;
     public static final ModConfigSpec.DoubleValue HEALING_MULTIPLIER;
     public static final ModConfigSpec.BooleanValue COOLDOWN_GROUP_SCALING;
+    public static final ModConfigSpec.BooleanValue ENABLE_BERSERKER_RAGE;
+    public static final ModConfigSpec.BooleanValue ENABLE_GUILLOTINE;
     public static final ModConfigSpec.ConfigValue<String> CASTER_VISUALS;
     public static final ModConfigSpec.BooleanValue APOTHEOSIS_ELITE_GEAR;
     public static final ModConfigSpec.DoubleValue FULL_SET_ELITE_CHANCE;
@@ -164,6 +166,15 @@ public final class RenegadesConfig {
                 .comment("If true, renegades fighting near other renegades get somewhat shorter attack cooldowns: at most 25 % shorter than alone, never below 1 second.",
                         "If false, cooldowns are always as for a renegade fighting alone.")
                 .define("cooldownGroupScaling", true);
+
+        ENABLE_BERSERKER_RAGE = builder
+                .comment("If true, the berserker gets stronger below 50 % health: up to +40 % damage, +25 % movement speed and shorter attack",
+                        "cooldowns at 10 % health.")
+                .define("enableBerserkerRage", true);
+
+        ENABLE_GUILLOTINE = builder
+                .comment("If true, the berserker leaps at targets 5-10 blocks away with an announced finishing blow (Guillotine).")
+                .define("enableGuillotine", true);
 
         builder.pop();
 

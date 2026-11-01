@@ -439,6 +439,31 @@ public final class GroundLocomotion {
     }
 
     private boolean isHazard(Level level, BlockPos pos) {
+        return isHazardBlock(level, pos);
+    }
+
+    /**
+     * Whether an entity may stand at this position (e.g. where a pull ends): the feet block is free and no hazard, and
+     * below is solid ground within the safe drop, with no hazard (lava, fire, water, ...) on the way.
+     */
+    public static boolean isSafeStandingSpot(Level level, Vec3 position) {
+        BlockPos feet = BlockPos.containing(position.x, position.y + 0.01, position.z);
+        if (isHazardBlock(level, feet) || isHazardBlock(level, feet.above())) {
+            return false;
+        }
+        for (int depth = 0; depth <= MAX_SAFE_DROP + 1; depth++) {
+            BlockPos pos = feet.below(depth);
+            if (depth > 0 && isHazardBlock(level, pos)) {
+                return false;
+            }
+            if (!level.getBlockState(pos).getCollisionShape(level, pos).isEmpty()) {
+                return depth > 0;
+            }
+        }
+        return false;
+    }
+
+    private static boolean isHazardBlock(Level level, BlockPos pos) {
         FluidState fluid = level.getFluidState(pos);
         if (fluid.is(FluidTags.LAVA) || fluid.is(FluidTags.WATER)) {
             return true;

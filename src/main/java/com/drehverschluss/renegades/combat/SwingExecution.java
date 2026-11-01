@@ -23,6 +23,7 @@ import org.jetbrains.annotations.Nullable;
 public final class SwingExecution {
     private final RenegadeEntity attacker;
     private final CombatAction action;
+    private final ActionContext context;
     private final AttackVolume volume;
     private AttackFrame frame;
     @Nullable
@@ -32,9 +33,10 @@ public final class SwingExecution {
     private boolean weaponSwingSpent;
     private int tick;
 
-    SwingExecution(RenegadeEntity attacker, CombatAction action, AttackVolume volume, AttackFrame frame) {
+    SwingExecution(RenegadeEntity attacker, CombatAction action, ActionContext context, AttackVolume volume, AttackFrame frame) {
         this.attacker = attacker;
         this.action = action;
+        this.context = context;
         this.volume = volume;
         this.frame = frame;
         this.previousOrigin = frame.origin();
@@ -86,12 +88,16 @@ public final class SwingExecution {
 
     private void strike(LivingEntity victim, float progress) {
         this.hits.put(victim, this.tick);
+        float before = victim.getHealth() + victim.getAbsorptionAmount();
         boolean landed;
         if (this.action.usesWeaponDamage() && !this.weaponSwingSpent) {
             this.weaponSwingSpent = true;
             landed = this.attacker.doHurtTarget(victim);
         } else {
             landed = this.attacker.meleeHit(victim, this.action.damageScale());
+        }
+        if (landed) {
+            this.action.fireHit(this.context, victim, Math.max(0.0F, before - victim.getHealth() - victim.getAbsorptionAmount()));
         }
 
         if (landed && !(this.action.knockback() <= 0.0)) {

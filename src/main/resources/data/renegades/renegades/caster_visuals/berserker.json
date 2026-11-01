@@ -1,0 +1,14 @@
+{
+  "neoforge:conditions": [
+    {"type": "neoforge:mod_loaded", "modid": "spell_engine"},
+    {"type": "neoforge:mod_loaded", "modid": "berserker_rpg"}
+  ],
+  "entity": "renegades:berserker",
+  "abilities": {
+    "rage": "berserker_rpg:wild_rage",
+    "bloody_strike": "berserker_rpg:bloody_strike",
+    "apprehend": "berserker_rpg:apprehend",
+    "guillotine": "berserker_rpg:northerners_guillotine",
+    "second_wind": "berserker_rpg:blood_reckoning"
+  }
+}

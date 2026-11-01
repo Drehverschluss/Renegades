@@ -27,6 +27,7 @@ public class RenegadesClient {
         event.registerEntityRenderer(ModEntityTypes.PRIEST.get(), RenegadeRenderer::new);
         // Same RenegadeRenderer and with it the one shared RenegadeModel (needed for Iris shadow passes, see RenegadeRenderer).
         event.registerEntityRenderer(ModEntityTypes.ELEMENTAL_WIZARD.get(), RenegadeRenderer::new);
+        event.registerEntityRenderer(ModEntityTypes.BERSERKER.get(), RenegadeRenderer::new);
         // Spell projectiles and clouds are drawn with particles (spawned client-side in their tick); projectiles with
         // another mod's spell look also draw that spell's model.
         event.registerEntityRenderer(ModEntityTypes.MAGIC_PROJECTILE.get(), MagicProjectileRenderer::new);

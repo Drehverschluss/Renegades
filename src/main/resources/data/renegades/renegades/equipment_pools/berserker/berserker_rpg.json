@@ -1,0 +1,78 @@
+{
+  "neoforge:conditions": [
+    {"type": "neoforge:mod_loaded", "modid": "berserker_rpg"}
+  ],
+  "entity": "renegades:berserker",
+  "fallback": false,
+  "entries": [
+    {
+      "id": "berserker_tier1",
+      "conditions": {
+        "dimensions": ["minecraft:overworld"],
+        "max_distance": 1500
+      },
+      "equipment": {
+        "head": "berserker_rpg:wildling_head",
+        "chest": "berserker_rpg:wildling_chest",
+        "legs": "berserker_rpg:wildling_legs",
+        "feet": "berserker_rpg:wildling_feet",
+        "mainhand": "berserker_rpg:iron_berserker_axe"
+      }
+    },
+    {
+      "id": "berserker_tier2",
+      "conditions": {
+        "dimensions": ["minecraft:overworld"],
+        "min_distance": 1500,
+        "max_distance": 4000
+      },
+      "equipment": {
+        "head": "berserker_rpg:northling_head",
+        "chest": "berserker_rpg:northling_chest",
+        "legs": "berserker_rpg:northling_legs",
+        "feet": "berserker_rpg:northling_feet",
+        "mainhand": "berserker_rpg:diamond_berserker_axe"
+      }
+    },
+    {
+      "id": "berserker_tier2_nether",
+      "conditions": {
+        "dimensions": ["minecraft:the_nether"]
+      },
+      "equipment": {
+        "head": "berserker_rpg:northling_head",
+        "chest": "berserker_rpg:northling_chest",
+        "legs": "berserker_rpg:northling_legs",
+        "feet": "berserker_rpg:northling_feet",
+        "mainhand": "berserker_rpg:diamond_berserker_axe"
+      }
+    },
+    {
+      "id": "berserker_tier3",
+      "conditions": {
+        "dimensions": ["minecraft:overworld"],
+        "min_distance": 4000
+      },
+      "equipment": {
+        "head": "berserker_rpg:netherite_northling_head",
+        "chest": "berserker_rpg:netherite_northling_chest",
+        "legs": "berserker_rpg:netherite_northling_legs",
+        "feet": "berserker_rpg:netherite_northling_feet",
+        "mainhand": "berserker_rpg:netherite_berserker_axe"
+      }
+    },
+    {
+      "id": "berserker_tier3_end",
+      "conditions": {
+        "dimensions": ["minecraft:the_end"]
+      },
+      "equipment": {
+        "head": "berserker_rpg:netherite_northling_head",
+        "chest": "berserker_rpg:netherite_northling_chest",
+        "legs": "berserker_rpg:netherite_northling_legs",
+        "feet": "berserker_rpg:netherite_northling_feet",
+        "mainhand": "berserker_rpg:netherite_berserker_axe"
+      }
+    }
+  ]
+}
