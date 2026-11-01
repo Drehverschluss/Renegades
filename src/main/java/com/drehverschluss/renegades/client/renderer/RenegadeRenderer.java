@@ -18,6 +18,12 @@ import software.bernie.geckolib.cache.object.GeoBone;
 import software.bernie.geckolib.renderer.GeoEntityRenderer;
 
 public class RenegadeRenderer extends GeoEntityRenderer<RenegadeEntity> {
+    // All renegade types use the same geo file, so GeckoLib gives every GeoModel the same baked bones. GeoModel skips the
+    // animation pass when it last animated the same entity (it assumes the bones still hold that entity's pose). With one
+    // GeoModel per renderer, an entity rendered twice per frame (e.g. a shader shadow pass, then the normal pass) would be
+    // drawn with the pose another renderer last wrote into the shared bones. One GeoModel for all renderers keeps it right.
+    private static final RenegadeModel MODEL = new RenegadeModel();
+
     // Only created when Armor Model API is installed, so its classes are never loaded otherwise.
     @Nullable
     private final ArmorModelApiRenderer armorModelApiRenderer;
@@ -27,7 +33,7 @@ public class RenegadeRenderer extends GeoEntityRenderer<RenegadeEntity> {
     private boolean hideBody;
 
     public RenegadeRenderer(EntityRendererProvider.Context context) {
-        super(context, new RenegadeModel());
+        super(context, MODEL);
         this.shadowRadius = 0.5F;
         this.armorModelApiRenderer = ArmorModelApiCompat.isLoaded() ? new ArmorModelApiRenderer() : null;
 
