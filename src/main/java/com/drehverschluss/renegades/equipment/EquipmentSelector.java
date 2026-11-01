@@ -50,6 +50,9 @@ public final class EquipmentSelector {
             for (EquipmentSlot slot : SLOTS) {
                 mob.setItemSlot(slot, ItemStack.EMPTY);
             }
+            if (mob instanceof RenegadeEntity renegade) {
+                renegade.resetVanillaDropChances();
+            }
         }
         return selection;
     }
@@ -87,6 +90,7 @@ public final class EquipmentSelector {
         }
         if (mob instanceof RenegadeEntity renegade) {
             renegade.applyPoolVariant(entry.variant());
+            renegade.resetVanillaDropChances();
         }
     }
 

@@ -121,8 +121,17 @@ public abstract class RenegadeEntity extends Monster implements GeoEntity {
 
     protected RenegadeEntity(EntityType<? extends RenegadeEntity> entityType, Level level) {
         super(entityType, level);
+        this.resetVanillaDropChances();
+    }
 
-        // Equipment drops are handled in dropCustomDeathLoot according to the server config.
+    /**
+     * Equipment drops are handled in dropCustomDeathLoot according to the server config, so the vanilla drop chance of
+     * every slot stays 0. Other mods may raise it: Apotheosis (random_affix_items augment, FinalizeSpawnEvent) puts an
+     * affix item into a slot and calls setGuaranteedDrop (chance 2.0) before our pool equipment replaces the item, so
+     * vanilla would drop the pool item at full durability. Called after every pool equip and before death drops, which
+     * also covers renegades saved with such a chance. Apotheosis affixes on renegade gear are planned for Phase 6 (elite).
+     */
+    public void resetVanillaDropChances() {
         for (EquipmentSlot slot : EquipmentSlot.values()) {
             this.setDropChance(slot, 0.0F);
         }
@@ -554,6 +563,8 @@ public abstract class RenegadeEntity extends Monster implements GeoEntity {
 
     @Override
     protected void dropCustomDeathLoot(ServerLevel level, DamageSource damageSource, boolean recentlyHit) {
+        // Vanilla must not drop equipment itself (see resetVanillaDropChances), e.g. for renegades saved with chance 2.0.
+        this.resetVanillaDropChances();
         super.dropCustomDeathLoot(level, damageSource, recentlyHit);
 
         if (RenegadesConfig.REQUIRE_PLAYER_KILL.get() && !recentlyHit) {
