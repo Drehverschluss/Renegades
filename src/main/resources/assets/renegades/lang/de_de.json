@@ -12,6 +12,8 @@
   "entity.renegades.wizard": "Abtrünniger Zauberer",
   "item.renegades.wizard_spawn_egg": "Spawn-Ei (Abtrünniger Zauberer)",
   "entity.renegades.priest": "Abtrünniger Priester",
+  "entity.renegades.elite": "%1$s %2$s",
+  "entity.renegades.elite_set": "%1$s %2$s (Elite)",
   "item.renegades.priest_spawn_egg": "Spawn-Ei (Abtrünniger Priester)",
   "entity.renegades.magic_projectile": "Zauber",
   "entity.renegades.magic_cloud": "Zauberwolke",

@@ -2,6 +2,7 @@ package com.drehverschluss.renegades.command;
 
 import com.drehverschluss.renegades.Renegades;
 import com.drehverschluss.renegades.combat.CombatProfiler;
+import com.drehverschluss.renegades.compat.apotheosis.ApotheosisCompat;
 import com.drehverschluss.renegades.config.RenegadesConfig;
 import com.drehverschluss.renegades.entity.RenegadeEntity;
 import com.drehverschluss.renegades.equipment.EquipmentPoolEntry;
@@ -11,7 +12,9 @@ import com.drehverschluss.renegades.group.RenegadeGroups;
 import com.drehverschluss.renegades.group.SpawnGroupTemplate;
 import com.drehverschluss.renegades.group.SpawnGroups;
 import com.drehverschluss.renegades.group.SpawnStats;
+import com.drehverschluss.renegades.registry.ModEntityTypes;
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
@@ -44,7 +47,7 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.event.EventHooks;
 
 /**
- * Debug commands (permission level 2): /renegades pools|reequip|groups|spawngroup|nearby|damagetags|stats|profile.
+ * Debug commands (permission level 2): /renegades pools|reequip|groups|spawngroup|nearby|damagetags|stats|profile|spawnelite.
  */
 public final class RenegadesCommand {
     private RenegadesCommand() {
@@ -91,7 +94,68 @@ public final class RenegadesCommand {
                 .then(Commands.literal("stats")
                         .executes(context -> showStats(context.getSource()))
                         .then(Commands.literal("reset")
-                                .executes(context -> resetStats(context.getSource())))));
+                                .executes(context -> resetStats(context.getSource()))))
+                .then(Commands.literal("spawnelite")
+                        .then(Commands.argument("class", StringArgumentType.word())
+                                .suggests((context, builder) -> SharedSuggestionProvider.suggest(
+                                        renegadeTypes().stream().map(type -> BuiltInRegistries.ENTITY_TYPE.getKey(type).getPath()), builder))
+                                .then(Commands.argument("rarity", ResourceLocationArgument.id())
+                                        .suggests((context, builder) -> SharedSuggestionProvider.suggestResource(ApotheosisCompat.rarityIds(), builder))
+                                        .executes(context -> spawnElite(context.getSource(), StringArgumentType.getString(context, "class"),
+                                                ResourceLocationArgument.getId(context, "rarity"), false))
+                                        .then(Commands.literal("set")
+                                                .executes(context -> spawnElite(context.getSource(), StringArgumentType.getString(context, "class"),
+                                                        ResourceLocationArgument.getId(context, "rarity"), true)))))));
+    }
+
+    private static List<EntityType<? extends RenegadeEntity>> renegadeTypes() {
+        return List.of(ModEntityTypes.WARRIOR.get(), ModEntityTypes.ROGUE.get(), ModEntityTypes.PALADIN.get(),
+                ModEntityTypes.ARCHER.get(), ModEntityTypes.WIZARD.get(), ModEntityTypes.PRIEST.get());
+    }
+
+    /**
+     * Spawns a renegade like a spawn egg and makes it an elite with the given rarity: one own piece, or with "set" all
+     * pieces that can take affixes (Apotheosis only).
+     */
+    private static int spawnElite(CommandSourceStack source, String className, ResourceLocation rarity, boolean fullSet) {
+        if (!ApotheosisCompat.isLoaded()) {
+            source.sendFailure(Component.literal("Apotheosis is not installed, there are no elite renegades"));
+            return 0;
+        }
+        Optional<EntityType<? extends RenegadeEntity>> type = renegadeTypes().stream()
+                .filter(candidate -> BuiltInRegistries.ENTITY_TYPE.getKey(candidate).getPath().equals(className))
+                .findFirst();
+        if (type.isEmpty()) {
+            source.sendFailure(Component.literal("Unknown renegade class " + className));
+            return 0;
+        }
+        if (ApotheosisCompat.rarityColor(rarity).isEmpty()) {
+            source.sendFailure(Component.literal("Unknown rarity " + rarity + " (known: " + ApotheosisCompat.rarityIds() + ")"));
+            return 0;
+        }
+
+        ServerLevel level = source.getLevel();
+        RenegadeEntity renegade = type.get().create(level);
+        if (renegade == null) {
+            return 0;
+        }
+        Vec3 pos = source.getPosition();
+        renegade.moveTo(pos.x, pos.y, pos.z, source.getRotation().y, 0.0F);
+        renegade.setForcedElite(new ApotheosisCompat.ForcedElite(rarity, fullSet));
+        EventHooks.finalizeMobSpawn(renegade, level, level.getCurrentDifficultyAt(renegade.blockPosition()), MobSpawnType.SPAWN_EGG, null);
+        level.addFreshEntityWithPassengers(renegade);
+
+        ApotheosisCompat.EliteResult result = renegade.getLastEliteResult();
+        if (result.upgraded().isEmpty()) {
+            source.sendFailure(Component.literal("Spawned " + renegade.getName().getString() + ", but no piece could take affixes (or no player nearby)"));
+            return 0;
+        }
+        String pieces = result.upgraded().stream()
+                .map(piece -> piece.slot().getName() + "=" + piece.item() + " (" + piece.rarity() + ", " + piece.affixes() + " affixes)")
+                .collect(Collectors.joining(", "));
+        source.sendSuccess(() -> Component.literal("Spawned ").append(renegade.getDisplayName())
+                .append(Component.literal(": " + pieces)), true);
+        return result.upgraded().size();
     }
 
     private static int showStats(CommandSourceStack source) {

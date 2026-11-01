@@ -40,8 +40,12 @@ public final class EquipmentSelector {
 
     /**
      * Rolls the equipment of a mob that is already in the world again (debug command); clears it if no entry matches.
+     * A renegade loses its elite state with its old gear.
      */
     public static Optional<Selection> reequip(Mob mob, ServerLevel level) {
+        if (mob instanceof RenegadeEntity renegade) {
+            renegade.clearEliteState();
+        }
         OptionalInt mobLevel = RenegadeLevels.provider().map(provider -> provider.currentLevel(mob)).orElse(OptionalInt.empty());
         Optional<Selection> selection = select(mob, level, mobLevel, mob.getRandom());
         if (selection.isPresent()) {

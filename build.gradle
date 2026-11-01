@@ -71,6 +71,17 @@ repositories {
             includeGroup 'com.ldtteam'
         }
     }
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = 'Shadows of Fire'
+                url = 'https://maven.shadowsoffire.dev/releases/'
+            }
+        }
+        filter {
+            includeGroup 'dev.shadowsoffire'
+        }
+    }
 }
 
 base {
@@ -172,6 +183,17 @@ dependencies {
     compileOnly("com.ldtteam:minecolonies:${minecolonies_version}") {
         transitive = false
     }
+    // Apotheosis (optional): elite renegades get affixes and a rarity on their own gear. Placebo and Apothic
+    // Attributes are only needed to compile against Apotheosis' API.
+    compileOnly("dev.shadowsoffire:Apotheosis:${apotheosis_version}") {
+        transitive = false
+    }
+    compileOnly("dev.shadowsoffire:Placebo:${placebo_version}") {
+        transitive = false
+    }
+    compileOnly("dev.shadowsoffire:ApothicAttributes:${apothic_attributes_version}") {
+        transitive = false
+    }
 
     // Local test mods (not in the repo) that are only loaded in the dev runs.
     localRuntime fileTree(dir: 'libs/test', include: '*.jar')
@@ -218,6 +240,7 @@ var generateModMetadata = tasks.register("generateModMetadata", ProcessResources
             dynamic_difficulty_version_range: dynamic_difficulty_version_range,
             spell_power_version_range: spell_power_version_range,
             minecolonies_version_range: minecolonies_version_range,
+            apotheosis_version_range: apotheosis_version_range,
     ]
     inputs.properties replaceProperties
     expand replaceProperties

@@ -4,8 +4,10 @@ import com.drehverschluss.renegades.registry.ModEntityTypes;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -14,6 +16,7 @@ import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
@@ -92,7 +95,15 @@ public class ThrowingKnife extends ThrowableItemProjectile {
         super.onHitEntity(result);
         Entity target = result.getEntity();
         LivingEntity thrower = this.getOwner() instanceof LivingEntity living ? living : null;
-        if (target.hurt(this.damageSources().mobProjectile(this, thrower), this.damage)) {
+        DamageSource source = this.damageSources().mobProjectile(this, thrower);
+        // Like a thrown trident: enchantments and Apotheosis affixes of the thrown dagger (and the thrower's gear) take part.
+        float damage = this.level() instanceof ServerLevel serverLevel
+                ? EnchantmentHelper.modifyDamage(serverLevel, this.getItem(), target, source, this.damage)
+                : this.damage;
+        if (target.hurt(source, damage)) {
+            if (this.level() instanceof ServerLevel serverLevel) {
+                EnchantmentHelper.doPostAttackEffectsWithItemSource(serverLevel, target, source, this.getItem());
+            }
             this.playSound(SoundEvents.TRIDENT_HIT, 1.0F, 1.2F);
         }
     }

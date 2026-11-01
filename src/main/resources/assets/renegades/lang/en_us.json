@@ -12,6 +12,8 @@
   "entity.renegades.wizard": "Wizard Renegade",
   "item.renegades.wizard_spawn_egg": "Wizard Renegade Spawn Egg",
   "entity.renegades.priest": "Priest Renegade",
+  "entity.renegades.elite": "%1$s %2$s",
+  "entity.renegades.elite_set": "%1$s Elite %2$s",
   "item.renegades.priest_spawn_egg": "Priest Renegade Spawn Egg",
   "entity.renegades.magic_projectile": "Spell",
   "entity.renegades.magic_cloud": "Spell Cloud",

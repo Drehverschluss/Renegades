@@ -327,3 +327,35 @@ Configured in the server config `config/renegades-server.toml`. To override it f
 Items with Curse of Vanishing (or any `prevent_equipment_drop` effect) never drop; Looting raises the chance like for
 vanilla mob equipment. The regular loot tables (`renegades:entities/<class>`) are empty by default and can be filled
 by datapacks.
+
+## Elite renegades (Apotheosis)
+
+With [Apotheosis](https://www.curseforge.com/minecraft/mc-mods/apotheosis) installed, renegades can be elites. The
+integration is optional; nothing from Apotheosis is bundled.
+
+- **Augment**: Apotheosis' augment `random_affix_items` (`data/apotheosis/apothic_augments`, 12 % of monster spawns,
+  not from (trial) spawners) gives a monster a random affix item. A renegade keeps its class gear instead: for each such
+  item one of its own pieces gets affixes and that item's rarity (the piece in the same slot, otherwise another free
+  piece). How often this happens is set through Apotheosis' own augment data; packs that add more augments with
+  `random_affix_item` get elites with several upgraded pieces.
+- **Elite set**: with `fullSetEliteChance` (see below) all worn pieces that can take affixes get affixes, all with the
+  same rarity, rolled for the world tier like Apotheosis' own loot. It replaces the augment for that renegade, so no
+  piece is upgraded twice. Elite sets are saved as `RenegadesElite.Set` in the entity NBT.
+- **Name**: an elite shows its rarity as a title, the whole name in the rarity's color: "Rare Warrior Renegade", with an
+  elite set "Rare Elite Warrior Renegade" (best rarity if several pieces were upgraded). The wording comes from the
+  language keys `entity.renegades.elite` and `entity.renegades.elite_set`; the rarity name from Apotheosis' `rarity.<id>`
+  keys. It is not a custom name, so elites despawn like other renegades and a name tag still wins.
+- **Drops**: upgraded pieces drop by the normal drop rules (chance, `requirePlayerKill`, 25-75 % durability) and keep
+  their affixes and rarity.
+- **Affix effects**: attribute affixes work for renegades like for players. Hit affixes trigger on melee hits, arrows and
+  thrown knives; projectile affixes on arrows (and on knives from the off-hand dagger). Spells do not trigger weapon
+  affixes.
+
+| Option (section `[elite]`) | Default | Effect |
+|---|---|---|
+| `apotheosisEliteGear` | `true` | Augment items upgrade the renegade's own pieces. If false, Apotheosis has no effect on renegade gear (and there are no elite sets). |
+| `fullSetEliteChance` | `0.0` | Chance per spawn (not from (trial) spawners, only with a player in the world) for an elite set. E.g. `0.02` = 2 %. |
+
+**Debug command**: `/renegades spawnelite <class> <rarity> [set]` spawns a renegade like a spawn egg and makes it an
+elite with that rarity (one piece, or with `set` all pieces). `/renegades reequip` rolls new gear and removes the elite
+state.

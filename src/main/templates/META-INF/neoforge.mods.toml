@@ -59,3 +59,10 @@ description='''${mod_description}'''
     versionRange="${minecolonies_version_range}"
     ordering="NONE"
     side="BOTH"
+
+[[dependencies.${mod_id}]]
+    modId="apotheosis"
+    type="optional"
+    versionRange="${apotheosis_version_range}"
+    ordering="NONE"
+    side="BOTH"

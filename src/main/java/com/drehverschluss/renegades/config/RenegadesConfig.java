@@ -35,6 +35,8 @@ public final class RenegadesConfig {
     public static final ModConfigSpec.BooleanValue ENABLE_PRIEST_HEALING;
     public static final ModConfigSpec.DoubleValue HEALING_MULTIPLIER;
     public static final ModConfigSpec.BooleanValue COOLDOWN_GROUP_SCALING;
+    public static final ModConfigSpec.BooleanValue APOTHEOSIS_ELITE_GEAR;
+    public static final ModConfigSpec.DoubleValue FULL_SET_ELITE_CHANCE;
 
     static {
         ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
@@ -155,6 +157,23 @@ public final class RenegadesConfig {
                 .comment("If true, renegades fighting near other renegades get somewhat shorter attack cooldowns: at most 25 % shorter than alone, never below 1 second.",
                         "If false, cooldowns are always as for a renegade fighting alone.")
                 .define("cooldownGroupScaling", true);
+
+        builder.pop();
+
+        builder.comment("Elite renegades with Apotheosis (only if Apotheosis is installed). How often a renegade becomes an elite is decided",
+                        "by Apotheosis' own augment data (data/apotheosis/apothic_augments, e.g. random_affix_items: 12 % of monster spawns).",
+                        "Instead of a random Apotheosis item replacing a piece of the class gear, one of the renegade's own pieces gets the affixes",
+                        "and rarity. Elites show the rarity as a title in their name, in the rarity's color.")
+                .push("elite");
+
+        APOTHEOSIS_ELITE_GEAR = builder
+                .comment("If true, each Apotheosis affix item a renegade gets on spawn upgrades one of its own pieces instead (different pieces).",
+                        "If false, Apotheosis has no effect on renegade gear. Also required for fullSetEliteChance.")
+                .define("apotheosisEliteGear", true);
+        FULL_SET_ELITE_CHANCE = builder
+                .comment("Chance per spawn (not from (trial) spawners, only with a player nearby) that ALL worn pieces get affixes, all with the same",
+                        "rarity rolled for the world tier (a small miniboss, shown as \"Elite\" in its name). 0 = never, e.g. 0.02 = 2 %.")
+                .defineInRange("fullSetEliteChance", 0.0D, 0.0D, 1.0D);
 
         builder.pop();
         SPEC = builder.build();

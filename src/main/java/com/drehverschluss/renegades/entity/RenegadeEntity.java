@@ -5,6 +5,7 @@ import com.drehverschluss.renegades.combat.CombatProfiler;
 import com.drehverschluss.renegades.combat.MovementOwner;
 import com.drehverschluss.renegades.combat.brain.MobBrain;
 import com.drehverschluss.renegades.combat.brain.MobBrainGoal;
+import com.drehverschluss.renegades.compat.apotheosis.ApotheosisCompat;
 import com.drehverschluss.renegades.config.RenegadesConfig;
 import com.drehverschluss.renegades.entity.ai.FollowGroupLeaderGoal;
 import com.drehverschluss.renegades.equipment.EquipmentSelector;
@@ -13,11 +14,17 @@ import com.drehverschluss.renegades.group.RenegadeGroups;
 import com.drehverschluss.renegades.group.SpawnGroupTemplate;
 import com.drehverschluss.renegades.group.SpawnGroups;
 import com.drehverschluss.renegades.group.SpawnStats;
+import java.util.List;
 import java.util.UUID;
 import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
@@ -63,6 +70,11 @@ public abstract class RenegadeEntity extends Monster implements GeoEntity {
      */
     public static final String ACTION_CONTROLLER = "action";
     private static final String TAG_GROUP = "RenegadesGroup";
+    // Elite state (Apotheosis): {Rarity: "apotheosis:rare", Color: int, Set: boolean}; also meant for pack scripts.
+    private static final String TAG_ELITE = "RenegadesElite";
+    private static final EntityDataAccessor<String> DATA_ELITE_RARITY = SynchedEntityData.defineId(RenegadeEntity.class, EntityDataSerializers.STRING);
+    private static final EntityDataAccessor<Integer> DATA_ELITE_COLOR = SynchedEntityData.defineId(RenegadeEntity.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Boolean> DATA_ELITE_SET = SynchedEntityData.defineId(RenegadeEntity.class, EntityDataSerializers.BOOLEAN);
     private static final double COOLDOWN_ALLY_RADIUS = 32.0D;
     private static final int MIN_SCALED_COOLDOWN = 20;
     private static final int MAX_FALL_DISTANCE = 3;
@@ -93,6 +105,11 @@ public abstract class RenegadeEntity extends Monster implements GeoEntity {
     private float smoothedSpeed;
     // Client only: walking (out of combat) with hysteresis, see updateWalkState.
     private boolean walking;
+    // Set by the spawnelite command before finalizeSpawn; replaces the augment items and the elite set roll.
+    @Nullable
+    private ApotheosisCompat.ForcedElite forcedElite;
+    // What finalizeSpawn upgraded (not saved); read by the spawnelite command.
+    private ApotheosisCompat.EliteResult lastEliteResult = ApotheosisCompat.EliteResult.NONE;
 
     /**
      * Out-of-combat animations shared by all classes: a calm stand and a plain walk with swinging arms.
@@ -412,7 +429,11 @@ public abstract class RenegadeEntity extends Monster implements GeoEntity {
         // Before the equipment roll: it commits the Dynamic Difficulty level, whose ADD_MULTIPLIED_BASE bonuses then
         // scale the multiplied base values. Only runs for new spawns, never when loading from NBT.
         this.applyStrengthMultipliers();
+        // Apotheosis' augment items are still in the slots here; the equipment roll replaces them.
+        List<ApotheosisCompat.AugmentItem> augmentItems = ApotheosisCompat.findAugmentItems(this);
         EquipmentSelector.equipOnSpawn(this, level.getLevel());
+        this.lastEliteResult = ApotheosisCompat.applyEliteGear(this, level.getLevel(), spawnType, augmentItems, this.forcedElite);
+        this.forcedElite = null;
         this.setHealth(this.getMaxHealth());
         this.fillHealthAfterFirstTick = true;
 
@@ -553,12 +574,91 @@ public abstract class RenegadeEntity extends Monster implements GeoEntity {
         if (this.groupId != null) {
             tag.putUUID(TAG_GROUP, this.groupId);
         }
+        String rarity = this.entityData.get(DATA_ELITE_RARITY);
+        if (!rarity.isEmpty()) {
+            CompoundTag elite = new CompoundTag();
+            elite.putString("Rarity", rarity);
+            elite.putInt("Color", this.entityData.get(DATA_ELITE_COLOR));
+            elite.putBoolean("Set", this.entityData.get(DATA_ELITE_SET));
+            tag.put(TAG_ELITE, elite);
+        }
     }
 
     @Override
     public void readAdditionalSaveData(CompoundTag tag) {
         super.readAdditionalSaveData(tag);
         this.groupId = tag.hasUUID(TAG_GROUP) ? tag.getUUID(TAG_GROUP) : null;
+
+        this.clearEliteState();
+        CompoundTag elite = tag.getCompound(TAG_ELITE);
+        String rarityId = elite.getString("Rarity");
+        ResourceLocation rarity = rarityId.isEmpty() ? null : ResourceLocation.tryParse(rarityId);
+        if (rarity != null) {
+            // The color is taken from the current rarity; an unknown rarity (datapack change, Apotheosis removed) means
+            // a normal renegade name.
+            ApotheosisCompat.rarityColor(rarity).ifPresent(color -> this.setEliteState(rarity, color, elite.getBoolean("Set")));
+        }
+    }
+
+    @Override
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(DATA_ELITE_RARITY, "");
+        builder.define(DATA_ELITE_COLOR, 0xFFFFFF);
+        builder.define(DATA_ELITE_SET, false);
+    }
+
+    /**
+     * Makes this renegade an elite (Apotheosis): rarity of its best upgraded piece, that rarity's color, and whether it
+     * wears an elite set. Saved and synced to clients for the name.
+     */
+    public void setEliteState(ResourceLocation rarity, int color, boolean fullSet) {
+        this.entityData.set(DATA_ELITE_RARITY, rarity.toString());
+        this.entityData.set(DATA_ELITE_COLOR, color);
+        this.entityData.set(DATA_ELITE_SET, fullSet);
+    }
+
+    public void clearEliteState() {
+        this.entityData.set(DATA_ELITE_RARITY, "");
+        this.entityData.set(DATA_ELITE_COLOR, 0xFFFFFF);
+        this.entityData.set(DATA_ELITE_SET, false);
+    }
+
+    @Nullable
+    public ResourceLocation getEliteRarity() {
+        String rarity = this.entityData.get(DATA_ELITE_RARITY);
+        return rarity.isEmpty() ? null : ResourceLocation.tryParse(rarity);
+    }
+
+    public boolean isEliteSet() {
+        return this.entityData.get(DATA_ELITE_SET);
+    }
+
+    /**
+     * Must be called before finalizeSpawn (spawnelite command).
+     */
+    public void setForcedElite(@Nullable ApotheosisCompat.ForcedElite forcedElite) {
+        this.forcedElite = forcedElite;
+    }
+
+    public ApotheosisCompat.EliteResult getLastEliteResult() {
+        return this.lastEliteResult;
+    }
+
+    /**
+     * Elites show their rarity as a title, the whole name in the rarity's color: "Rare Warrior Renegade", with an elite
+     * set "Rare Elite Warrior Renegade" (keys entity.renegades.elite / elite_set). The rarity name uses Apotheosis' own
+     * key "rarity.<id>", so the client needs no Apotheosis classes. Not a custom name: named mobs never despawn and other
+     * mods treat them differently; a name tag still wins over this.
+     */
+    @Override
+    protected Component getTypeName() {
+        String rarity = this.entityData.get(DATA_ELITE_RARITY);
+        if (rarity.isEmpty()) {
+            return super.getTypeName();
+        }
+        return Component.translatable(this.isEliteSet() ? "entity.renegades.elite_set" : "entity.renegades.elite",
+                Component.translatable("rarity." + rarity), super.getTypeName()).withColor(this.entityData.get(DATA_ELITE_COLOR));
     }
 
     @Override
