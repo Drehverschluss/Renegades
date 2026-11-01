@@ -11,6 +11,7 @@ import com.drehverschluss.renegades.config.RenegadesConfig;
 import com.drehverschluss.renegades.entity.PriestRenegade;
 import com.drehverschluss.renegades.entity.RenegadeEntity;
 import com.drehverschluss.renegades.magic.AbilityExecutor;
+import com.drehverschluss.renegades.magic.AbilityPresentation;
 import com.drehverschluss.renegades.magic.AbilitySpec;
 import com.drehverschluss.renegades.magic.AreaShape;
 import com.drehverschluss.renegades.magic.CastTarget;
@@ -104,6 +105,7 @@ public class PriestBrain extends MobBrain {
     private final AbilitySpec healSpell;
     private final AbilitySpec cloudSpell;
     private final AbilitySpec boltSpell;
+    private final AbilitySpec protectSpell;
     private final CombatAction healCast;
     private final CombatAction selfHealCast;
     private final CombatAction cloudCast;
@@ -129,16 +131,24 @@ public class PriestBrain extends MobBrain {
         super(entity, Stance.ALONE, CombatState.POSITIONING);
         this.healSpell = AbilitySpec.builder(id("priest/heal"), MagicSchool.HEALING)
                 .helpful()
+                .visual("heal")
                 .impact(new Impact.Heal(HEAL_FACTOR, HEAL_CAP))
                 .build();
         this.cloudSpell = AbilitySpec.builder(id("priest/heal_cloud"), MagicSchool.HEALING)
                 .helpful()
+                .visual("healing_cloud")
                 .delivery(new Delivery.Cloud(new Delivery.CloudSpec(AreaShape.circle(CLOUD_RADIUS), 3.0, CLOUD_DURATION, CLOUD_INTERVAL), Delivery.Anchor.TARGET))
                 .impact(new Impact.Heal(CLOUD_FACTOR, CLOUD_CAP_PER_PULSE))
                 .build();
         this.boltSpell = AbilitySpec.builder(id("priest/holy_bolt"), MagicSchool.HEALING)
+                .visual("holy_bolt")
                 .delivery(new Delivery.Projectile(Delivery.ProjectileSpec.straight(1.4).withLifetime(25)))
                 .impact(new Impact.Damage(BOLT_DAMAGE, 0.3F, true))
+                .build();
+        // Absorption is applied by the brain itself; the spec only carries its look.
+        this.protectSpell = AbilitySpec.builder(id("priest/protect"), MagicSchool.HEALING)
+                .helpful()
+                .visual("absorption")
                 .build();
 
         this.healCast = this.healAction(HEAL_ID, 160, false);
@@ -198,7 +208,8 @@ public class PriestBrain extends MobBrain {
                 .tracking(TrackingMode.LOCKED, TrackingMode.LOCKED)
                 .cooldown(cooldown)
                 .onStart(ctx -> {
-                    if (this.entity.level() instanceof ServerLevel level) {
+                    if (this.entity.level() instanceof ServerLevel level
+                            && !AbilityPresentation.spellWindup(level, this.entity, this.healSpell).sounds()) {
                         MagicParticles.sound(level, this.entity.position(), MagicSounds.HEALING.windup(), 1.5F, 1.0F);
                     }
                 })
@@ -483,10 +494,16 @@ public class PriestBrain extends MobBrain {
             this.beam(level, ally, MagicSchool.HEALING.dust(1.2F));
         }
         AbilityExecutor.applyAll(this.healSpell, ImpactContext.of(this.entity, MagicSchool.HEALING, this.entity.position(), null), ally);
+        AbilityPresentation.spellRelease(level, this.entity, this.healSpell, CastTarget.at(this.entity, ally));
+        AbilityPresentation.Handled handled = AbilityPresentation.spellImpact(level, this.entity, this.healSpell, ally);
         Vec3 centre = ally.getBoundingBox().getCenter();
-        MagicParticles.pulse(level, MagicSchool.HEALING, centre, 1.4F);
-        level.sendParticles(ParticleTypes.HEART, centre.x, ally.getY() + ally.getBbHeight() + 0.3, centre.z, 3, 0.3, 0.2, 0.3, 0.0);
-        MagicParticles.sound(level, centre, MagicSounds.HEALING.release(), 1.2F, 1.2F);
+        if (!handled.particles()) {
+            MagicParticles.pulse(level, MagicSchool.HEALING, centre, 1.4F);
+            level.sendParticles(ParticleTypes.HEART, centre.x, ally.getY() + ally.getBbHeight() + 0.3, centre.z, 3, 0.3, 0.2, 0.3, 0.0);
+        }
+        if (!handled.sounds()) {
+            MagicParticles.sound(level, centre, MagicSounds.HEALING.release(), 1.2F, 1.2F);
+        }
     }
 
     private void releaseProtection() {
@@ -496,9 +513,15 @@ public class PriestBrain extends MobBrain {
         }
         this.beam(level, ally, MagicSchool.LIGHTNING.dust(1.0F));
         ally.addEffect(new MobEffectInstance(MobEffects.ABSORPTION, PROTECT_TICKS, 0), this.entity);
+        AbilityPresentation.spellRelease(level, this.entity, this.protectSpell, CastTarget.at(this.entity, ally));
+        AbilityPresentation.Handled handled = AbilityPresentation.spellImpact(level, this.entity, this.protectSpell, ally);
         Vec3 centre = ally.getBoundingBox().getCenter();
-        level.sendParticles(ParticleTypes.END_ROD, centre.x, centre.y, centre.z, 12, 0.4, 0.6, 0.4, 0.02);
-        MagicParticles.sound(level, centre, SoundEvents.ARMOR_EQUIP_GOLD.value(), 1.2F, 1.0F);
+        if (!handled.particles()) {
+            level.sendParticles(ParticleTypes.END_ROD, centre.x, centre.y, centre.z, 12, 0.4, 0.6, 0.4, 0.02);
+        }
+        if (!handled.sounds()) {
+            MagicParticles.sound(level, centre, SoundEvents.ARMOR_EQUIP_GOLD.value(), 1.2F, 1.0F);
+        }
     }
 
     private void releaseBolt() {

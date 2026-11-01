@@ -1,6 +1,7 @@
 package com.drehverschluss.renegades;
 
 import com.drehverschluss.renegades.client.renderer.ArcherTrapRenderer;
+import com.drehverschluss.renegades.client.renderer.MagicProjectileRenderer;
 import com.drehverschluss.renegades.client.renderer.RenegadeRenderer;
 import com.drehverschluss.renegades.client.renderer.ThrowingKnifeRenderer;
 import com.drehverschluss.renegades.registry.ModEntityTypes;
@@ -24,8 +25,9 @@ public class RenegadesClient {
         event.registerEntityRenderer(ModEntityTypes.ARCHER_TRAP.get(), ArcherTrapRenderer::new);
         event.registerEntityRenderer(ModEntityTypes.WIZARD.get(), RenegadeRenderer::new);
         event.registerEntityRenderer(ModEntityTypes.PRIEST.get(), RenegadeRenderer::new);
-        // Spell projectiles and clouds are drawn with particles only (spawned client-side in their tick).
-        event.registerEntityRenderer(ModEntityTypes.MAGIC_PROJECTILE.get(), NoopRenderer::new);
+        // Spell projectiles and clouds are drawn with particles (spawned client-side in their tick); projectiles with
+        // another mod's spell look also draw that spell's model.
+        event.registerEntityRenderer(ModEntityTypes.MAGIC_PROJECTILE.get(), MagicProjectileRenderer::new);
         event.registerEntityRenderer(ModEntityTypes.MAGIC_CLOUD.get(), NoopRenderer::new);
         event.registerEntityRenderer(ModEntityTypes.THROWING_KNIFE.get(), ThrowingKnifeRenderer::new);
     }

@@ -17,6 +17,7 @@ import com.drehverschluss.renegades.equipment.EquipmentPoolLoader;
 import com.drehverschluss.renegades.equipment.EquipmentPools;
 import com.drehverschluss.renegades.equipment.RareItemLoader;
 import com.drehverschluss.renegades.equipment.RareItems;
+import com.drehverschluss.renegades.visual.CasterVisualsLoader;
 import com.drehverschluss.renegades.group.RenegadeSpawner;
 import com.drehverschluss.renegades.group.SpawnGroupLoader;
 import com.drehverschluss.renegades.group.SpawnStats;
@@ -107,6 +108,7 @@ public class Renegades {
     private static void addReloadListeners(AddReloadListenerEvent event) {
         event.addListener(new EquipmentPoolLoader());
         event.addListener(new RareItemLoader());
+        event.addListener(new CasterVisualsLoader());
         event.addListener(new SpawnGroupLoader());
     }
 

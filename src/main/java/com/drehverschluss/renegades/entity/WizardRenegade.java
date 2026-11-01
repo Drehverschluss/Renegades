@@ -62,6 +62,11 @@ public class WizardRenegade extends RenegadeEntity {
         return this.variant;
     }
 
+    @Override
+    public String visualVariant() {
+        return this.getVariant().id();
+    }
+
     /**
      * Takes the pool entry's variant (random if none or unknown) and dyes leather armor in the school's colour.
      */

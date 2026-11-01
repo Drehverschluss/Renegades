@@ -41,10 +41,11 @@ public record AbilitySpec(ResourceLocation id, MagicSchool school, Intent intent
      * @param impactSound  null = the school's impact sound
      * @param telegraph    whether area spells mark their area on the ground during the windup
      * @param look         school used for particles and sounds (null = the spell's school)
+     * @param visual       key of this ability in the caster_visuals data (e.g. "double_bolt"), null = always the built-in look
      */
     public record Presentation(@Nullable SoundEvent windupSound, @Nullable SoundEvent releaseSound, @Nullable SoundEvent impactSound, boolean telegraph,
-                               @Nullable MagicSchool look) {
-        public static final Presentation DEFAULT = new Presentation(null, null, null, true, null);
+                               @Nullable MagicSchool look, @Nullable String visual) {
+        public static final Presentation DEFAULT = new Presentation(null, null, null, true, null, null);
     }
 
     public static final class Builder {
@@ -63,6 +64,8 @@ public record AbilitySpec(ResourceLocation id, MagicSchool school, Intent intent
         private boolean telegraph = true;
         @Nullable
         private MagicSchool look;
+        @Nullable
+        private String visual;
 
         private Builder(ResourceLocation id, MagicSchool school) {
             this.id = id;
@@ -118,8 +121,16 @@ public record AbilitySpec(ResourceLocation id, MagicSchool school, Intent intent
             return this;
         }
 
+        /**
+         * Key of this ability in the caster_visuals data, so it can take the look of another mod's spell.
+         */
+        public Builder visual(String key) {
+            this.visual = key;
+            return this;
+        }
+
         public AbilitySpec build() {
-            Presentation presentation = new Presentation(this.windupSound, this.releaseSound, this.impactSound, this.telegraph, this.look);
+            Presentation presentation = new Presentation(this.windupSound, this.releaseSound, this.impactSound, this.telegraph, this.look, this.visual);
             return new AbilitySpec(this.id, this.school, this.intent, this.delivery, this.impacts, this.allyImpacts, presentation);
         }
     }

@@ -3,6 +3,7 @@ package com.drehverschluss.renegades.command;
 import com.drehverschluss.renegades.Renegades;
 import com.drehverschluss.renegades.combat.CombatProfiler;
 import com.drehverschluss.renegades.compat.apotheosis.ApotheosisCompat;
+import com.drehverschluss.renegades.compat.spellengine.SpellEngineCompat;
 import com.drehverschluss.renegades.config.RenegadesConfig;
 import com.drehverschluss.renegades.entity.RenegadeEntity;
 import com.drehverschluss.renegades.equipment.EquipmentPoolEntry;
@@ -15,15 +16,21 @@ import com.drehverschluss.renegades.group.SpawnGroupTemplate;
 import com.drehverschluss.renegades.group.SpawnGroups;
 import com.drehverschluss.renegades.group.SpawnStats;
 import com.drehverschluss.renegades.registry.ModEntityTypes;
+import com.drehverschluss.renegades.visual.CasterVisualEntry;
+import com.drehverschluss.renegades.visual.CasterVisuals;
+import com.drehverschluss.renegades.visual.VisualRef;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
@@ -49,7 +56,7 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.event.EventHooks;
 
 /**
- * Debug commands (permission level 2): /renegades pools|reequip|groups|spawngroup|nearby|damagetags|stats|profile|rareitems|spawnelite.
+ * Debug commands (permission level 2): /renegades pools|reequip|groups|spawngroup|nearby|damagetags|stats|profile|rareitems|castervisuals|spawnelite.
  */
 public final class RenegadesCommand {
     private RenegadesCommand() {
@@ -99,6 +106,8 @@ public final class RenegadesCommand {
                                 .executes(context -> resetStats(context.getSource()))))
                 .then(Commands.literal("rareitems")
                         .executes(context -> listRareItems(context.getSource())))
+                .then(Commands.literal("castervisuals")
+                        .executes(context -> listCasterVisuals(context.getSource())))
                 .then(Commands.literal("spawnelite")
                         .then(Commands.argument("class", StringArgumentType.word())
                                 .suggests((context, builder) -> SharedSuggestionProvider.suggest(
@@ -110,6 +119,53 @@ public final class RenegadesCommand {
                                         .then(Commands.literal("set")
                                                 .executes(context -> spawnElite(context.getSource(), StringArgumentType.getString(context, "class"),
                                                         ResourceLocationArgument.getId(context, "rarity"), true)))))));
+    }
+
+    /**
+     * The loaded caster_visuals per class: which spell lends its look to which ability (per variant) and whether that
+     * spell exists, plus the casterVisuals config value.
+     */
+    private static int listCasterVisuals(CommandSourceStack source) {
+        ServerLevel level = source.getLevel();
+        boolean spellEngine = SpellEngineCompat.isLoaded();
+        source.sendSuccess(() -> Component.literal("casterVisuals = " + RenegadesConfig.CASTER_VISUALS.get() + ", Spell Engine "
+                + (spellEngine ? "installed" : "not installed") + " -> " + (CasterVisuals.useSpellLook() ? "spell looks where assigned" : "built-in look only")), false);
+        int count = 0;
+        for (Map.Entry<EntityType<?>, Map<String, CasterVisualEntry>> type : CasterVisuals.all().entrySet()) {
+            source.sendSuccess(() -> Component.literal(BuiltInRegistries.ENTITY_TYPE.getKey(type.getKey()) + ": " + type.getValue().size() + " abilities"), false);
+            for (Map.Entry<String, CasterVisualEntry> ability : type.getValue().entrySet()) {
+                count++;
+                CasterVisualEntry entry = ability.getValue();
+                List<String> parts = new ArrayList<>();
+                if (entry.base() != null && entry.base().spell() != null) {
+                    parts.add(describeSpell(level, entry.forVariant(null)));
+                }
+                entry.variants().keySet().stream().sorted().forEach(variant -> parts.add(variant + "=" + describeSpell(level, entry.forVariant(variant))));
+                source.sendSuccess(() -> Component.literal("- " + ability.getKey() + ": " + String.join(", ", parts)), false);
+            }
+        }
+        if (count == 0) {
+            source.sendSuccess(() -> Component.literal("No spell looks assigned (data/<namespace>/renegades/caster_visuals)"), false);
+        }
+        return count;
+    }
+
+    private static String describeSpell(ServerLevel level, @Nullable VisualRef ref) {
+        if (ref == null) {
+            return "-";
+        }
+        List<String> off = new ArrayList<>();
+        if (!ref.model()) {
+            off.add("model");
+        }
+        if (!ref.particles()) {
+            off.add("particles");
+        }
+        if (!ref.sounds()) {
+            off.add("sounds");
+        }
+        return ref.spell() + (SpellEngineCompat.spellExists(level, ref.spell()) ? " (found)" : " (MISSING)")
+                + (off.isEmpty() ? "" : " [built-in " + String.join("/", off) + "]");
     }
 
     private static List<EntityType<? extends RenegadeEntity>> renegadeTypes() {

@@ -1,0 +1,22 @@
+{
+  "neoforge:conditions": [
+    {"type": "neoforge:mod_loaded", "modid": "spell_engine"},
+    {"type": "neoforge:mod_loaded", "modid": "wizards"}
+  ],
+  "entity": "renegades:wizard",
+  "abilities": {
+    "double_bolt": {
+      "variants": {"fire": "wizards:fireball", "frost": "wizards:frostbolt", "arcane": "wizards:arcane_bolt"}
+    },
+    "homing_bolts": {
+      "variants": {"fire": "wizards:fire_blast", "frost": "wizards:frost_shard", "arcane": "wizards:arcane_missile"}
+    },
+    "nova": {
+      "variants": {
+        "fire": {"spell": "wizards:fire_breath", "model": false},
+        "frost": "wizards:frost_nova",
+        "arcane": "wizards:arcane_explosion"
+      }
+    }
+  }
+}

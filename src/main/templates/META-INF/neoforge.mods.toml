@@ -66,3 +66,10 @@ description='''${mod_description}'''
     versionRange="${apotheosis_version_range}"
     ordering="NONE"
     side="BOTH"
+
+[[dependencies.${mod_id}]]
+    modId="spell_engine"
+    type="optional"
+    versionRange="${spell_engine_version_range}"
+    ordering="NONE"
+    side="BOTH"

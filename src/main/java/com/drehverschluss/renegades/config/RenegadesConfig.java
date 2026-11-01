@@ -1,5 +1,6 @@
 package com.drehverschluss.renegades.config;
 
+import java.util.Arrays;
 import net.neoforged.neoforge.common.ModConfigSpec;
 
 /**
@@ -36,6 +37,7 @@ public final class RenegadesConfig {
     public static final ModConfigSpec.BooleanValue ENABLE_PRIEST_HEALING;
     public static final ModConfigSpec.DoubleValue HEALING_MULTIPLIER;
     public static final ModConfigSpec.BooleanValue COOLDOWN_GROUP_SCALING;
+    public static final ModConfigSpec.ConfigValue<String> CASTER_VISUALS;
     public static final ModConfigSpec.BooleanValue APOTHEOSIS_ELITE_GEAR;
     public static final ModConfigSpec.DoubleValue FULL_SET_ELITE_CHANCE;
 
@@ -162,6 +164,18 @@ public final class RenegadesConfig {
                 .comment("If true, renegades fighting near other renegades get somewhat shorter attack cooldowns: at most 25 % shorter than alone, never below 1 second.",
                         "If false, cooldowns are always as for a renegade fighting alone.")
                 .define("cooldownGroupScaling", true);
+
+        builder.pop();
+
+        builder.comment("Look of the casters' spells (wizard, priest, ...).")
+                .push("visuals");
+
+        // Arrays.asList: List.of throws on contains(null) when an older config file lacks this key.
+        CASTER_VISUALS = builder
+                .comment("\"auto\": if Spell Engine is installed and the spell assigned in data/<namespace>/renegades/caster_visuals exists, casters' spells",
+                        "use that spell's projectile model, particles and sounds; otherwise the built-in look. \"builtin\": always the built-in look.",
+                        "Only the look changes; damage, targets, flight paths and cooldowns stay the same. Applies to new spells right away.")
+                .defineInList("casterVisuals", "auto", Arrays.asList("auto", "builtin"));
 
         builder.pop();
 

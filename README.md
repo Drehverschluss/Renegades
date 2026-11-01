@@ -408,3 +408,47 @@ integration is optional; nothing from Apotheosis is bundled.
 **Debug command**: `/renegades spawnelite <class> <rarity> [set]` spawns a renegade like a spawn egg and makes it an
 elite with that rarity (one piece, or with `set` all pieces). `/renegades reequip` rolls new gear and removes the elite
 state.
+
+## Spell looks (Spell Engine, datapack)
+
+With [Spell Engine](https://www.curseforge.com/minecraft/mc-mods/spell-engine) installed, the casters' spells can use
+the look of a Spell Engine spell: its projectile model, travel/release/impact particles and sounds. Only the look
+changes; damage, healing, targets, flight paths, homing, areas, shield blocking and cooldowns stay exactly the same.
+Without Spell Engine (or without an assigned spell) the built-in look is used. Nothing from Spell Engine is bundled.
+
+| Option (section `[visuals]`) | Default | Effect |
+|---|---|---|
+| `casterVisuals` | `"auto"` | `"auto"`: spell looks where a spell is assigned and exists, otherwise the built-in look. `"builtin"`: always the built-in look. Applies to new spells right away. |
+
+Which spell's look an ability uses comes from `data/<namespace>/renegades/caster_visuals/<name>.json`. Files for the
+same entity are merged per ability; a file with the same path in a later datapack replaces it. `neoforge:conditions`
+are supported. A spell id that does not exist falls back to the built-in look (one warning in the log).
+
+```json
+{
+  "neoforge:conditions": [
+    {"type": "neoforge:mod_loaded", "modid": "spell_engine"},
+    {"type": "neoforge:mod_loaded", "modid": "wizards"}
+  ],
+  "entity": "renegades:wizard",
+  "abilities": {
+    "double_bolt": {"variants": {"fire": "wizards:fireball", "frost": "wizards:frostbolt", "arcane": "wizards:arcane_bolt"}},
+    "nova": {"variants": {"fire": {"spell": "wizards:fire_breath", "model": false}, "frost": "wizards:frost_nova"}}
+  }
+}
+```
+
+- `entity`: one id or a list.
+- `abilities`: ability key → spell id, or an object with `spell` and/or `variants` (variant id → spell id or object).
+  A variant without its own entry uses `spell`.
+- `model`, `particles`, `sounds` (optional, default `true`, at ability or variant level): `false` keeps the built-in
+  model, particles or sounds for that part. The telegraph ring before an area spell is always shown.
+
+Ability keys: wizard `double_bolt`, `homing_bolts`, `nova` (variants `fire`, `frost`, `arcane`); priest `heal`,
+`healing_cloud`, `absorption`, `holy_bolt`. The staff swing keeps the built-in look.
+
+Included (only with Spell Engine and the class mod): wizard spells from Wizards (fire, frost, arcane), priest spells
+from Paladins & Priests (heal, circle of healing, divine protection, penance).
+
+**Debug command**: `/renegades castervisuals` shows the mode and the assigned spells per class and ability, and whether
+each spell exists.

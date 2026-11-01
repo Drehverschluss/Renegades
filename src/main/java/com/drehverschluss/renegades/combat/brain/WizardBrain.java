@@ -19,6 +19,7 @@ import com.drehverschluss.renegades.entity.RenegadeEntity;
 import com.drehverschluss.renegades.entity.WizardRenegade;
 import com.drehverschluss.renegades.entity.WizardVariant;
 import com.drehverschluss.renegades.magic.AbilityExecutor;
+import com.drehverschluss.renegades.magic.AbilityPresentation;
 import com.drehverschluss.renegades.magic.AbilitySpec;
 import com.drehverschluss.renegades.magic.AreaShape;
 import com.drehverschluss.renegades.magic.CastTarget;
@@ -128,14 +129,17 @@ public class WizardBrain extends MobBrain {
         MagicSchool school = variant.school();
         String prefix = "wizard/" + variant.id() + "/";
         AbilitySpec fireball = this.withVariantEffect(AbilitySpec.builder(id(prefix + "fireball"), school)
+                .visual("double_bolt")
                 .delivery(new Delivery.Projectile(Delivery.ProjectileSpec.straight(1.6 * variant.projectileSpeedFactor()).withLifetime(20)))
                 .impact(new Impact.Damage(FIREBALL_DAMAGE, 0.2F, true)), variant, 1.5F, 40).build();
         AbilitySpec volleyBolt = AbilitySpec.builder(id(prefix + "volley_bolt"), school)
+                .visual("homing_bolts")
                 .delivery(new Delivery.Projectile(Delivery.ProjectileSpec.straight(1.0 * variant.projectileSpeedFactor())
                         .homing(20.0F, 4).homingUntil(12).withLifetime(100).bursting(AreaShape.circle(4.0), 3.0)))
                 .impact(new Impact.Damage(0.2F, 2.0F, true))
                 .build();
         AbilitySpec nova = this.withVariantEffect(AbilitySpec.builder(id(prefix + "nova"), school)
+                .visual("nova")
                 .delivery(Delivery.Area.around(AreaShape.circle(6.0)))
                 .damage(0.6F), variant, 3.0F, 80).build();
 
@@ -145,6 +149,12 @@ public class WizardBrain extends MobBrain {
                 .motion(AttackMotion.MOBILE)
                 .tracking(TrackingMode.FULL, TrackingMode.REDUCED)
                 .cooldown(80)
+                .onStart(ctx -> {
+                    // Only a spell look has casting effects here; the built-in look stays as it was.
+                    if (this.entity.level() instanceof ServerLevel level) {
+                        AbilityPresentation.spellWindup(level, this.entity, fireball);
+                    }
+                })
                 .onActiveStart(ctx -> this.castFireball(fireball))
                 .onActiveTick(ctx -> {
                     // Second bolt of the same cast, with the casting animation replayed.

@@ -1,7 +1,9 @@
 // Based on BossCloud from ANARCHY - RPG Minibosses by cleannrooster (CC0-1.0).
-// Changes: client look is drifting particles in the school's colours instead of AtlasVFX; never saved.
+// Changes: client look is drifting particles in the school's colours instead of AtlasVFX (or the look of another
+// mod's spell, see caster_visuals); never saved.
 package com.drehverschluss.renegades.magic.entity;
 
+import com.drehverschluss.renegades.compat.spellengine.SpellEngineCompat;
 import com.drehverschluss.renegades.magic.AbilityExecutor;
 import com.drehverschluss.renegades.magic.AbilityPresentation;
 import com.drehverschluss.renegades.magic.AbilitySpec;
@@ -9,6 +11,8 @@ import com.drehverschluss.renegades.magic.Delivery;
 import com.drehverschluss.renegades.magic.ImpactContext;
 import com.drehverschluss.renegades.magic.MagicSchool;
 import com.drehverschluss.renegades.registry.ModEntityTypes;
+import com.drehverschluss.renegades.visual.VisualRef;
+import java.util.List;
 import javax.annotation.Nullable;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -27,9 +31,14 @@ import net.minecraft.world.phys.Vec3;
 public class MagicCloud extends Entity {
     private static final EntityDataAccessor<Byte> SCHOOL = SynchedEntityData.defineId(MagicCloud.class, EntityDataSerializers.BYTE);
     private static final EntityDataAccessor<Float> RADIUS = SynchedEntityData.defineId(MagicCloud.class, EntityDataSerializers.FLOAT);
+    // True if the server shows another mod's spell particles with each pulse (caster_visuals); the client then skips
+    // the built-in drifting particles.
+    private static final EntityDataAccessor<Boolean> SPELL_LOOK = SynchedEntityData.defineId(MagicCloud.class, EntityDataSerializers.BOOLEAN);
 
     @Nullable
     private AbilitySpec ability;
+    @Nullable
+    private VisualRef visual;
     @Nullable
     private Delivery.CloudSpec spec;
     @Nullable
@@ -51,6 +60,9 @@ public class MagicCloud extends Entity {
         cloud.yaw = yaw;
         cloud.getEntityData().set(SCHOOL, (byte) ability.lookSchool().ordinal());
         cloud.getEntityData().set(RADIUS, (float) spec.shape().extent());
+        cloud.visual = AbilityPresentation.visual(caster, ability);
+        cloud.getEntityData().set(SPELL_LOOK, cloud.visual != null && cloud.visual.particles()
+                && SpellEngineCompat.hasReleaseParticles(level, cloud.visual.spell()));
         cloud.setPos(at);
         level.addFreshEntity(cloud);
         return cloud;
@@ -60,6 +72,7 @@ public class MagicCloud extends Entity {
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         builder.define(SCHOOL, (byte) 0);
         builder.define(RADIUS, 1.0F);
+        builder.define(SPELL_LOOK, false);
     }
 
     public MagicSchool school() {
@@ -80,7 +93,7 @@ public class MagicCloud extends Entity {
     public void tick() {
         super.tick();
         if (!(this.level() instanceof ServerLevel level)) {
-            if (this.tickCount % 2 == 0) {
+            if (this.tickCount % 2 == 0 && !this.getEntityData().get(SPELL_LOOK)) {
                 float radius = this.radius();
                 double angle = this.random.nextDouble() * Math.PI * 2.0;
                 double distance = Math.sqrt(this.random.nextDouble()) * radius;
@@ -95,8 +108,9 @@ public class MagicCloud extends Entity {
         }
         if ((this.tickCount - 1) % Math.max(1, this.spec.intervalTicks()) == 0) {
             Delivery.Area area = new Delivery.Area(this.spec.shape(), Delivery.Anchor.TARGET, this.spec.height());
-            AbilityExecutor.applyArea(level, this.ability, this.context.withDirect(this), area, this.position(), this.yaw, null);
-            AbilityPresentation.cloudPulse(level, this.ability, this.position(), (float) this.spec.shape().extent());
+            List<LivingEntity> struck = AbilityExecutor.applyArea(level, this.ability, this.context.withDirect(this), area, this.position(), this.yaw, null);
+            AbilityPresentation.cloudPulse(level, this.context.caster(), this.ability, this.visual, this.position(), (float) this.spec.shape().extent(),
+                    struck);
         }
     }
 

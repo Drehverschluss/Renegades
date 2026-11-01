@@ -1,8 +1,10 @@
 // Based on BossProjectile from ANARCHY - RPG Minibosses by cleannrooster (CC0-1.0).
-// Changes: client look is a particle trail in the school's colours instead of AtlasVFX; never saved; hits only what
-// the caster may harm and stops (bursting there) at the first block; a raised shield blocks it like an arrow.
+// Changes: client look is a particle trail in the school's colours instead of AtlasVFX (or the look of another mod's
+// spell, see caster_visuals); never saved; hits only what the caster may harm and stops (bursting there) at the first
+// block; a raised shield blocks it like an arrow.
 package com.drehverschluss.renegades.magic.entity;
 
+import com.drehverschluss.renegades.compat.spellengine.SpellEngineCompat;
 import com.drehverschluss.renegades.magic.AbilityExecutor;
 import com.drehverschluss.renegades.magic.AbilityPresentation;
 import com.drehverschluss.renegades.magic.AbilitySpec;
@@ -12,6 +14,7 @@ import com.drehverschluss.renegades.magic.Impact;
 import com.drehverschluss.renegades.magic.ImpactContext;
 import com.drehverschluss.renegades.magic.MagicSchool;
 import com.drehverschluss.renegades.registry.ModEntityTypes;
+import com.drehverschluss.renegades.visual.VisualRef;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -22,6 +25,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
@@ -44,9 +48,15 @@ import net.minecraft.world.phys.Vec3;
  */
 public class MagicProjectile extends Entity implements TraceableEntity {
     private static final EntityDataAccessor<Byte> SCHOOL = SynchedEntityData.defineId(MagicProjectile.class, EntityDataSerializers.BYTE);
+    // Look from another mod's spell (caster_visuals): the spell id ("" = built-in look) and which parts of its
+    // projectile look are used (SpellEngineCompat.PROJECTILE_* flags). Decided by the server when the projectile is cast.
+    private static final EntityDataAccessor<String> LOOK_SPELL = SynchedEntityData.defineId(MagicProjectile.class, EntityDataSerializers.STRING);
+    private static final EntityDataAccessor<Byte> LOOK_PARTS = SynchedEntityData.defineId(MagicProjectile.class, EntityDataSerializers.BYTE);
 
     @Nullable
     private AbilitySpec ability;
+    @Nullable
+    private VisualRef visual;
     @Nullable
     private Delivery.ProjectileSpec spec;
     @Nullable
@@ -72,6 +82,15 @@ public class MagicProjectile extends Entity implements TraceableEntity {
         projectile.homingTarget = spec.homingDegrees() > 0.0F ? homingTarget : null;
         projectile.meteor = meteor;
         projectile.getEntityData().set(SCHOOL, (byte) ability.lookSchool().ordinal());
+        projectile.visual = AbilityPresentation.visual(caster, ability);
+        if (projectile.visual != null) {
+            int available = SpellEngineCompat.projectileLook(level, projectile.visual.spell());
+            int parts = (projectile.visual.model() ? available & SpellEngineCompat.PROJECTILE_MODEL : 0)
+                    | (projectile.visual.particles() ? available & SpellEngineCompat.PROJECTILE_TRAIL : 0)
+                    | (projectile.visual.sounds() ? available & SpellEngineCompat.PROJECTILE_TRAVEL_SOUND : 0);
+            projectile.getEntityData().set(LOOK_SPELL, projectile.visual.spell().toString());
+            projectile.getEntityData().set(LOOK_PARTS, (byte) parts);
+        }
         projectile.setPos(from);
         Vec3 heading = direction.lengthSqr() < 1.0E-8 ? caster.getLookAngle() : direction.normalize();
         projectile.setDeltaMovement(heading.scale(spec.speed()));
@@ -94,6 +113,21 @@ public class MagicProjectile extends Entity implements TraceableEntity {
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         builder.define(SCHOOL, (byte) 0);
+        builder.define(LOOK_SPELL, "");
+        builder.define(LOOK_PARTS, (byte) 0);
+    }
+
+    /**
+     * The spell whose projectile look this projectile uses, or null for the built-in look.
+     */
+    @Nullable
+    public ResourceLocation lookSpell() {
+        String spell = this.getEntityData().get(LOOK_SPELL);
+        return spell.isEmpty() ? null : ResourceLocation.tryParse(spell);
+    }
+
+    public boolean usesLookPart(int part) {
+        return (this.getEntityData().get(LOOK_PARTS) & part) != 0 && this.lookSpell() != null && SpellEngineCompat.isLoaded();
     }
 
     public MagicSchool school() {
@@ -111,11 +145,18 @@ public class MagicProjectile extends Entity implements TraceableEntity {
         super.tick();
         boolean server = !this.level().isClientSide();
         if (!server) {
-            this.spawnTrail();
+            if (this.usesLookPart(SpellEngineCompat.PROJECTILE_TRAIL)) {
+                SpellEngineCompat.travelParticles(this, this.lookSpell());
+            } else {
+                this.spawnTrail();
+            }
         } else {
             if (this.ability == null || this.spec == null || this.context == null || this.tickCount > this.spec.lifetimeTicks()) {
                 this.discard();
                 return;
+            }
+            if (this.usesLookPart(SpellEngineCompat.PROJECTILE_TRAVEL_SOUND) && this.level() instanceof ServerLevel level) {
+                SpellEngineCompat.travelSound(level, this, this.lookSpell());
             }
             this.steer();
         }
@@ -207,7 +248,7 @@ public class MagicProjectile extends Entity implements TraceableEntity {
         if (this.struck.size() > this.spec.pierce()) {
             this.land(level, target);
         } else {
-            AbilityPresentation.impact(level, this.ability, this.position(), 0.0F);
+            AbilityPresentation.impact(level, this.context.caster(), this.ability, this.visual, target, this.position(), 0.0F);
         }
     }
 
@@ -251,9 +292,9 @@ public class MagicProjectile extends Entity implements TraceableEntity {
     }
 
     private void land(ServerLevel level, @Nullable Entity alreadyStruck) {
-        if (this.ability != null && this.spec != null) {
+        if (this.ability != null && this.spec != null && this.context != null) {
             float radius = this.spec.burst() == null ? 0.0F : (float) this.spec.burst().shape().extent();
-            AbilityPresentation.impact(level, this.ability, this.position(), radius);
+            AbilityPresentation.impact(level, this.context.caster(), this.ability, this.visual, alreadyStruck, this.position(), radius);
         }
         if (this.spec != null && this.spec.burst() != null && this.ability != null && this.context != null) {
             AbilityExecutor.applyArea(level, this.ability, this.context.withDirect(this), this.spec.burst(), this.position(),

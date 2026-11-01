@@ -176,6 +176,10 @@ dependencies {
     compileOnly "maven.modrinth:armor-model-api:${armor_model_api_version}"
     // Spell Power API (optional): spell schools, spell power attributes and damage sources for the magic backend.
     compileOnly "maven.modrinth:spell-power:${spell_power_version}"
+    // Spell Engine (optional, GPL-3.0): only the look of spells (models, particles, sounds) for our casters; never bundled.
+    compileOnly("maven.modrinth:spell-engine:${spell_engine_version}") {
+        transitive = false
+    }
     compileOnly("dev.muon.dynamic_difficulty:dynamic_difficulty-neoforge:${dynamic_difficulty_version}") {
         transitive = false
     }
@@ -240,6 +244,7 @@ var generateModMetadata = tasks.register("generateModMetadata", ProcessResources
             dynamic_difficulty_version_range: dynamic_difficulty_version_range,
             spell_power_version_range: spell_power_version_range,
             minecolonies_version_range: minecolonies_version_range,
+            spell_engine_version_range: spell_engine_version_range,
             apotheosis_version_range: apotheosis_version_range,
     ]
     inputs.properties replaceProperties

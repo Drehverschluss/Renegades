@@ -414,6 +414,14 @@ public abstract class RenegadeEntity extends Monster implements GeoEntity {
     }
 
     /**
+     * Class variant used to pick the look of its spells (caster_visuals "variants"), or null if the class has none.
+     */
+    @Nullable
+    public String visualVariant() {
+        return null;
+    }
+
+    /**
      * Never more than 3 blocks, also while chasing a target (vanilla allows much deeper drops then), matching the
      * hazard check of the direct combat movement.
      */

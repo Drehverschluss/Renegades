@@ -33,7 +33,7 @@ public final class AbilityExecutor {
             case Delivery.Direct direct -> {
                 LivingEntity entity = target.entity();
                 applyAll(spec, context, entity);
-                AbilityPresentation.impact(level, spec, entity.getBoundingBox().getCenter(), 0.0F);
+                AbilityPresentation.impact(level, caster, spec, AbilityPresentation.visual(caster, spec), entity, entity.getBoundingBox().getCenter(), 0.0F);
             }
             case Delivery.Area area -> applyArea(level, spec, context, area, anchor(caster, area.anchor(), target), target.yaw(), null);
             case Delivery.Beam beam -> {
@@ -117,7 +117,7 @@ public final class AbilityExecutor {
                 }
             }
         }
-        AbilityPresentation.areaHit(level, spec, area, origin);
+        AbilityPresentation.areaHit(level, context.caster(), spec, area, origin, struck);
         return struck;
     }
 
