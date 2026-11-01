@@ -6,6 +6,9 @@
     "renegades:frost",
     "renegades:healing",
     "renegades:lightning",
-    "renegades:soul"
+    "renegades:soul",
+    "renegades:water",
+    "renegades:earth",
+    "renegades:air"
   ]
 }

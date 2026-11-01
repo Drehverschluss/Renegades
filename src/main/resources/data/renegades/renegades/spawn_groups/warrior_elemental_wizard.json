@@ -1,0 +1,10 @@
+{
+  "neoforge:conditions": [
+    {"type": "neoforge:mod_loaded", "modid": "elemental_wizards_rpg"}
+  ],
+  "leader": "renegades:warrior",
+  "weight": 2,
+  "members": [
+    { "entity": "renegades:elemental_wizard", "min": 1, "max": 1 }
+  ]
+}

@@ -5,8 +5,10 @@ import com.drehverschluss.renegades.compat.dynamicdifficulty.DynamicDifficultyCo
 import com.drehverschluss.renegades.compat.dynamicdifficulty.DynamicDifficultyLevelProvider;
 import com.drehverschluss.renegades.config.RenegadesConfig;
 import com.drehverschluss.renegades.entity.ArcherRenegade;
+import com.drehverschluss.renegades.entity.ElementalWizardRenegade;
 import com.drehverschluss.renegades.entity.PaladinRenegade;
 import com.drehverschluss.renegades.entity.PriestRenegade;
+import com.drehverschluss.renegades.entity.RenegadeClasses;
 import com.drehverschluss.renegades.entity.RenegadeEntity;
 import com.drehverschluss.renegades.entity.RenegadeProjectiles;
 import com.drehverschluss.renegades.entity.WizardRenegade;
@@ -77,31 +79,23 @@ public class Renegades {
         event.put(ModEntityTypes.ARCHER.get(), ArcherRenegade.createAttributes().build());
         event.put(ModEntityTypes.WIZARD.get(), WizardRenegade.createAttributes().build());
         event.put(ModEntityTypes.PRIEST.get(), PriestRenegade.createAttributes().build());
+        event.put(ModEntityTypes.ELEMENTAL_WIZARD.get(), ElementalWizardRenegade.createAttributes().build());
     }
 
     private static void registerSpawnPlacements(RegisterSpawnPlacementsEvent event) {
-        event.register(ModEntityTypes.WARRIOR.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
-                RenegadeEntity::checkRenegadeSpawnRules, RegisterSpawnPlacementsEvent.Operation.REPLACE);
-        event.register(ModEntityTypes.ROGUE.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
-                RenegadeEntity::checkRenegadeSpawnRules, RegisterSpawnPlacementsEvent.Operation.REPLACE);
-        event.register(ModEntityTypes.PALADIN.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
-                RenegadeEntity::checkRenegadeSpawnRules, RegisterSpawnPlacementsEvent.Operation.REPLACE);
-        event.register(ModEntityTypes.ARCHER.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
-                RenegadeEntity::checkRenegadeSpawnRules, RegisterSpawnPlacementsEvent.Operation.REPLACE);
-        event.register(ModEntityTypes.WIZARD.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
-                RenegadeEntity::checkRenegadeSpawnRules, RegisterSpawnPlacementsEvent.Operation.REPLACE);
-        event.register(ModEntityTypes.PRIEST.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
-                RenegadeEntity::checkRenegadeSpawnRules, RegisterSpawnPlacementsEvent.Operation.REPLACE);
+        for (RenegadeClasses.RenegadeClass renegadeClass : RenegadeClasses.all()) {
+            event.register(renegadeClass.entityType(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+                    RenegadeEntity::checkRenegadeSpawnRules, RegisterSpawnPlacementsEvent.Operation.REPLACE);
+        }
     }
 
     private static void addCreativeTabContents(BuildCreativeModeTabContentsEvent event) {
         if (event.getTabKey() == CreativeModeTabs.SPAWN_EGGS) {
-            event.accept(ModItems.WARRIOR_SPAWN_EGG);
-            event.accept(ModItems.ROGUE_SPAWN_EGG);
-            event.accept(ModItems.PALADIN_SPAWN_EGG);
-            event.accept(ModItems.ARCHER_SPAWN_EGG);
-            event.accept(ModItems.WIZARD_SPAWN_EGG);
-            event.accept(ModItems.PRIEST_SPAWN_EGG);
+            for (RenegadeClasses.RenegadeClass renegadeClass : RenegadeClasses.all()) {
+                if (renegadeClass.isAvailable()) {
+                    event.accept(renegadeClass.spawnEgg().get());
+                }
+            }
         }
     }
 

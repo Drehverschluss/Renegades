@@ -1,0 +1,7 @@
+{
+  "neoforge:conditions": [
+    {"type": "neoforge:mod_loaded", "modid": "elemental_wizards_rpg"}
+  ],
+  "leader": "renegades:elemental_wizard",
+  "weight": 3
+}

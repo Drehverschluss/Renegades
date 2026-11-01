@@ -26,12 +26,28 @@ import net.minecraft.world.level.biome.Biome;
  */
 public final class SpawnGroups {
     private static volatile Map<ResourceLocation, SpawnGroupTemplate> templates = Map.of();
+    // Templates left out because a class in them is not available (id -> that class), for the debug commands.
+    private static volatile Map<ResourceLocation, EntityType<?>> unavailable = Map.of();
 
     private SpawnGroups() {
     }
 
-    static void set(Map<ResourceLocation, SpawnGroupTemplate> loaded) {
+    static void set(Map<ResourceLocation, SpawnGroupTemplate> loaded, Map<ResourceLocation, EntityType<?>> leftOut) {
         templates = Map.copyOf(loaded);
+        unavailable = Map.copyOf(leftOut);
+    }
+
+    /**
+     * The class that kept this template out (by full id or unique path), if it was left out for a missing class mod.
+     */
+    public static Optional<EntityType<?>> unavailableClass(ResourceLocation id) {
+        EntityType<?> exact = unavailable.get(id);
+        if (exact != null) {
+            return Optional.of(exact);
+        }
+        List<EntityType<?>> byPath = unavailable.entrySet().stream().filter(entry -> entry.getKey().getPath().equals(id.getPath()))
+                .<EntityType<?>>map(Map.Entry::getValue).toList();
+        return byPath.size() == 1 ? Optional.of(byPath.getFirst()) : Optional.empty();
     }
 
     public static Collection<SpawnGroupTemplate> all() {

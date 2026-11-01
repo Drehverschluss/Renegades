@@ -7,7 +7,9 @@ public enum AttackMotion {
     MOBILE(false, false),
     COMMITTED_VECTOR(true, true),
     CROSS_THROUGH(true, true),
-    RETREATING(true, true);
+    RETREATING(true, true),
+    // Committed step to the side of the target (side from ActionContext#scratch), facing the target the whole time.
+    SIDESTEP(true, true);
 
     private final boolean ownsMovement;
     private final boolean arrestsOnWindup;
@@ -26,6 +28,6 @@ public enum AttackMotion {
     }
 
     public boolean isCommitted() {
-        return this == COMMITTED_VECTOR || this == CROSS_THROUGH || this == RETREATING;
+        return this == COMMITTED_VECTOR || this == CROSS_THROUGH || this == RETREATING || this == SIDESTEP;
     }
 }

@@ -265,7 +265,48 @@ backing off, circling, attack advances, dashes and rolls) the ground ahead is ch
 fire, magma, cactus, powder snow, sweet berries or water, nor off a drop deeper than 3 blocks. At such an edge they
 move only along it and then walk to their goal with normal pathfinding, which finds the way around.
 
+**Elemental Wizard** (requires [Elemental Wizards RPG](https://www.curseforge.com/minecraft/mc-mods/elemental-wizards-rpg),
+see "Classes that need other mods" below): a control caster of one element (`aqua`, `terra` or `wind`, set by its
+equipment entry or random). It moves like the wizard (circles at about 7.5 blocks, jumps back from close targets, a
+staff swing as a last resort) and casts with the power of its element (Spell Power schools `spell_power:water`, `earth`,
+`air` from the class gear; damage types `renegades:water|earth|air`). It deals a bit less damage than a wizard and makes
+up for it with control and support:
+
+| Element | Spell (caster_visuals key) | Effect |
+|---|---|---|
+| Aqua | Water ball volley (`water_volley`) | 3 small bolts in a row, power × 0.18 each (blocked by shields) |
+| Aqua | Water whip (`water_whip`) | Direct hit up to 12 blocks, × 0.35 and Soaked (4 s) |
+| Aqua | Springwater (`springwater`) | Area radius 5 around it: enemies × 0.5 and Soaked; heals itself and its allies there by power × 1.0 (max. 15 % of max health, × `healingMultiplier`) and gives them Cleansing Water. Cast when an enemy is within 5 blocks or it or an ally nearby is below 60 % (cooldown 20 s, 1.5 s windup, interrupted like the priest's heals) |
+| Terra | Stone spear (`stone_spear`) | Slow projectile, × 0.8 and Bleed (3 s), pierces up to 3 more targets (blocked by shields) |
+| Terra | Impale (`impale`) | Marked on the ground under the target for 1 s, then strikes that spot (radius 1.5): × 0.5 and Impaled (holds in place, 1 s). Only against a target on the ground; step out of the marked circle to dodge it (cooldown 12 s) |
+| Terra | Stone skin (`stone_skin`) | When it or an ally nearby is attacked: Stone Flesh for itself and its allies within 5 blocks (10 s, +4 armor, +1 toughness; the next hit at full health is halved; cooldown 25 s) |
+| Wind | Air cutter (`air_cutter`) | Fast direct hit up to 16 blocks, × 0.6 and a strong push away |
+| Wind | Aeroblast (`aeroblast`) | Against a target within 6 blocks: × 0.4 and throws it about 6 blocks up, with Slow Falling, so no fall damage (cooldown 15 s) |
+| Wind | Windfield (`windfield`) | Marked at the target's position, then area radius 4: × 0.3 once and Slowness IV for 5 s (cooldown 18 s) |
+
+The wind wizard jumps back twice as often and also steps aside. Aqua, terra and wind effects (Soaked, Cleansing Water,
+Impaled, Stone Flesh) and Bleed are the real ones from Elemental Wizards RPG, mrpg_lib and Spell Engine. Windfield uses
+vanilla Slowness instead of the mod's own effect: that effect also pushes targets in the air up every tick, so a player
+thrown by Aeroblast would hover until the server kicks him for flying. Support and control spells (springwater, stone
+skin, impale, aeroblast, windfield) keep their full cooldown.
+
 Combat and magic system based on ANARCHY – RPG Minibosses by cleannrooster (CC0-1.0).
+
+## Classes that need other mods
+
+Some classes mirror classes of other mods and only exist with that mod, because without its gear and spells they would
+be a plain copy of another class: the **Elemental Wizard** needs `elemental_wizards_rpg`. Without the mod:
+
+- no natural spawns; spawn groups with the class are left out (`/renegades spawngroup` names the missing mod);
+- its spawn egg is not in the creative tab; an egg from `/give` and the commands (`spawnelite`, `reequip`) report
+  "… is not available (requires: elemental_wizards_rpg)" instead of spawning it;
+- the entity type stays registered (worlds and server/client stay compatible); a renegade of that class saved earlier
+  loads with the plain fallback gear of its pools (leather) and logs one line.
+
+Its data (equipment pools, spawn groups, caster_visuals, rare items) uses `neoforge:mod_loaded` conditions. These
+classes always use the Spell Engine look from caster_visuals, also with `casterVisuals = "builtin"` (their mods need
+Spell Engine; they have no built-in look of their own). A missing or wrong spell id in caster_visuals falls back to the
+plain built-in bolt and particles (one log line).
 
 ## Spawn groups (datapack)
 
@@ -304,7 +345,9 @@ target, members walk back to the group when they are more than 12 blocks away. B
 leading a wizard, weight 1), `priest_solo` (weight 2), `warrior_priest` (a warrior leading a priest, weight 3),
 `paladin_priest` (a paladin leading a priest, weight 2) and `warrior_archer_priest` (a warrior leading a priest and an
 archer, weight 1; with `maxNearby` 3 it only spawns complete when no other renegade is near, otherwise the archer is
-left out first).
+left out first). With Elemental Wizards RPG also `elemental_wizard_solo` (weight 3), `warrior_elemental_wizard`
+(weight 2) and `paladin_elemental_wizard` (weight 1), so the elemental wizard is about as common as the wizard; the
+spawn timer still makes one attempt per interval, so the total spawn rate stays the same.
 
 **Debug commands**: `/renegades groups <leader>` lists the templates, `/renegades spawngroup <id>` spawns one at your
 position like a natural spawn, `/renegades nearby` lists the renegades within `capRadius` with group, spawn type,
@@ -361,11 +404,11 @@ supported; items of mods that are not installed are left out, and an entry witho
 - `allow_affixes` (optional, default `true`): with Apotheosis, rare items get affixes like any other piece of an elite;
   `false` = never (an augment then upgrades another piece).
 
-Included (only with Arsenal from the RPG Series and the class mod): the
-Arsenal uniques replace the tier 2-3 weapon of the same type (tags `renegades:rare_replace/*`), so about 1 in 400
+Included (only with Arsenal from the RPG Series and the class mod; for the Elemental Wizard only Elemental Wizards RPG):
+the uniques replace the tier 2-3 weapon of the same type (tags `renegades:rare_replace/*`), so about 1 in 400
 renegades with tier 2-3 gear carries one:
 
-| Class | Unique (Arsenal) | Replaces | Chance per entry |
+| Class | Unique | Replaces | Chance per entry |
 |---|---|---|---|
 | Warrior | double axe, glaive | diamond/netherite double axe, glaive | 0.25 % |
 | Rogue | dagger (main and off hand), sickle | diamond/netherite dagger, sickle | 0.125 % (two rolls per rogue) |
@@ -374,6 +417,7 @@ renegades with tier 2-3 gear carries one:
 | Archer | longbow, heavy crossbow | royal/netherite longbow, (netherite) heavy crossbow | 0.5 % (short bows and rapid crossbows have no unique) |
 | Wizard | damage staffs with the variant's school | fire/frost/arcane staff (not wands) | 0.5 % |
 | Priest | healing staffs | diamond/netherite holy staff (not wands) | 0.5 % |
+| Elemental Wizard | Crystal Aqua / Ruby Terra / Aeternium Wind staff of its element, or the Valkyrie Elementalist Staff (Elemental Wizards RPG) | aqua/terra/wind staff of tier 2-3 (not wands) | 0.5 % |
 
 **Debug command**: `/renegades rareitems` lists the loaded entries per class (slot, chance, items, replaces).
 
@@ -418,7 +462,7 @@ Without Spell Engine (or without an assigned spell) the built-in look is used. N
 
 | Option (section `[visuals]`) | Default | Effect |
 |---|---|---|
-| `casterVisuals` | `"auto"` | `"auto"`: spell looks where a spell is assigned and exists, otherwise the built-in look. `"builtin"`: always the built-in look. Applies to new spells right away. |
+| `casterVisuals` | `"auto"` | `"auto"`: spell looks where a spell is assigned and exists, otherwise the built-in look. `"builtin"`: always the built-in look (only for the six original classes; classes of other mods such as the Elemental Wizard always use the spell look). Applies to new spells right away. |
 
 Which spell's look an ability uses comes from `data/<namespace>/renegades/caster_visuals/<name>.json`. Files for the
 same entity are merged per ability; a file with the same path in a later datapack replaces it. `neoforge:conditions`
@@ -445,10 +489,13 @@ are supported. A spell id that does not exist falls back to the built-in look (o
   model, particles or sounds for that part. The telegraph ring before an area spell is always shown.
 
 Ability keys: wizard `double_bolt`, `homing_bolts`, `nova` (variants `fire`, `frost`, `arcane`); priest `heal`,
-`healing_cloud`, `absorption`, `holy_bolt`. The staff swing keeps the built-in look.
+`healing_cloud`, `absorption`, `holy_bolt`; elemental wizard `water_volley`, `water_whip`, `springwater`, `stone_spear`,
+`impale`, `stone_skin`, `air_cutter`, `aeroblast`, `windfield` (variants `aqua`, `terra`, `wind`). The staff swing keeps
+the built-in look.
 
 Included (only with Spell Engine and the class mod): wizard spells from Wizards (fire, frost, arcane), priest spells
-from Paladins & Priests (heal, circle of healing, divine protection, penance).
+from Paladins & Priests (heal, circle of healing, divine protection, penance), elemental wizard spells from Elemental
+Wizards RPG (waterball, water whip, springwater, stone spear, impale, stone flesh, air cutter, aeroblast, windfield).
 
 **Debug command**: `/renegades castervisuals` shows the mode and the assigned spells per class and ability, and whether
 each spell exists.

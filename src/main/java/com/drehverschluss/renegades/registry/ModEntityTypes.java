@@ -3,6 +3,7 @@ package com.drehverschluss.renegades.registry;
 import com.drehverschluss.renegades.Renegades;
 import com.drehverschluss.renegades.entity.ArcherRenegade;
 import com.drehverschluss.renegades.entity.ArcherTrap;
+import com.drehverschluss.renegades.entity.ElementalWizardRenegade;
 import com.drehverschluss.renegades.entity.PaladinRenegade;
 import com.drehverschluss.renegades.entity.PriestRenegade;
 import com.drehverschluss.renegades.entity.RogueRenegade;
@@ -69,6 +70,15 @@ public final class ModEntityTypes {
                     .eyeHeight(1.62F)
                     .clientTrackingRange(8)
                     .build("priest"));
+
+    // Always registered (same registry on server and client, old worlds keep loading); spawns only with its class mod,
+    // see RenegadeClasses.
+    public static final DeferredHolder<EntityType<?>, EntityType<ElementalWizardRenegade>> ELEMENTAL_WIZARD = ENTITY_TYPES.register("elemental_wizard",
+            () -> EntityType.Builder.of(ElementalWizardRenegade::new, MobCategory.MONSTER)
+                    .sized(0.6F, 1.8F)
+                    .eyeHeight(1.62F)
+                    .clientTrackingRange(8)
+                    .build("elemental_wizard"));
 
     public static final DeferredHolder<EntityType<?>, EntityType<MagicProjectile>> MAGIC_PROJECTILE = ENTITY_TYPES.register("magic_projectile",
             () -> EntityType.Builder.<MagicProjectile>of(MagicProjectile::new, MobCategory.MISC)

@@ -12,6 +12,9 @@
   "entity.renegades.wizard": "Abtrünniger Zauberer",
   "item.renegades.wizard_spawn_egg": "Spawn-Ei (Abtrünniger Zauberer)",
   "entity.renegades.priest": "Abtrünniger Priester",
+  "entity.renegades.elemental_wizard": "Abtrünniger Elementarmagier",
+  "item.renegades.elemental_wizard_spawn_egg": "Spawn-Ei (Abtrünniger Elementarmagier)",
+  "message.renegades.class_unavailable": "%1$s ist nicht verfügbar (benötigt: %2$s)",
   "entity.renegades.elite": "%1$s %2$s",
   "entity.renegades.elite_set": "%1$s %2$s (Elite)",
   "item.renegades.priest_spawn_egg": "Spawn-Ei (Abtrünniger Priester)",
@@ -31,6 +34,12 @@
   "death.attack.renegades.lightning.player": "%1$s wurde von Blitzmagie getroffen, gewirkt von %2$s",
   "death.attack.renegades.soul": "%1$s wurde von Seelenmagie verzehrt",
   "death.attack.renegades.soul.player": "%1$s wurde von Seelenmagie verzehrt, gewirkt von %2$s",
+  "death.attack.renegades.water": "%1$s wurde von Wassermagie fortgespült",
+  "death.attack.renegades.water.player": "%1$s wurde von Wassermagie fortgespült, gewirkt von %2$s",
+  "death.attack.renegades.earth": "%1$s wurde von Erdmagie zermalmt",
+  "death.attack.renegades.earth.player": "%1$s wurde von Erdmagie zermalmt, gewirkt von %2$s",
+  "death.attack.renegades.air": "%1$s wurde von Windmagie zerschnitten",
+  "death.attack.renegades.air.player": "%1$s wurde von Windmagie zerschnitten, gewirkt von %2$s",
   "death.attack.renegades.spell_projectile": "%1$s wurde von einem Zauber getroffen",
   "death.attack.renegades.spell_projectile.player": "%1$s wurde von einem Zauber getroffen, gewirkt von %2$s"
 }

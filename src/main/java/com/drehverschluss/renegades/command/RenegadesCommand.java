@@ -5,6 +5,7 @@ import com.drehverschluss.renegades.combat.CombatProfiler;
 import com.drehverschluss.renegades.compat.apotheosis.ApotheosisCompat;
 import com.drehverschluss.renegades.compat.spellengine.SpellEngineCompat;
 import com.drehverschluss.renegades.config.RenegadesConfig;
+import com.drehverschluss.renegades.entity.RenegadeClasses;
 import com.drehverschluss.renegades.entity.RenegadeEntity;
 import com.drehverschluss.renegades.equipment.EquipmentPoolEntry;
 import com.drehverschluss.renegades.equipment.EquipmentPools;
@@ -15,7 +16,6 @@ import com.drehverschluss.renegades.group.RenegadeGroups;
 import com.drehverschluss.renegades.group.SpawnGroupTemplate;
 import com.drehverschluss.renegades.group.SpawnGroups;
 import com.drehverschluss.renegades.group.SpawnStats;
-import com.drehverschluss.renegades.registry.ModEntityTypes;
 import com.drehverschluss.renegades.visual.CasterVisualEntry;
 import com.drehverschluss.renegades.visual.CasterVisuals;
 import com.drehverschluss.renegades.visual.VisualRef;
@@ -132,7 +132,8 @@ public final class RenegadesCommand {
                 + (spellEngine ? "installed" : "not installed") + " -> " + (CasterVisuals.useSpellLook() ? "spell looks where assigned" : "built-in look only")), false);
         int count = 0;
         for (Map.Entry<EntityType<?>, Map<String, CasterVisualEntry>> type : CasterVisuals.all().entrySet()) {
-            source.sendSuccess(() -> Component.literal(BuiltInRegistries.ENTITY_TYPE.getKey(type.getKey()) + ": " + type.getValue().size() + " abilities"), false);
+            source.sendSuccess(() -> Component.literal(BuiltInRegistries.ENTITY_TYPE.getKey(type.getKey()) + ": " + type.getValue().size() + " abilities"
+                    + (RenegadeClasses.alwaysSpellEngineLook(type.getKey()) && spellEngine ? " (always the spell look, casterVisuals does not apply)" : "")), false);
             for (Map.Entry<String, CasterVisualEntry> ability : type.getValue().entrySet()) {
                 count++;
                 CasterVisualEntry entry = ability.getValue();
@@ -169,8 +170,7 @@ public final class RenegadesCommand {
     }
 
     private static List<EntityType<? extends RenegadeEntity>> renegadeTypes() {
-        return List.of(ModEntityTypes.WARRIOR.get(), ModEntityTypes.ROGUE.get(), ModEntityTypes.PALADIN.get(),
-                ModEntityTypes.ARCHER.get(), ModEntityTypes.WIZARD.get(), ModEntityTypes.PRIEST.get());
+        return RenegadeClasses.all().stream().<EntityType<? extends RenegadeEntity>>map(RenegadeClasses.RenegadeClass::entityType).toList();
     }
 
     /**
@@ -211,6 +211,10 @@ public final class RenegadesCommand {
                 .findFirst();
         if (type.isEmpty()) {
             source.sendFailure(Component.literal("Unknown renegade class " + className));
+            return 0;
+        }
+        if (!RenegadeClasses.isAvailable(type.get())) {
+            source.sendFailure(RenegadeClasses.unavailableMessage(type.get()));
             return 0;
         }
         if (ApotheosisCompat.rarityColor(rarity).isEmpty()) {
@@ -283,6 +287,11 @@ public final class RenegadesCommand {
     private static int spawnGroup(CommandSourceStack source, ResourceLocation id) {
         Optional<SpawnGroupTemplate> template = SpawnGroups.find(id);
         if (template.isEmpty()) {
+            Optional<EntityType<?>> unavailable = SpawnGroups.unavailableClass(id);
+            if (unavailable.isPresent()) {
+                source.sendFailure(Component.literal("Spawn group " + id + ": ").append(RenegadeClasses.unavailableMessage(unavailable.get())));
+                return 0;
+            }
             source.sendFailure(Component.literal("Unknown spawn group " + id));
             return 0;
         }
@@ -396,6 +405,10 @@ public final class RenegadesCommand {
             count++;
 
             String name = target.getName().getString();
+            if (!RenegadeClasses.isAvailable(renegade.getType())) {
+                source.sendFailure(Component.literal(name + ": ").append(RenegadeClasses.unavailableMessage(renegade.getType())));
+                continue;
+            }
             Optional<EquipmentSelector.Selection> selection = EquipmentSelector.reequip(renegade, level);
             if (selection.isEmpty()) {
                 String context = EquipmentSelector.currentContext(renegade, level).describe();

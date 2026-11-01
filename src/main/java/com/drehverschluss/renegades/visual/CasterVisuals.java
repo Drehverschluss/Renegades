@@ -3,6 +3,7 @@ package com.drehverschluss.renegades.visual;
 import com.drehverschluss.renegades.Renegades;
 import com.drehverschluss.renegades.compat.spellengine.SpellEngineCompat;
 import com.drehverschluss.renegades.config.RenegadesConfig;
+import com.drehverschluss.renegades.entity.RenegadeClasses;
 import com.drehverschluss.renegades.entity.RenegadeEntity;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -41,12 +42,21 @@ public final class CasterVisuals {
     }
 
     /**
-     * The look of the caster's ability with this visual key, or null for the built-in look (config "builtin", no Spell
-     * Engine, no entry, or the spell does not exist; the last case is logged once per spell).
+     * Whether this caster's spells take the look from caster_visuals: with casterVisuals = "auto", and always for
+     * classes of mods that need Spell Engine (they have no built-in look of their own, see RenegadeClasses).
+     */
+    public static boolean useSpellLook(LivingEntity caster) {
+        return SpellEngineCompat.isLoaded()
+                && ("auto".equals(RenegadesConfig.CASTER_VISUALS.get()) || RenegadeClasses.alwaysSpellEngineLook(caster.getType()));
+    }
+
+    /**
+     * The look of the caster's ability with this visual key, or null for the built-in look (config "builtin" for the
+     * original classes, no Spell Engine, no entry, or the spell does not exist; the last case is logged once per spell).
      */
     @Nullable
     public static VisualRef resolve(LivingEntity caster, @Nullable String visualKey) {
-        if (visualKey == null || !useSpellLook()) {
+        if (visualKey == null || !useSpellLook(caster)) {
             return null;
         }
         CasterVisualEntry entry = entries.getOrDefault(caster.getType(), Map.of()).get(visualKey);

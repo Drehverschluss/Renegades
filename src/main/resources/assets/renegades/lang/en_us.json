@@ -12,6 +12,9 @@
   "entity.renegades.wizard": "Wizard Renegade",
   "item.renegades.wizard_spawn_egg": "Wizard Renegade Spawn Egg",
   "entity.renegades.priest": "Priest Renegade",
+  "entity.renegades.elemental_wizard": "Elemental Wizard Renegade",
+  "item.renegades.elemental_wizard_spawn_egg": "Elemental Wizard Renegade Spawn Egg",
+  "message.renegades.class_unavailable": "%1$s is not available (requires: %2$s)",
   "entity.renegades.elite": "%1$s %2$s",
   "entity.renegades.elite_set": "%1$s Elite %2$s",
   "item.renegades.priest_spawn_egg": "Priest Renegade Spawn Egg",
@@ -31,6 +34,12 @@
   "death.attack.renegades.lightning.player": "%1$s was struck by lightning magic cast by %2$s",
   "death.attack.renegades.soul": "%1$s was consumed by soul magic",
   "death.attack.renegades.soul.player": "%1$s was consumed by soul magic cast by %2$s",
+  "death.attack.renegades.water": "%1$s was swept away by water magic",
+  "death.attack.renegades.water.player": "%1$s was swept away by water magic cast by %2$s",
+  "death.attack.renegades.earth": "%1$s was crushed by earth magic",
+  "death.attack.renegades.earth.player": "%1$s was crushed by earth magic cast by %2$s",
+  "death.attack.renegades.air": "%1$s was cut down by air magic",
+  "death.attack.renegades.air.player": "%1$s was cut down by air magic cast by %2$s",
   "death.attack.renegades.spell_projectile": "%1$s was hit by a spell",
   "death.attack.renegades.spell_projectile.player": "%1$s was hit by a spell cast by %2$s"
 }

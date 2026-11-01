@@ -173,7 +173,9 @@ public final class ActionRunner {
 
             if (action.motion().isCommitted()) {
                 Vec3 heading = this.committedHeading(action, ctx);
-                this.locomotion.snapFacing(heading);
+                if (action.motion() != AttackMotion.SIDESTEP) {
+                    this.locomotion.snapFacing(heading);
+                }
                 this.locomotion
                         .beginCommittedMotion(heading, action.committedSpeed(), action.committedTicks(), action.committedLift(), action.committedCorrection());
                 if (action.committedCorrection() > 0.0 && ctx.committedTargetPos() != null) {
@@ -249,6 +251,10 @@ public final class ActionRunner {
         return switch (action.motion()) {
             case CROSS_THROUGH -> target == null ? ctx.committedForward() : this.locomotion.crossVector(target, ctx.scratch() >= 0 ? 1 : -1);
             case RETREATING -> target == null ? ctx.committedForward().scale(-1.0) : this.locomotion.retreatVector(target);
+            case SIDESTEP -> {
+                Vec3 forward = ctx.committedForward();
+                yield new Vec3(-forward.z, 0.0, forward.x).scale(ctx.scratch() >= 0 ? 1.0 : -1.0);
+            }
             default -> ctx.committedForward();
         };
     }

@@ -1,0 +1,39 @@
+{
+  "entity": "renegades:elemental_wizard",
+  "fallback": true,
+  "entries": [
+    {
+      "id": "fallback_leather_aqua",
+      "equipment": {
+        "head": "minecraft:leather_helmet",
+        "chest": "minecraft:leather_chestplate",
+        "legs": "minecraft:leather_leggings",
+        "feet": "minecraft:leather_boots",
+        "mainhand": "minecraft:stick"
+      },
+      "variant": "aqua"
+    },
+    {
+      "id": "fallback_leather_terra",
+      "equipment": {
+        "head": "minecraft:leather_helmet",
+        "chest": "minecraft:leather_chestplate",
+        "legs": "minecraft:leather_leggings",
+        "feet": "minecraft:leather_boots",
+        "mainhand": "minecraft:stick"
+      },
+      "variant": "terra"
+    },
+    {
+      "id": "fallback_leather_wind",
+      "equipment": {
+        "head": "minecraft:leather_helmet",
+        "chest": "minecraft:leather_chestplate",
+        "legs": "minecraft:leather_leggings",
+        "feet": "minecraft:leather_boots",
+        "mainhand": "minecraft:stick"
+      },
+      "variant": "wind"
+    }
+  ]
+}

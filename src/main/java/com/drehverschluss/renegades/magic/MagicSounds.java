@@ -15,6 +15,9 @@ public final class MagicSounds {
     public static final SchoolSounds HEALING = new SchoolSounds(SoundEvents.AMETHYST_BLOCK_CHIME, SoundEvents.BEACON_POWER_SELECT, SoundEvents.AMETHYST_BLOCK_RESONATE);
     public static final SchoolSounds LIGHTNING = new SchoolSounds(SoundEvents.BEACON_AMBIENT, SoundEvents.TRIDENT_THUNDER.value(), SoundEvents.LIGHTNING_BOLT_IMPACT);
     public static final SchoolSounds SOUL = new SchoolSounds(SoundEvents.SOUL_ESCAPE.value(), SoundEvents.WITHER_SHOOT, SoundEvents.SCULK_CATALYST_BLOOM);
+    public static final SchoolSounds WATER = new SchoolSounds(SoundEvents.BUCKET_FILL, SoundEvents.PLAYER_SPLASH, SoundEvents.GENERIC_SPLASH);
+    public static final SchoolSounds EARTH = new SchoolSounds(SoundEvents.GRAVEL_HIT, SoundEvents.STONE_BREAK, SoundEvents.DRIPSTONE_BLOCK_BREAK);
+    public static final SchoolSounds AIR = new SchoolSounds(SoundEvents.BREEZE_CHARGE, SoundEvents.BREEZE_SHOOT, SoundEvents.BREEZE_WIND_CHARGE_BURST.value());
     public static final SchoolSounds MELEE = new SchoolSounds(SoundEvents.PLAYER_ATTACK_SWEEP, SoundEvents.PLAYER_ATTACK_STRONG, SoundEvents.PLAYER_ATTACK_KNOCKBACK);
     public static final SchoolSounds RANGED = new SchoolSounds(SoundEvents.CROSSBOW_LOADING_START.value(), SoundEvents.ARROW_SHOOT, SoundEvents.ARROW_HIT);
     public static final SoundEvent EXPLOSION = SoundEvents.GENERIC_EXPLODE.value();
@@ -28,6 +31,9 @@ public final class MagicSounds {
         BY_SCHOOL.put(MagicSchool.HEALING, HEALING);
         BY_SCHOOL.put(MagicSchool.LIGHTNING, LIGHTNING);
         BY_SCHOOL.put(MagicSchool.SOUL, SOUL);
+        BY_SCHOOL.put(MagicSchool.WATER, WATER);
+        BY_SCHOOL.put(MagicSchool.EARTH, EARTH);
+        BY_SCHOOL.put(MagicSchool.AIR, AIR);
         BY_SCHOOL.put(MagicSchool.PHYSICAL_MELEE, MELEE);
         BY_SCHOOL.put(MagicSchool.PHYSICAL_RANGED, RANGED);
     }

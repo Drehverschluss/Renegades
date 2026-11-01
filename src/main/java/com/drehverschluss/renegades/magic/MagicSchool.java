@@ -3,6 +3,7 @@
 package com.drehverschluss.renegades.magic;
 
 import com.drehverschluss.renegades.Renegades;
+import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
@@ -10,6 +11,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.damagesource.DamageType;
+import net.minecraft.world.level.block.Blocks;
 import org.joml.Vector3f;
 
 /**
@@ -27,6 +29,10 @@ public enum MagicSchool {
     HEALING("healing", 0x66FF66, true),
     LIGHTNING("lightning", 0xFFFF66, true),
     SOUL("soul", 0x2DD4DA, true),
+    // Schools of the elemental classes (Spell Power schools registered by mrpg_lib).
+    WATER("water", 0x3D8FE0, true),
+    EARTH("earth", 0x8A6A3C, true),
+    AIR("air", 0xD8F3EE, true),
     PHYSICAL_MELEE("physical_melee", 0xB3B3B3, false),
     PHYSICAL_RANGED("physical_ranged", 0x805D4D, false);
 
@@ -84,6 +90,9 @@ public enum MagicSchool {
             case HEALING -> ParticleTypes.HAPPY_VILLAGER;
             case LIGHTNING -> ParticleTypes.ELECTRIC_SPARK;
             case SOUL -> ParticleTypes.SOUL_FIRE_FLAME;
+            case WATER -> ParticleTypes.SPLASH;
+            case EARTH -> new BlockParticleOption(ParticleTypes.BLOCK, Blocks.COARSE_DIRT.defaultBlockState());
+            case AIR -> ParticleTypes.CLOUD;
             case GENERIC -> ParticleTypes.ENCHANT;
             case PHYSICAL_MELEE, PHYSICAL_RANGED -> ParticleTypes.CRIT;
         };

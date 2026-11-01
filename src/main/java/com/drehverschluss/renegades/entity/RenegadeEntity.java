@@ -20,6 +20,7 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -94,6 +95,8 @@ public abstract class RenegadeEntity extends Monster implements GeoEntity {
     // Set on spawn: worn gear can raise max health (e.g. Paladins armor), but vanilla applies equipment attributes only
     // in the first tick, after finalizeSpawn already set the health.
     private boolean fillHealthAfterFirstTick;
+    // Set when a renegade of a class that is not available (class mod missing) is loaded from NBT.
+    private boolean needsFallbackGear;
     // Server only: created in registerGoals, which the Mob constructor calls only on the server.
     @Nullable
     private MobBrain brain;
@@ -465,6 +468,9 @@ public abstract class RenegadeEntity extends Monster implements GeoEntity {
      */
     public static boolean checkRenegadeSpawnRules(EntityType<? extends RenegadeEntity> type, ServerLevelAccessor level, MobSpawnType spawnType,
                                                   BlockPos pos, RandomSource random) {
+        if (!RenegadeClasses.isAvailable(type)) {
+            return false;
+        }
         return RenegadesConfig.REQUIRE_DARKNESS.get()
                 ? Monster.checkMonsterSpawnRules(type, level, spawnType, pos, random)
                 : Monster.checkAnyLightMonsterSpawnRules(type, level, spawnType, pos, random);
@@ -521,6 +527,13 @@ public abstract class RenegadeEntity extends Monster implements GeoEntity {
                 if (this.getHealth() < this.getMaxHealth()) {
                     this.setHealth(this.getMaxHealth());
                 }
+            }
+            if (this.needsFallbackGear && this.level() instanceof ServerLevel serverLevel) {
+                this.needsFallbackGear = false;
+                EquipmentSelector.reequip(this, serverLevel);
+                Renegades.LOGGER.info("Loaded {} at {} without its class mod ({}), re-equipped with its fallback gear",
+                        BuiltInRegistries.ENTITY_TYPE.getKey(this.getType()), this.blockPosition().toShortString(),
+                        String.join(", ", RenegadeClasses.of(this.getType()) == null ? List.of() : RenegadeClasses.of(this.getType()).missingMods()));
             }
             if (this.pendingGroup != null) {
                 this.spawnPendingGroup();
@@ -599,6 +612,9 @@ public abstract class RenegadeEntity extends Monster implements GeoEntity {
     public void readAdditionalSaveData(CompoundTag tag) {
         super.readAdditionalSaveData(tag);
         this.groupId = tag.hasUUID(TAG_GROUP) ? tag.getUUID(TAG_GROUP) : null;
+        // Saved while its class mod was installed: that gear is gone now (unknown items load as empty), so it gets the
+        // fallback entries of its pools (e.g. leather) on its first tick.
+        this.needsFallbackGear = !RenegadeClasses.isAvailable(this.getType());
 
         this.clearEliteState();
         CompoundTag elite = tag.getCompound(TAG_ELITE);
