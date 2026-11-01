@@ -8,6 +8,8 @@ import com.drehverschluss.renegades.entity.RenegadeEntity;
 import com.drehverschluss.renegades.equipment.EquipmentPoolEntry;
 import com.drehverschluss.renegades.equipment.EquipmentPools;
 import com.drehverschluss.renegades.equipment.EquipmentSelector;
+import com.drehverschluss.renegades.equipment.RareItemEntry;
+import com.drehverschluss.renegades.equipment.RareItems;
 import com.drehverschluss.renegades.group.RenegadeGroups;
 import com.drehverschluss.renegades.group.SpawnGroupTemplate;
 import com.drehverschluss.renegades.group.SpawnGroups;
@@ -47,7 +49,7 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.event.EventHooks;
 
 /**
- * Debug commands (permission level 2): /renegades pools|reequip|groups|spawngroup|nearby|damagetags|stats|profile|spawnelite.
+ * Debug commands (permission level 2): /renegades pools|reequip|groups|spawngroup|nearby|damagetags|stats|profile|rareitems|spawnelite.
  */
 public final class RenegadesCommand {
     private RenegadesCommand() {
@@ -95,6 +97,8 @@ public final class RenegadesCommand {
                         .executes(context -> showStats(context.getSource()))
                         .then(Commands.literal("reset")
                                 .executes(context -> resetStats(context.getSource()))))
+                .then(Commands.literal("rareitems")
+                        .executes(context -> listRareItems(context.getSource())))
                 .then(Commands.literal("spawnelite")
                         .then(Commands.argument("class", StringArgumentType.word())
                                 .suggests((context, builder) -> SharedSuggestionProvider.suggest(
@@ -111,6 +115,30 @@ public final class RenegadesCommand {
     private static List<EntityType<? extends RenegadeEntity>> renegadeTypes() {
         return List.of(ModEntityTypes.WARRIOR.get(), ModEntityTypes.ROGUE.get(), ModEntityTypes.PALADIN.get(),
                 ModEntityTypes.ARCHER.get(), ModEntityTypes.WIZARD.get(), ModEntityTypes.PRIEST.get());
+    }
+
+    /**
+     * The loaded rare items per class: slot, chance (and with rareItemChanceMultiplier), items, replaces, conditions.
+     */
+    private static int listRareItems(CommandSourceStack source) {
+        double multiplier = RenegadesConfig.RARE_ITEM_CHANCE_MULTIPLIER.get();
+        int total = 0;
+        for (EntityType<?> type : renegadeTypes()) {
+            List<RareItemEntry> entries = RareItems.get(type);
+            total += entries.size();
+            source.sendSuccess(() -> Component.literal(BuiltInRegistries.ENTITY_TYPE.getKey(type) + ": " + entries.size() + " rare item entries"
+                    + " (rareItemChanceMultiplier " + multiplier + ")"), false);
+            for (RareItemEntry entry : entries) {
+                double effective = Math.min(1.0D, entry.chance() * multiplier);
+                source.sendSuccess(() -> Component.literal("- " + entry.id() + " | " + entry.slot().getName()
+                        + String.format(Locale.ROOT, " | chance %.5f (1 in %s)", effective, effective > 0.0D ? String.valueOf(Math.round(1.0D / effective)) : "never")
+                        + " | " + entry.items().options().size() + " item option(s): " + entry.items()
+                        + " | replaces " + (entry.replaces() == null ? "any piece" : entry.replaces())
+                        + " | " + entry.conditions().describe()
+                        + (entry.allowAffixes() ? "" : " | no affixes")), false);
+            }
+        }
+        return total;
     }
 
     /**

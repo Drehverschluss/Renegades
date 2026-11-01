@@ -1,0 +1,15 @@
+{
+  "neoforge:conditions": [
+    {"type": "neoforge:mod_loaded", "modid": "arsenal"},
+    {"type": "neoforge:mod_loaded", "modid": "paladins"}
+  ],
+  "entity": "renegades:paladin",
+  "slot": "offhand",
+  "chance": 0.00125,
+  "items": [
+    "arsenal:unique_shield_1",
+    "arsenal:unique_shield_2",
+    "arsenal:unique_shield_sw"
+  ],
+  "replaces": "#renegades:rare_replace/shield_t2_t3"
+}

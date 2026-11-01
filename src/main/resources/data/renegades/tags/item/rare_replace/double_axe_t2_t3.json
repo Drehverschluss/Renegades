@@ -1,0 +1,6 @@
+{
+  "values": [
+    {"id": "rogues:diamond_double_axe", "required": false},
+    {"id": "rogues:netherite_double_axe", "required": false}
+  ]
+}

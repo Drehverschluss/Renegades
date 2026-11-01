@@ -19,6 +19,18 @@ public record ItemChoice(List<Option> options) {
         return option.enchanting().apply(option.pick(random), random, registries);
     }
 
+    /**
+     * Whether the stack is one of the options' items (or in one of their tags); enchantments do not matter.
+     */
+    public boolean matches(ItemStack stack) {
+        for (Option option : this.options) {
+            if (option instanceof ItemOption itemOption ? stack.is(itemOption.item()) : stack.is(((TagOption) option).tag())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public sealed interface Option permits ItemOption, TagOption {
         ItemStack pick(RandomSource random);
 

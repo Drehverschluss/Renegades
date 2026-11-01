@@ -10,6 +10,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import javax.annotation.Nullable;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
@@ -21,13 +22,14 @@ import net.minecraft.world.item.Item;
 import org.slf4j.Logger;
 
 /**
- * Parses equipment pool files. Invalid entries are skipped with a warning; an invalid file header throws.
+ * Parses equipment pool files (and the item and slot values of rare item files). Invalid entries are skipped with a
+ * warning; an invalid file header throws.
  */
 final class EquipmentPoolParser {
     private static final Set<String> FILE_KEYS = Set.of("entity", "fallback", "entries", "neoforge:conditions");
     private static final Set<String> ENTRY_KEYS = Set.of("id", "weight", "conditions", "equipment", "variant");
     private static final Set<String> OPTION_KEYS = Set.of("item", "enchantments", "enchant_with_levels");
-    private static final Map<String, EquipmentSlot> SLOTS = Map.of(
+    static final Map<String, EquipmentSlot> SLOTS = Map.of(
             "head", EquipmentSlot.HEAD,
             "chest", EquipmentSlot.CHEST,
             "legs", EquipmentSlot.LEGS,
@@ -92,16 +94,31 @@ final class EquipmentPoolParser {
     }
 
     private static ItemChoice parseChoice(JsonElement json, String slotName) {
+        return parseChoice(json, slotName, null);
+    }
+
+    /**
+     * An item, #tag, object or a list of them. With a skipped list, options naming an unknown item (e.g. from a mod that
+     * is not installed) are left out and noted there instead of failing; the choice may then be null (nothing left).
+     */
+    @Nullable
+    static ItemChoice parseChoice(JsonElement json, String slotName, @Nullable List<String> skipped) {
         List<ItemChoice.Option> options = new ArrayList<>();
-        if (json.isJsonArray()) {
-            for (JsonElement element : json.getAsJsonArray()) {
+        for (JsonElement element : json.isJsonArray() ? json.getAsJsonArray() : List.of(json)) {
+            try {
                 options.add(parseOptionElement(element, slotName));
+            } catch (UnknownItemException e) {
+                if (skipped == null) {
+                    throw e;
+                }
+                skipped.add(e.itemId.toString());
             }
-        } else {
-            options.add(parseOptionElement(json, slotName));
         }
 
         if (options.isEmpty()) {
+            if (skipped != null) {
+                return null;
+            }
             throw new JsonParseException("Slot '" + slotName + "' has an empty list");
         }
         return new ItemChoice(List.copyOf(options));
@@ -154,11 +171,20 @@ final class EquipmentPoolParser {
 
         ResourceLocation itemId = parseId(value, "item");
         Item item = BuiltInRegistries.ITEM.getOptional(itemId)
-                .orElseThrow(() -> new JsonParseException("Unknown item '" + itemId + "'"));
+                .orElseThrow(() -> new UnknownItemException(itemId));
         return new ItemChoice.ItemOption(item, enchanting);
     }
 
-    private static ResourceLocation parseId(String value, String what) {
+    private static final class UnknownItemException extends JsonParseException {
+        private final ResourceLocation itemId;
+
+        UnknownItemException(ResourceLocation itemId) {
+            super("Unknown item '" + itemId + "'");
+            this.itemId = itemId;
+        }
+    }
+
+    static ResourceLocation parseId(String value, String what) {
         ResourceLocation id = ResourceLocation.tryParse(value);
         if (id == null) {
             throw new JsonParseException("Invalid " + what + " id '" + value + "'");

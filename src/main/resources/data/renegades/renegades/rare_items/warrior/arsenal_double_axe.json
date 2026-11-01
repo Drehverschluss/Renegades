@@ -1,0 +1,15 @@
+{
+  "neoforge:conditions": [
+    {"type": "neoforge:mod_loaded", "modid": "arsenal"},
+    {"type": "neoforge:mod_loaded", "modid": "rogues"}
+  ],
+  "entity": "renegades:warrior",
+  "slot": "mainhand",
+  "chance": 0.0025,
+  "items": [
+    "arsenal:unique_double_axe_1",
+    "arsenal:unique_double_axe_2",
+    "arsenal:unique_double_axe_sw"
+  ],
+  "replaces": "#renegades:rare_replace/double_axe_t2_t3"
+}

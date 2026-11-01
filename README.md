@@ -323,10 +323,59 @@ Configured in the server config `config/renegades-server.toml`. To override it f
 | `weaponDropChance` | `1.0` | Chance for each held item (main and off hand) to drop. |
 | `requirePlayerKill` | `true` | Equipment only drops if a player killed the mob or hit it shortly before. |
 | `dropDurabilityMin` / `dropDurabilityMax` | `0.25` / `0.75` | Each dropped item with durability keeps a random share of its max durability in this range (rolled per item; wear from the fight does not matter). Items without durability or unbreakable items are unchanged; nothing drops broken. `1.0` / `1.0` drops everything undamaged. |
+| `rareItemChanceMultiplier` | `1.0` | Multiplies the chance of every rare item (see below). `0` = no rare items, `100` = for testing. |
 
 Items with Curse of Vanishing (or any `prevent_equipment_drop` effect) never drop; Looting raises the chance like for
 vanilla mob equipment. The regular loot tables (`renegades:entities/<class>`) are empty by default and can be filled
 by datapacks.
+
+## Rare items (datapack)
+
+Very rarely, a renegade wears a special item (e.g. a unique weapon) instead of one piece of its pool equipment. It is
+rolled right after the pool set on spawn (all spawn types) and on `/renegades reequip`, and drops like the rest of the
+equipment (drop rules above). One entry per file in `data/<namespace>/renegades/rare_items/<name>.json`; a file with
+the same path in a later datapack replaces it (e.g. `"chance": 0.0` switches an entry off). `neoforge:conditions` are
+supported; items of mods that are not installed are left out, and an entry without any item left is dropped.
+
+```json
+{
+  "neoforge:conditions": [{"type": "neoforge:mod_loaded", "modid": "arsenal"}],
+  "entity": "renegades:rogue",
+  "slot": "mainhand",
+  "chance": 0.00125,
+  "items": ["arsenal:unique_dagger_1", "arsenal:unique_dagger_2", "arsenal:unique_dagger_sw"],
+  "replaces": "#renegades:rare_replace/dagger_t2_t3",
+  "conditions": {"dimensions": ["minecraft:overworld"]},
+  "allow_affixes": true
+}
+```
+
+- `entity`: one id or a list. `slot`: `mainhand`, `offhand`, `head`, `chest`, `legs` or `feet`.
+- `chance`: per spawn, multiplied by `rareItemChanceMultiplier`. Every matching entry is rolled once; at most one rare
+  item per slot. Empty slots are never filled.
+- `items`: an item, `#tag`, list or object like in the equipment pools (`item`, `enchantments`, `enchant_with_levels`).
+- `replaces` (optional): only replaces a worn piece that matches (item, list or `#tag`); without it, any worn piece in
+  the slot. This keeps the class working (a unique claymore only replaces a claymore, never the mace of the shield
+  set) and ties the rarity to the pool tier.
+- `conditions` (optional): like in the equipment pools.
+- `allow_affixes` (optional, default `true`): with Apotheosis, rare items get affixes like any other piece of an elite;
+  `false` = never (an augment then upgrades another piece).
+
+Included (only with Arsenal from the RPG Series and the class mod): the
+Arsenal uniques replace the tier 2-3 weapon of the same type (tags `renegades:rare_replace/*`), so about 1 in 400
+renegades with tier 2-3 gear carries one:
+
+| Class | Unique (Arsenal) | Replaces | Chance per entry |
+|---|---|---|---|
+| Warrior | double axe, glaive | diamond/netherite double axe, glaive | 0.25 % |
+| Rogue | dagger (main and off hand), sickle | diamond/netherite dagger, sickle | 0.125 % (two rolls per rogue) |
+| Paladin | claymore, hammer | diamond/netherite claymore, great hammer | 0.25 % |
+| Paladin | mace, shield | diamond/netherite mace, kite shield | 0.125 % (two rolls) |
+| Archer | longbow, heavy crossbow | royal/netherite longbow, (netherite) heavy crossbow | 0.5 % (short bows and rapid crossbows have no unique) |
+| Wizard | damage staffs with the variant's school | fire/frost/arcane staff (not wands) | 0.5 % |
+| Priest | healing staffs | diamond/netherite holy staff (not wands) | 0.5 % |
+
+**Debug command**: `/renegades rareitems` lists the loaded entries per class (slot, chance, items, replaces).
 
 ## Elite renegades (Apotheosis)
 

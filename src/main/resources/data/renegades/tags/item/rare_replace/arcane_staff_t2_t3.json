@@ -1,0 +1,6 @@
+{
+  "values": [
+    {"id": "wizards:staff_arcane", "required": false},
+    {"id": "wizards:staff_netherite_arcane", "required": false}
+  ]
+}

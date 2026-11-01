@@ -1,0 +1,6 @@
+{
+  "values": [
+    {"id": "paladins:diamond_great_hammer", "required": false},
+    {"id": "paladins:netherite_great_hammer", "required": false}
+  ]
+}

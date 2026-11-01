@@ -1,0 +1,6 @@
+{
+  "values": [
+    {"id": "archers:royal_longbow", "required": false},
+    {"id": "archers:netherite_longbow", "required": false}
+  ]
+}

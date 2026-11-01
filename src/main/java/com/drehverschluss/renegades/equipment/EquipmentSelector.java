@@ -35,12 +35,12 @@ public final class EquipmentSelector {
      */
     public static void equipOnSpawn(Mob mob, ServerLevel level) {
         OptionalInt mobLevel = RenegadeLevels.provider().map(provider -> provider.levelForSpawn(mob)).orElse(OptionalInt.empty());
-        select(mob, level, mobLevel, mob.getRandom()).ifPresent(selection -> apply(mob, selection.entry(), mob.getRandom()));
+        select(mob, level, mobLevel, mob.getRandom()).ifPresent(selection -> apply(mob, selection, mob.getRandom()));
     }
 
     /**
-     * Rolls the equipment of a mob that is already in the world again (debug command); clears it if no entry matches.
-     * A renegade loses its elite state with its old gear.
+     * Rolls the equipment of a mob that is already in the world again (debug command), including rare items; clears it
+     * if no entry matches. A renegade loses its elite state with its old gear.
      */
     public static Optional<Selection> reequip(Mob mob, ServerLevel level) {
         if (mob instanceof RenegadeEntity renegade) {
@@ -49,12 +49,13 @@ public final class EquipmentSelector {
         OptionalInt mobLevel = RenegadeLevels.provider().map(provider -> provider.currentLevel(mob)).orElse(OptionalInt.empty());
         Optional<Selection> selection = select(mob, level, mobLevel, mob.getRandom());
         if (selection.isPresent()) {
-            apply(mob, selection.get().entry(), mob.getRandom());
+            apply(mob, selection.get(), mob.getRandom());
         } else {
             for (EquipmentSlot slot : SLOTS) {
                 mob.setItemSlot(slot, ItemStack.EMPTY);
             }
             if (mob instanceof RenegadeEntity renegade) {
+                renegade.setRareItems(RareItems.Result.NONE);
                 renegade.resetVanillaDropChances();
             }
         }
@@ -85,15 +86,19 @@ public final class EquipmentSelector {
 
     /**
      * Replaces all hand and armor slots with the entry's equipment (with its enchantments); slots the entry does not
-     * define are cleared. A renegade also gets the entry's variant (random if the entry has none).
+     * define are cleared. Then rare items may replace single pieces (see RareItems). A renegade also gets the entry's
+     * variant (random if the entry has none).
      */
-    public static void apply(Mob mob, EquipmentPoolEntry entry, RandomSource random) {
+    public static void apply(Mob mob, Selection selection, RandomSource random) {
+        EquipmentPoolEntry entry = selection.entry();
         for (EquipmentSlot slot : SLOTS) {
             ItemChoice choice = entry.equipment().get(slot);
             mob.setItemSlot(slot, choice == null ? ItemStack.EMPTY : choice.pick(random, mob.level().registryAccess()));
         }
+        RareItems.Result rare = RareItems.roll(mob, selection.context(), random);
         if (mob instanceof RenegadeEntity renegade) {
             renegade.applyPoolVariant(entry.variant());
+            renegade.setRareItems(rare);
             renegade.resetVanillaDropChances();
         }
     }

@@ -1,0 +1,6 @@
+{
+  "values": [
+    {"id": "paladins:diamond_claymore", "required": false},
+    {"id": "paladins:netherite_claymore", "required": false}
+  ]
+}

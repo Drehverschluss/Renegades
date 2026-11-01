@@ -15,6 +15,8 @@ import com.drehverschluss.renegades.entity.RogueRenegade;
 import com.drehverschluss.renegades.entity.WarriorRenegade;
 import com.drehverschluss.renegades.equipment.EquipmentPoolLoader;
 import com.drehverschluss.renegades.equipment.EquipmentPools;
+import com.drehverschluss.renegades.equipment.RareItemLoader;
+import com.drehverschluss.renegades.equipment.RareItems;
 import com.drehverschluss.renegades.group.RenegadeSpawner;
 import com.drehverschluss.renegades.group.SpawnGroupLoader;
 import com.drehverschluss.renegades.group.SpawnStats;
@@ -104,12 +106,14 @@ public class Renegades {
 
     private static void addReloadListeners(AddReloadListenerEvent event) {
         event.addListener(new EquipmentPoolLoader());
+        event.addListener(new RareItemLoader());
         event.addListener(new SpawnGroupLoader());
     }
 
     private static void onTagsUpdated(TagsUpdatedEvent event) {
         if (event.getUpdateCause() == TagsUpdatedEvent.UpdateCause.SERVER_DATA_LOAD) {
             EquipmentPools.validateTagsAndLog(event.getRegistryAccess());
+            RareItems.validateTagsAndLog(event.getRegistryAccess());
         }
     }
 

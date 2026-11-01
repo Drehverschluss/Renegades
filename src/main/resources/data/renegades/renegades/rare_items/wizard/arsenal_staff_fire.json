@@ -1,0 +1,16 @@
+{
+  "neoforge:conditions": [
+    {"type": "neoforge:mod_loaded", "modid": "arsenal"},
+    {"type": "neoforge:mod_loaded", "modid": "wizards"}
+  ],
+  "entity": "renegades:wizard",
+  "slot": "mainhand",
+  "chance": 0.005,
+  "items": [
+    "arsenal:unique_staff_damage_2",
+    "arsenal:unique_staff_damage_3",
+    "arsenal:unique_staff_damage_4",
+    "arsenal:unique_staff_damage_sw"
+  ],
+  "replaces": "#renegades:rare_replace/fire_staff_t2_t3"
+}

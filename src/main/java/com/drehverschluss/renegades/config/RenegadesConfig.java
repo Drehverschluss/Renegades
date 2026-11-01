@@ -13,6 +13,7 @@ public final class RenegadesConfig {
     public static final ModConfigSpec.BooleanValue REQUIRE_PLAYER_KILL;
     public static final ModConfigSpec.DoubleValue DROP_DURABILITY_MIN;
     public static final ModConfigSpec.DoubleValue DROP_DURABILITY_MAX;
+    public static final ModConfigSpec.DoubleValue RARE_ITEM_CHANCE_MULTIPLIER;
     public static final ModConfigSpec.DoubleValue HEALTH_MULTIPLIER;
     public static final ModConfigSpec.DoubleValue DAMAGE_MULTIPLIER;
     public static final ModConfigSpec.IntValue SPAWN_INTERVAL_SECONDS;
@@ -59,6 +60,10 @@ public final class RenegadesConfig {
         DROP_DURABILITY_MAX = builder
                 .comment("Highest remaining durability of a dropped damageable item, as a fraction of its max durability.")
                 .defineInRange("dropDurabilityMax", 0.75D, 0.0D, 1.0D);
+        RARE_ITEM_CHANCE_MULTIPLIER = builder
+                .comment("Multiplier for the chance of every rare item (data/<namespace>/renegades/rare_items, e.g. unique weapons that",
+                        "replace a piece of the equipment on spawn). 0 = no rare items, 2 = twice as often.")
+                .defineInRange("rareItemChanceMultiplier", 1.0D, 0.0D, 100.0D);
 
         builder.pop();
 

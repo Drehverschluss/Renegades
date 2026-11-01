@@ -1,0 +1,6 @@
+{
+  "values": [
+    {"id": "paladins:diamond_mace", "required": false},
+    {"id": "paladins:netherite_mace", "required": false}
+  ]
+}

@@ -1,0 +1,6 @@
+{
+  "values": [
+    {"id": "rogues:diamond_sickle", "required": false},
+    {"id": "rogues:netherite_sickle", "required": false}
+  ]
+}

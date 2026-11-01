@@ -171,7 +171,8 @@ final class ApotheosisElites {
 
     private static boolean canTakeAffixes(RenegadeEntity renegade, EquipmentSlot slot) {
         ItemStack stack = renegade.getItemBySlot(slot);
-        return !stack.isEmpty() && !AffixHelper.hasAffixes(stack) && !LootCategory.forItem(stack).isNone();
+        // Rare items with allow_affixes = false count like category "none": augments move on to another piece.
+        return !stack.isEmpty() && !renegade.isAffixLocked(slot) && !AffixHelper.hasAffixes(stack) && !LootCategory.forItem(stack).isNone();
     }
 
     /**

@@ -1,0 +1,6 @@
+{
+  "values": [
+    {"id": "rogues:diamond_dagger", "required": false},
+    {"id": "rogues:netherite_dagger", "required": false}
+  ]
+}

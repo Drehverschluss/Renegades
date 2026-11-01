@@ -1,0 +1,6 @@
+{
+  "values": [
+    {"id": "rogues:diamond_glaive", "required": false},
+    {"id": "rogues:netherite_glaive", "required": false}
+  ]
+}

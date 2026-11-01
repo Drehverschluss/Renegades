@@ -1,0 +1,6 @@
+{
+  "values": [
+    {"id": "wizards:staff_frost", "required": false},
+    {"id": "wizards:staff_netherite_frost", "required": false}
+  ]
+}

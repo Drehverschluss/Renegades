@@ -9,6 +9,7 @@ import com.drehverschluss.renegades.compat.apotheosis.ApotheosisCompat;
 import com.drehverschluss.renegades.config.RenegadesConfig;
 import com.drehverschluss.renegades.entity.ai.FollowGroupLeaderGoal;
 import com.drehverschluss.renegades.equipment.EquipmentSelector;
+import com.drehverschluss.renegades.equipment.RareItems;
 import com.drehverschluss.renegades.group.GroupSpawner;
 import com.drehverschluss.renegades.group.RenegadeGroups;
 import com.drehverschluss.renegades.group.SpawnGroupTemplate;
@@ -110,6 +111,8 @@ public abstract class RenegadeEntity extends Monster implements GeoEntity {
     private ApotheosisCompat.ForcedElite forcedElite;
     // What finalizeSpawn upgraded (not saved); read by the spawnelite command.
     private ApotheosisCompat.EliteResult lastEliteResult = ApotheosisCompat.EliteResult.NONE;
+    // Rare items of the last equipment roll (not saved: only the elite upgrade right after the roll reads it).
+    private RareItems.Result rareItems = RareItems.Result.NONE;
 
     /**
      * Out-of-combat animations shared by all classes: a calm stand and a plain walk with swinging arms.
@@ -643,6 +646,21 @@ public abstract class RenegadeEntity extends Monster implements GeoEntity {
 
     public ApotheosisCompat.EliteResult getLastEliteResult() {
         return this.lastEliteResult;
+    }
+
+    public void setRareItems(RareItems.Result rareItems) {
+        this.rareItems = rareItems;
+    }
+
+    public RareItems.Result getRareItems() {
+        return this.rareItems;
+    }
+
+    /**
+     * Whether the piece in this slot is a rare item whose entry forbids affixes (allow_affixes = false).
+     */
+    public boolean isAffixLocked(EquipmentSlot slot) {
+        return this.rareItems.noAffixes().contains(slot);
     }
 
     /**

@@ -1,0 +1,15 @@
+{
+  "neoforge:conditions": [
+    {"type": "neoforge:mod_loaded", "modid": "arsenal"},
+    {"type": "neoforge:mod_loaded", "modid": "rogues"}
+  ],
+  "entity": "renegades:rogue",
+  "slot": "offhand",
+  "chance": 0.00125,
+  "items": [
+    "arsenal:unique_dagger_1",
+    "arsenal:unique_dagger_2",
+    "arsenal:unique_dagger_sw"
+  ],
+  "replaces": "#renegades:rare_replace/dagger_t2_t3"
+}

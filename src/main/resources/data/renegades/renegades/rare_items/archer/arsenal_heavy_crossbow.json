@@ -1,0 +1,15 @@
+{
+  "neoforge:conditions": [
+    {"type": "neoforge:mod_loaded", "modid": "arsenal"},
+    {"type": "neoforge:mod_loaded", "modid": "archers"}
+  ],
+  "entity": "renegades:archer",
+  "slot": "mainhand",
+  "chance": 0.005,
+  "items": [
+    "arsenal:unique_heavy_crossbow_1",
+    "arsenal:unique_heavy_crossbow_2",
+    "arsenal:unique_heavy_crossbow_sw"
+  ],
+  "replaces": "#renegades:rare_replace/heavy_crossbow_t2_t3"
+}
