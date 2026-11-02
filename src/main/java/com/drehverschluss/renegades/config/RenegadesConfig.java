@@ -81,7 +81,7 @@ public final class RenegadesConfig {
                 .comment("Multiplier for the base max health.")
                 .defineInRange("healthMultiplier", 1.0D, 0.1D, 10.0D);
         DAMAGE_MULTIPLIER = builder
-                .comment("Multiplier for the base attack damage.")
+                .comment("Multiplier for the base attack damage. Also scales the archer's arrows and bolts and, with Spell Power, the spell power casters get from their gear.")
                 .defineInRange("damageMultiplier", 1.0D, 0.1D, 10.0D);
 
         builder.pop();
@@ -133,7 +133,7 @@ public final class RenegadesConfig {
                 .define("enableParry", true);
 
         ENABLE_DODGE = builder
-                .comment("If true, renegades that can dodge (e.g. the rogue) sometimes evade a heavy hit (more than 4 damage) completely with a sidestep.")
+                .comment("If true, the rogue sometimes evades a heavy hit (more than 4 damage) completely with a sidestep. The forcemaster's side step is not affected.")
                 .define("enableDodge", true);
 
         ENABLE_STEALTH = builder
@@ -145,7 +145,7 @@ public final class RenegadesConfig {
                 .define("enableBrace", true);
 
         ENABLE_LEAP = builder
-                .comment("If true, renegades that leap (e.g. the paladin) jump at distant targets and land with a ground impact.")
+                .comment("If true, the paladin leaps at distant targets and lands with a ground impact. The berserker's leap has its own option (enableGuillotine).")
                 .define("enableLeap", true);
 
         ENABLE_TRAPS = builder
@@ -157,7 +157,9 @@ public final class RenegadesConfig {
                 .define("enableNova", true);
 
         ENABLE_PRIEST_HEALING = builder
-                .comment("If true, renegades that heal (e.g. the priest) heal and shield their allies. If false, they only protect and attack.")
+                .comment("If true, renegades heal: the priest heals its allies, the guardian bard's song heals a little, and the aqua elemental wizard",
+                        "also casts springwater to heal wounded allies. If false, the priest only protects (absorption) and attacks, the song does not heal,",
+                        "and springwater is only cast against enemies close by.")
                 .define("enablePriestHealing", true);
 
         HEALING_MULTIPLIER = builder
@@ -211,7 +213,7 @@ public final class RenegadesConfig {
                         "If false, Apotheosis has no effect on renegade gear. Also required for fullSetEliteChance.")
                 .define("apotheosisEliteGear", true);
         FULL_SET_ELITE_CHANCE = builder
-                .comment("Chance per spawn (not from (trial) spawners, only with a player nearby) that ALL worn pieces get affixes, all with the same",
+                .comment("Chance per spawn (not from (trial) spawners, only while a player is in the world) that ALL worn pieces get affixes, all with the same",
                         "rarity rolled for the world tier (a small miniboss, shown as \"Elite\" in its name). 0 = never, e.g. 0.02 = 2 %.")
                 .defineInRange("fullSetEliteChance", 0.0D, 0.0D, 1.0D);
 
