@@ -8,7 +8,9 @@ modId="${mod_id}"
 version="${mod_version}"
 displayName="${mod_name}"
 displayURL="https://github.com/Drehverschluss/Renegades"
+logoFile="renegades.png"
 authors="${mod_authors}"
+credits="Model, animations, combat and magic system based on ANARCHY – RPG Minibosses by cleannrooster (CC0)"
 description='''${mod_description}'''
 
 [[dependencies.${mod_id}]]
@@ -71,5 +73,84 @@ description='''${mod_description}'''
     modId="spell_engine"
     type="optional"
     versionRange="${spell_engine_version_range}"
+    ordering="NONE"
+    side="BOTH"
+
+# Class mods and Arsenal: only their registry ids are used (gear, effects, spell looks, unique items).
+
+[[dependencies.${mod_id}]]
+    modId="mrpg_lib"
+    type="optional"
+    versionRange="[2.0.0,)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.${mod_id}]]
+    modId="rogues"
+    type="optional"
+    versionRange="[3.0.0,)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.${mod_id}]]
+    modId="paladins"
+    type="optional"
+    versionRange="[3.0.0,)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.${mod_id}]]
+    modId="wizards"
+    type="optional"
+    versionRange="[3.0.0,)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.${mod_id}]]
+    modId="archers"
+    type="optional"
+    versionRange="[3.0.0,)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.${mod_id}]]
+    modId="archers_expansion"
+    type="optional"
+    versionRange="[2.0.0,)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.${mod_id}]]
+    modId="elemental_wizards_rpg"
+    type="optional"
+    versionRange="[3.0.0,)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.${mod_id}]]
+    modId="berserker_rpg"
+    type="optional"
+    versionRange="[3.0.0,)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.${mod_id}]]
+    modId="bards_rpg"
+    type="optional"
+    versionRange="[1.0.0,)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.${mod_id}]]
+    modId="forcemaster_rpg"
+    type="optional"
+    versionRange="[3.0.0,)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.${mod_id}]]
+    modId="arsenal"
+    type="optional"
+    versionRange="[1.0.0,)"
     ordering="NONE"
     side="BOTH"

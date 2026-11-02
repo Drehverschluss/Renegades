@@ -150,7 +150,7 @@ only dealt in the active window, when the weapon actually swings through its tar
 (attack damage incl. weapon and level bonuses, weapon enchantments such as Sharpness and Fire Aspect, blockable with a
 shield) and needs line of sight, so attacks never go through walls.
 
-**Cooldowns:** each attack has a cooldown, shortened at random like in ANARCHY – about 40 % on average for a renegade
+**Cooldowns:** each attack has a cooldown, shortened at random – about 40 % on average for a renegade
 fighting alone. Renegades fighting near other renegades (within 32 blocks) get somewhat shorter cooldowns, but at most
 25 % shorter than alone, and no cooldown is ever shorter than 1 second (`cooldownGroupScaling` in `[combat]`,
 default `true`; `false` = always like alone). The priest's support spells always use their full cooldown.
@@ -474,8 +474,8 @@ supported; items of mods that are not installed are left out, and an entry witho
 - `allow_affixes` (optional, default `true`): with Apotheosis, rare items get affixes like any other piece of an elite;
   `false` = never (an augment then upgrades another piece).
 
-Included (only with Arsenal from the RPG Series and the class mod; for the Elemental Wizard and the Berserker only their
-class mod):
+Included (only with Arsenal from the RPG Series and the class mod; for the Elemental Wizard instead with the mod that
+the class mod needs for the staff, see the table):
 the uniques replace the tier 2-3 weapon of the same type (tags `renegades:rare_replace/*`), so about 1 in 400
 renegades with tier 2-3 gear carries one:
 
@@ -488,8 +488,8 @@ renegades with tier 2-3 gear carries one:
 | Archer | longbow, heavy crossbow | royal/netherite longbow, (netherite) heavy crossbow | 0.5 % (short bows and rapid crossbows have no unique) |
 | Wizard | damage staffs with the variant's school | fire/frost/arcane staff (not wands) | 0.5 % |
 | Priest | healing staffs | diamond/netherite holy staff (not wands) | 0.5 % |
-| Elemental Wizard | Crystal Aqua / Ruby Terra / Aeternium Wind staff of its element, or the Valkyrie Elementalist Staff (Elemental Wizards RPG) | aqua/terra/wind staff of tier 2-3 (not wands) | 0.5 % |
-| Berserker | unique berserker axes 1 and 2 (Berserker RPG) | diamond/netherite berserker axe | 0.25 % |
+| Elemental Wizard | Crystal Aqua / Ruby Terra / Aeternium Wind staff of its element (Elemental Wizards RPG registers them only with Better End / Better Nether / Better End), or the Valkyrie Elementalist Staff (only with Aether) | aqua/terra/wind staff of tier 2-3 (not wands) | 0.5 % |
+| Berserker | unique berserker axes 1 and 2 (Berserker RPG, need Arsenal too) | diamond/netherite berserker axe | 0.25 % |
 | Bard | unique lutes (battle) and lyres (guardian) (Bards RPG, need Arsenal too) | diamond/netherite lute or lyre | 0.5 % |
 | Forcemaster | unique knuckles 1 and 2 (Forcemaster RPG, need Arsenal too), main hand only | diamond/netherite knuckle | 0.25 % |
 

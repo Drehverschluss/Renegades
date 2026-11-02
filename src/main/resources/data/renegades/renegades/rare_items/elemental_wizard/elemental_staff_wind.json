@@ -1,6 +1,10 @@
 {
   "neoforge:conditions": [
-    {"type": "neoforge:mod_loaded", "modid": "elemental_wizards_rpg"}
+    {"type": "neoforge:mod_loaded", "modid": "elemental_wizards_rpg"},
+    {"type": "neoforge:or", "values": [
+      {"type": "neoforge:mod_loaded", "modid": "betterend"},
+      {"type": "neoforge:mod_loaded", "modid": "aether"}
+    ]}
   ],
   "entity": "renegades:elemental_wizard",
   "slot": "mainhand",

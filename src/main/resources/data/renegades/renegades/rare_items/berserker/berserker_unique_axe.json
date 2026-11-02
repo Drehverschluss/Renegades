@@ -1,6 +1,7 @@
 {
   "neoforge:conditions": [
-    {"type": "neoforge:mod_loaded", "modid": "berserker_rpg"}
+    {"type": "neoforge:mod_loaded", "modid": "berserker_rpg"},
+    {"type": "neoforge:mod_loaded", "modid": "arsenal"}
   ],
   "entity": "renegades:berserker",
   "slot": "mainhand",
