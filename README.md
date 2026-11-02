@@ -308,13 +308,30 @@ The effects (Bleed, Blood Sacrifice, Apprehend, Blood Reckoning) are the real on
 Berserker RPG also makes berserker axes disable shields they hit, for the berserker too. Its abilities keep their
 cooldown (only rage shortens it); the plain swings are shortened like other attacks.
 
+**Bard** (requires [Bards RPG](https://www.curseforge.com/minecraft/mc-mods/bards-rpg), see "Classes that need other
+mods" below): a supporter that makes its group stronger and its enemies weaker (the priest heals instead). It keeps
+8–14 blocks from its target, preferably behind an ally (alone 11–16 blocks), jumps back from close targets and hits
+with its instrument as a last resort (35 HP, attack 3). Variant per bard: **battle** (lute) or **guardian** (lyre).
+Its spells use spell power (arcane):
+
+| Ability (caster_visuals key) | Effect |
+|---|---|
+| Song (`song`, variants `battle`, `guardian`) | When an ally within 10 blocks fights, it stands still and plays for 8 s; every 2 s a pulse around it (radius 10) hurts enemies a little and gives itself and every renegade ally a stack for 9 s (at most 3): battle +10 % attack damage per stack, guardian −10 % damage taken per stack and a small heal (power × 0.3, max. 5 % of max health, × `healingMultiplier`, off with `enablePriestHealing = false`). 4 damage or a melee hit interrupts it (cooldown then halved). Cooldown 20 s, `enableBardSongs` in `[combat]`, default `true` |
+| Mockery (`mockery`) | Vicious Mockery on the target (up to 16 blocks) for 6 s: −10 % damage dealt, +10 % damage taken (cooldown 15 s) |
+| Crescendo (`crescendo`) | A sound wave (× 0.6) that pierces up to 3 targets, stuns them for 0.5 s and lets them take 10 % more damage for 3 s (cooldown 10 s) |
+| Encore (`encore`) | When an enemy is within 4 blocks: a blast (× 0.4) that knocks it away; allies within 8 blocks get their running ability cooldowns shortened by 20 % (cooldown 12 s) |
+
+The effects (Vicious Mockery, Crescendo, the song markers Tale of the Dragonslayer / Troubadour's Minuet) are the real
+ones from Bards RPG; the song's bonus is its own, so the markers only show it. Songs only affect renegades, never
+players. Its abilities keep their full cooldown.
+
 Combat and magic system based on ANARCHY – RPG Minibosses by cleannrooster (CC0-1.0).
 
 ## Classes that need other mods
 
 Some classes mirror classes of other mods and only exist with that mod, because without its gear and spells they would
 be a plain copy of another class: the **Elemental Wizard** needs `elemental_wizards_rpg`, the **Berserker** needs
-`berserker_rpg`. Without the mod:
+`berserker_rpg`, the **Bard** needs `bards_rpg`. Without the mod:
 
 - no natural spawns; spawn groups with the class are left out (`/renegades spawngroup` names the missing mod);
 - its spawn egg is not in the creative tab; an egg from `/give` and the commands (`spawnelite`, `reequip`) report
@@ -368,7 +385,9 @@ left out first). With Elemental Wizards RPG also `elemental_wizard_solo` (weight
 (weight 2) and `paladin_elemental_wizard` (weight 1), so the elemental wizard is about as common as the wizard; the
 spawn timer still makes one attempt per interval, so the total spawn rate stays the same. With Berserker RPG also
 `berserker_solo` (weight 4), `berserker_pair` (two berserkers, weight 1), `warrior_berserker` (weight 2) and
-`berserker_priest` (a berserker leading a priest, weight 1): 8 of 62 weight, about as often as the wizard (7).
+`berserker_priest` (a berserker leading a priest, weight 1): 8 of 62 weight, about as often as the wizard (7). With
+Bards RPG also `bard_solo` (weight 1), `warrior_bard` (a warrior leading a bard, weight 3), `paladin_bard` (weight 2)
+and, with Berserker RPG too, `berserker_bard` (weight 1): 7 of 69 weight; as a supporter the bard rarely spawns alone.
 
 **Debug commands**: `/renegades groups <leader>` lists the templates, `/renegades spawngroup <id>` spawns one at your
 position like a natural spawn, `/renegades nearby` lists the renegades within `capRadius` with group, spawn type,
@@ -441,6 +460,7 @@ renegades with tier 2-3 gear carries one:
 | Priest | healing staffs | diamond/netherite holy staff (not wands) | 0.5 % |
 | Elemental Wizard | Crystal Aqua / Ruby Terra / Aeternium Wind staff of its element, or the Valkyrie Elementalist Staff (Elemental Wizards RPG) | aqua/terra/wind staff of tier 2-3 (not wands) | 0.5 % |
 | Berserker | unique berserker axes 1 and 2 (Berserker RPG) | diamond/netherite berserker axe | 0.25 % |
+| Bard | unique lutes (battle) and lyres (guardian) (Bards RPG, need Arsenal too) | diamond/netherite lute or lyre | 0.5 % |
 
 **Debug command**: `/renegades rareitems` lists the loaded entries per class (slot, chance, items, replaces).
 
@@ -514,13 +534,15 @@ are supported. A spell id that does not exist falls back to the built-in look (o
 Ability keys: wizard `double_bolt`, `homing_bolts`, `nova` (variants `fire`, `frost`, `arcane`); priest `heal`,
 `healing_cloud`, `absorption`, `holy_bolt`; elemental wizard `water_volley`, `water_whip`, `springwater`, `stone_spear`,
 `impale`, `stone_skin`, `air_cutter`, `aeroblast`, `windfield` (variants `aqua`, `terra`, `wind`); berserker `rage`,
-`bloody_strike`, `apprehend`, `guillotine`, `second_wind` (particles and sounds only). The staff swing keeps
+`bloody_strike`, `apprehend`, `guillotine`, `second_wind` (particles and sounds only); bard `song` (variants `battle`,
+`guardian`), `mockery`, `crescendo`, `encore`. The staff swing keeps
 the built-in look.
 
 Included (only with Spell Engine and the class mod): wizard spells from Wizards (fire, frost, arcane), priest spells
 from Paladins & Priests (heal, circle of healing, divine protection, penance), elemental wizard spells from Elemental
 Wizards RPG (waterball, water whip, springwater, stone spear, impale, stone flesh, air cutter, aeroblast, windfield),
-berserker looks from Berserker RPG (wild rage, bloody strike, apprehend, northerner's guillotine, blood reckoning).
+berserker looks from Berserker RPG (wild rage, bloody strike, apprehend, northerner's guillotine, blood reckoning),
+bard spells from Bards RPG (wanderer's minuet, nature's minne, vicious mockery, crescendo, encore).
 
 **Debug command**: `/renegades castervisuals` shows the mode and the assigned spells per class and ability, and whether
 each spell exists.

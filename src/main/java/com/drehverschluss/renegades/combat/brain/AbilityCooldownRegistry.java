@@ -26,4 +26,11 @@ public final class AbilityCooldownRegistry {
     public void clear(String id) {
         this.cooldownsInTicks.put(id, 0);
     }
+
+    /**
+     * Shortens all running cooldowns to this fraction of what is left (e.g. 0.8 = 20 % shorter).
+     */
+    public void scaleRunning(double factor) {
+        this.cooldownsInTicks.replaceAll((id, ticks) -> ticks <= 0 ? 0 : (int) Math.floor(ticks * factor));
+    }
 }

@@ -28,6 +28,8 @@ public final class ModItems {
             () -> new RenegadeSpawnEggItem(ModEntityTypes.ELEMENTAL_WIZARD, 0x2E6E8E, 0xC9A64B, new Item.Properties()));
     public static final DeferredItem<RenegadeSpawnEggItem> BERSERKER_SPAWN_EGG = ITEMS.register("berserker_spawn_egg",
             () -> new RenegadeSpawnEggItem(ModEntityTypes.BERSERKER, 0x6B3A26, 0x9E1B1B, new Item.Properties()));
+    public static final DeferredItem<RenegadeSpawnEggItem> BARD_SPAWN_EGG = ITEMS.register("bard_spawn_egg",
+            () -> new RenegadeSpawnEggItem(ModEntityTypes.BARD, 0x7A2E6B, 0xE3C25A, new Item.Properties()));
 
     private ModItems() {
     }

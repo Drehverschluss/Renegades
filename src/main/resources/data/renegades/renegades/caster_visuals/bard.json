@@ -1,0 +1,13 @@
+{
+  "neoforge:conditions": [
+    {"type": "neoforge:mod_loaded", "modid": "spell_engine"},
+    {"type": "neoforge:mod_loaded", "modid": "bards_rpg"}
+  ],
+  "entity": "renegades:bard",
+  "abilities": {
+    "song": {"variants": {"battle": "bards_rpg:wanderers_minuet", "guardian": "bards_rpg:natures_minne"}},
+    "mockery": "bards_rpg:vicious_mockery",
+    "crescendo": "bards_rpg:crescendo",
+    "encore": "bards_rpg:encore"
+  }
+}

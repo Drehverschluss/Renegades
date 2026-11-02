@@ -1,0 +1,157 @@
+{
+  "neoforge:conditions": [
+    {"type": "neoforge:mod_loaded", "modid": "bards_rpg"}
+  ],
+  "entity": "renegades:bard",
+  "fallback": false,
+  "entries": [
+    {
+      "id": "bards_tier1_battle",
+      "conditions": {
+        "dimensions": ["minecraft:overworld"],
+        "max_distance": 1500
+      },
+      "equipment": {
+        "head": "bards_rpg:entertainer_garb_head",
+        "chest": "bards_rpg:entertainer_garb_chest",
+        "legs": "bards_rpg:entertainer_garb_legs",
+        "feet": "bards_rpg:entertainer_garb_feet",
+        "mainhand": "bards_rpg:wooden_lute"
+      },
+      "variant": "battle"
+    },
+    {
+      "id": "bards_tier1_guardian",
+      "conditions": {
+        "dimensions": ["minecraft:overworld"],
+        "max_distance": 1500
+      },
+      "equipment": {
+        "head": "bards_rpg:entertainer_garb_head",
+        "chest": "bards_rpg:entertainer_garb_chest",
+        "legs": "bards_rpg:entertainer_garb_legs",
+        "feet": "bards_rpg:entertainer_garb_feet",
+        "mainhand": "bards_rpg:golden_lyre"
+      },
+      "variant": "guardian"
+    },
+    {
+      "id": "bards_tier2_battle",
+      "conditions": {
+        "dimensions": ["minecraft:overworld"],
+        "min_distance": 1500,
+        "max_distance": 4000
+      },
+      "equipment": {
+        "head": "bards_rpg:troubadour_garb_head",
+        "chest": "bards_rpg:troubadour_garb_chest",
+        "legs": "bards_rpg:troubadour_garb_legs",
+        "feet": "bards_rpg:troubadour_garb_feet",
+        "mainhand": "bards_rpg:diamond_lute"
+      },
+      "variant": "battle"
+    },
+    {
+      "id": "bards_tier2_guardian",
+      "conditions": {
+        "dimensions": ["minecraft:overworld"],
+        "min_distance": 1500,
+        "max_distance": 4000
+      },
+      "equipment": {
+        "head": "bards_rpg:troubadour_garb_head",
+        "chest": "bards_rpg:troubadour_garb_chest",
+        "legs": "bards_rpg:troubadour_garb_legs",
+        "feet": "bards_rpg:troubadour_garb_feet",
+        "mainhand": "bards_rpg:diamond_lyre"
+      },
+      "variant": "guardian"
+    },
+    {
+      "id": "bards_tier2_nether_battle",
+      "conditions": {
+        "dimensions": ["minecraft:the_nether"]
+      },
+      "equipment": {
+        "head": "bards_rpg:troubadour_garb_head",
+        "chest": "bards_rpg:troubadour_garb_chest",
+        "legs": "bards_rpg:troubadour_garb_legs",
+        "feet": "bards_rpg:troubadour_garb_feet",
+        "mainhand": "bards_rpg:diamond_lute"
+      },
+      "variant": "battle"
+    },
+    {
+      "id": "bards_tier2_nether_guardian",
+      "conditions": {
+        "dimensions": ["minecraft:the_nether"]
+      },
+      "equipment": {
+        "head": "bards_rpg:troubadour_garb_head",
+        "chest": "bards_rpg:troubadour_garb_chest",
+        "legs": "bards_rpg:troubadour_garb_legs",
+        "feet": "bards_rpg:troubadour_garb_feet",
+        "mainhand": "bards_rpg:diamond_lyre"
+      },
+      "variant": "guardian"
+    },
+    {
+      "id": "bards_tier3_battle",
+      "conditions": {
+        "dimensions": ["minecraft:overworld"],
+        "min_distance": 4000
+      },
+      "equipment": {
+        "head": "bards_rpg:netherite_troubadour_garb_head",
+        "chest": "bards_rpg:netherite_troubadour_garb_chest",
+        "legs": "bards_rpg:netherite_troubadour_garb_legs",
+        "feet": "bards_rpg:netherite_troubadour_garb_feet",
+        "mainhand": "bards_rpg:netherite_lute"
+      },
+      "variant": "battle"
+    },
+    {
+      "id": "bards_tier3_guardian",
+      "conditions": {
+        "dimensions": ["minecraft:overworld"],
+        "min_distance": 4000
+      },
+      "equipment": {
+        "head": "bards_rpg:netherite_troubadour_garb_head",
+        "chest": "bards_rpg:netherite_troubadour_garb_chest",
+        "legs": "bards_rpg:netherite_troubadour_garb_legs",
+        "feet": "bards_rpg:netherite_troubadour_garb_feet",
+        "mainhand": "bards_rpg:netherite_lyre"
+      },
+      "variant": "guardian"
+    },
+    {
+      "id": "bards_tier3_end_battle",
+      "conditions": {
+        "dimensions": ["minecraft:the_end"]
+      },
+      "equipment": {
+        "head": "bards_rpg:netherite_troubadour_garb_head",
+        "chest": "bards_rpg:netherite_troubadour_garb_chest",
+        "legs": "bards_rpg:netherite_troubadour_garb_legs",
+        "feet": "bards_rpg:netherite_troubadour_garb_feet",
+        "mainhand": "bards_rpg:netherite_lute"
+      },
+      "variant": "battle"
+    },
+    {
+      "id": "bards_tier3_end_guardian",
+      "conditions": {
+        "dimensions": ["minecraft:the_end"]
+      },
+      "equipment": {
+        "head": "bards_rpg:netherite_troubadour_garb_head",
+        "chest": "bards_rpg:netherite_troubadour_garb_chest",
+        "legs": "bards_rpg:netherite_troubadour_garb_legs",
+        "feet": "bards_rpg:netherite_troubadour_garb_feet",
+        "mainhand": "bards_rpg:netherite_lyre"
+      },
+      "variant": "guardian"
+    }
+  ]
+}

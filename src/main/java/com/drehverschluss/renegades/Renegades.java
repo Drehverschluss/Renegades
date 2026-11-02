@@ -5,6 +5,7 @@ import com.drehverschluss.renegades.compat.dynamicdifficulty.DynamicDifficultyCo
 import com.drehverschluss.renegades.compat.dynamicdifficulty.DynamicDifficultyLevelProvider;
 import com.drehverschluss.renegades.config.RenegadesConfig;
 import com.drehverschluss.renegades.entity.ArcherRenegade;
+import com.drehverschluss.renegades.entity.BardRenegade;
 import com.drehverschluss.renegades.entity.BerserkerRenegade;
 import com.drehverschluss.renegades.entity.ElementalWizardRenegade;
 import com.drehverschluss.renegades.entity.PaladinRenegade;
@@ -82,6 +83,7 @@ public class Renegades {
         event.put(ModEntityTypes.PRIEST.get(), PriestRenegade.createAttributes().build());
         event.put(ModEntityTypes.ELEMENTAL_WIZARD.get(), ElementalWizardRenegade.createAttributes().build());
         event.put(ModEntityTypes.BERSERKER.get(), BerserkerRenegade.createAttributes().build());
+        event.put(ModEntityTypes.BARD.get(), BardRenegade.createAttributes().build());
     }
 
     private static void registerSpawnPlacements(RegisterSpawnPlacementsEvent event) {

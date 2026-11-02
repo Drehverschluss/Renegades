@@ -1,0 +1,28 @@
+{
+  "entity": "renegades:bard",
+  "fallback": true,
+  "entries": [
+    {
+      "id": "fallback_leather_battle",
+      "equipment": {
+        "head": "minecraft:leather_helmet",
+        "chest": "minecraft:leather_chestplate",
+        "legs": "minecraft:leather_leggings",
+        "feet": "minecraft:leather_boots",
+        "mainhand": "minecraft:stick"
+      },
+      "variant": "battle"
+    },
+    {
+      "id": "fallback_leather_guardian",
+      "equipment": {
+        "head": "minecraft:leather_helmet",
+        "chest": "minecraft:leather_chestplate",
+        "legs": "minecraft:leather_leggings",
+        "feet": "minecraft:leather_boots",
+        "mainhand": "minecraft:stick"
+      },
+      "variant": "guardian"
+    }
+  ]
+}

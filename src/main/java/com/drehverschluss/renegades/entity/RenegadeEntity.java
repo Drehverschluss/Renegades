@@ -41,6 +41,7 @@ import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.FloatGoal;
 import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
@@ -97,6 +98,13 @@ public abstract class RenegadeEntity extends Monster implements GeoEntity {
     private boolean fillHealthAfterFirstTick;
     // Set when a renegade of a class that is not available (class mod missing) is loaded from NBT.
     private boolean needsFallbackGear;
+    // Bard songs on this renegade (server only, not saved): stacks and the game time they run out.
+    private static final float SONG_STEP = 0.1F;
+    private static final ResourceLocation SONG_DAMAGE_ID = ResourceLocation.fromNamespaceAndPath(Renegades.MODID, "bard_song_damage");
+    private int battleSongStacks;
+    private long battleSongUntil;
+    private int guardianSongStacks;
+    private long guardianSongUntil;
     // Server only: created in registerGoals, which the Mob constructor calls only on the server.
     @Nullable
     private MobBrain brain;
@@ -538,8 +546,58 @@ public abstract class RenegadeEntity extends Monster implements GeoEntity {
             if (this.pendingGroup != null) {
                 this.spawnPendingGroup();
             }
+            this.tickSongs();
         }
         CombatProfiler.end(CombatProfiler.Section.ENTITY_TICK, start);
+    }
+
+    /**
+     * A bard's song on this renegade: one more stack (up to maxStacks) of +10 % attack damage (battle) or -10 % damage
+     * taken (guardian), refreshed for the given ticks. Not saved; it runs out on its own.
+     *
+     * @return the stacks now
+     */
+    public int addSongStack(boolean guardian, int maxStacks, int ticks) {
+        long until = this.level().getGameTime() + ticks;
+        if (guardian) {
+            this.guardianSongStacks = Math.min(maxStacks, this.guardianSongStacks + 1);
+            this.guardianSongUntil = until;
+            return this.guardianSongStacks;
+        }
+        this.battleSongStacks = Math.min(maxStacks, this.battleSongStacks + 1);
+        this.battleSongUntil = until;
+        this.updateSongModifier();
+        return this.battleSongStacks;
+    }
+
+    public int battleSongStacks() {
+        return this.battleSongStacks;
+    }
+
+    public int guardianSongStacks() {
+        return this.guardianSongStacks;
+    }
+
+    private void tickSongs() {
+        long now = this.level().getGameTime();
+        if (this.battleSongStacks > 0 && now >= this.battleSongUntil) {
+            this.battleSongStacks = 0;
+            this.updateSongModifier();
+        }
+        if (this.guardianSongStacks > 0 && now >= this.guardianSongUntil) {
+            this.guardianSongStacks = 0;
+        }
+    }
+
+    private void updateSongModifier() {
+        AttributeInstance attack = this.getAttribute(Attributes.ATTACK_DAMAGE);
+        if (attack == null) {
+            return;
+        }
+        attack.removeModifier(SONG_DAMAGE_ID);
+        if (this.battleSongStacks > 0) {
+            attack.addTransientModifier(new AttributeModifier(SONG_DAMAGE_ID, SONG_STEP * this.battleSongStacks, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
+        }
     }
 
     /**
@@ -567,6 +625,9 @@ public abstract class RenegadeEntity extends Monster implements GeoEntity {
 
     @Override
     public boolean hurt(DamageSource source, float amount) {
+        if (!this.level().isClientSide && this.guardianSongStacks > 0) {
+            amount *= 1.0F - SONG_STEP * this.guardianSongStacks;
+        }
         boolean hurt = super.hurt(source, amount);
         if (hurt && !this.level().isClientSide) {
             if (this.brain != null) {

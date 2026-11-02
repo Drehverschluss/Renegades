@@ -16,6 +16,8 @@
   "item.renegades.elemental_wizard_spawn_egg": "Elemental Wizard Renegade Spawn Egg",
   "entity.renegades.berserker": "Berserker Renegade",
   "item.renegades.berserker_spawn_egg": "Berserker Renegade Spawn Egg",
+  "entity.renegades.bard": "Bard Renegade",
+  "item.renegades.bard_spawn_egg": "Bard Renegade Spawn Egg",
   "message.renegades.class_unavailable": "%1$s is not available (requires: %2$s)",
   "entity.renegades.elite": "%1$s %2$s",
   "entity.renegades.elite_set": "%1$s Elite %2$s",

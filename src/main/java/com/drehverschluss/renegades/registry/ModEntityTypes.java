@@ -3,6 +3,7 @@ package com.drehverschluss.renegades.registry;
 import com.drehverschluss.renegades.Renegades;
 import com.drehverschluss.renegades.entity.ArcherRenegade;
 import com.drehverschluss.renegades.entity.ArcherTrap;
+import com.drehverschluss.renegades.entity.BardRenegade;
 import com.drehverschluss.renegades.entity.BerserkerRenegade;
 import com.drehverschluss.renegades.entity.ElementalWizardRenegade;
 import com.drehverschluss.renegades.entity.PaladinRenegade;
@@ -87,6 +88,13 @@ public final class ModEntityTypes {
                     .eyeHeight(1.62F)
                     .clientTrackingRange(8)
                     .build("berserker"));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<BardRenegade>> BARD = ENTITY_TYPES.register("bard",
+            () -> EntityType.Builder.of(BardRenegade::new, MobCategory.MONSTER)
+                    .sized(0.6F, 1.8F)
+                    .eyeHeight(1.62F)
+                    .clientTrackingRange(8)
+                    .build("bard"));
 
     public static final DeferredHolder<EntityType<?>, EntityType<MagicProjectile>> MAGIC_PROJECTILE = ENTITY_TYPES.register("magic_projectile",
             () -> EntityType.Builder.<MagicProjectile>of(MagicProjectile::new, MobCategory.MISC)

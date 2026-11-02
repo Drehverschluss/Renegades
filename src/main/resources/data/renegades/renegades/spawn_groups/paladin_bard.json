@@ -1,0 +1,10 @@
+{
+  "neoforge:conditions": [
+    {"type": "neoforge:mod_loaded", "modid": "bards_rpg"}
+  ],
+  "leader": "renegades:paladin",
+  "weight": 2,
+  "members": [
+    { "entity": "renegades:bard", "min": 1, "max": 1 }
+  ]
+}

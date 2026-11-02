@@ -39,6 +39,7 @@ public final class RenegadesConfig {
     public static final ModConfigSpec.BooleanValue COOLDOWN_GROUP_SCALING;
     public static final ModConfigSpec.BooleanValue ENABLE_BERSERKER_RAGE;
     public static final ModConfigSpec.BooleanValue ENABLE_GUILLOTINE;
+    public static final ModConfigSpec.BooleanValue ENABLE_BARD_SONGS;
     public static final ModConfigSpec.ConfigValue<String> CASTER_VISUALS;
     public static final ModConfigSpec.BooleanValue APOTHEOSIS_ELITE_GEAR;
     public static final ModConfigSpec.DoubleValue FULL_SET_ELITE_CHANCE;
@@ -175,6 +176,10 @@ public final class RenegadesConfig {
         ENABLE_GUILLOTINE = builder
                 .comment("If true, the berserker leaps at targets 5-10 blocks away with an announced finishing blow (Guillotine).")
                 .define("enableGuillotine", true);
+
+        ENABLE_BARD_SONGS = builder
+                .comment("If true, the bard plays songs for its allies (stacks of more damage or less damage taken); if false, it only uses its other abilities.")
+                .define("enableBardSongs", true);
 
         builder.pop();
 

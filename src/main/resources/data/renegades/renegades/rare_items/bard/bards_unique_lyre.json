@@ -1,0 +1,11 @@
+{
+  "neoforge:conditions": [
+    {"type": "neoforge:mod_loaded", "modid": "bards_rpg"},
+    {"type": "neoforge:mod_loaded", "modid": "arsenal"}
+  ],
+  "entity": "renegades:bard",
+  "slot": "mainhand",
+  "chance": 0.005,
+  "items": ["bards_rpg:unique_lyre_0", "bards_rpg:unique_lyre_1"],
+  "replaces": "#renegades:rare_replace/lyre_t2_t3"
+}

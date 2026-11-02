@@ -4,17 +4,21 @@ package com.drehverschluss.renegades.magic;
 import com.drehverschluss.renegades.config.RenegadesConfig;
 import javax.annotation.Nullable;
 import net.minecraft.core.Holder;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.phys.Vec3;
 
 /**
  * What a spell does to each target it reaches.
  */
-public sealed interface Impact permits Impact.Damage, Impact.Ignite, Impact.ApplyEffect, Impact.ApplyToCaster, Impact.Knockback, Impact.Heal, Impact.Launch {
+public sealed interface Impact permits Impact.Damage, Impact.Ignite, Impact.ApplyEffect, Impact.ApplyToCaster, Impact.Knockback, Impact.Heal, Impact.Launch,
+        Impact.TimedAttribute {
     void apply(ImpactContext context, LivingEntity target);
 
     /**
@@ -134,6 +138,20 @@ public sealed interface Impact permits Impact.Damage, Impact.Ignite, Impact.Appl
             target.hurtMarked = true;
             target.resetFallDistance();
             target.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, this.slowFallingTicks, 0), context.caster());
+        }
+    }
+
+    /**
+     * An attribute modifier on the target for some ticks (see TimedModifiers), e.g. another mod's "damage taken"
+     * attribute; nothing if the target does not have that attribute.
+     */
+    record TimedAttribute(ResourceLocation attribute, ResourceLocation modifierId, double amount, AttributeModifier.Operation operation, int ticks)
+            implements Impact {
+        @Override
+        public void apply(ImpactContext context, LivingEntity target) {
+            if (target.level() instanceof ServerLevel level) {
+                TimedModifiers.apply(level, target, this.attribute, this.modifierId, this.amount, this.operation, this.ticks);
+            }
         }
     }
 

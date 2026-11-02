@@ -1,0 +1,6 @@
+{
+  "values": [
+    {"id": "bards_rpg:diamond_lyre", "required": false},
+    {"id": "bards_rpg:netherite_lyre", "required": false}
+  ]
+}
