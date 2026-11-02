@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="src/main/resources/renegades.png" alt="Renegades" width="160">
+  <img src="docs/images/banner.png" alt="Renegades" width="720">
 </p>
 
 <h1 align="center">Renegades</h1>
@@ -29,11 +29,7 @@ Full documentation: **[Renegades wiki](https://github.com/Drehverschluss/Renegad
 
 ## Screenshots
 
-<p align="center">
-  <img src="docs/images/banner.png" alt="Renegades" width="720">
-</p>
-
-<!-- More screenshots will be added later. -->
+<!-- Screenshots will be added later. -->
 
 ## How it works
 
