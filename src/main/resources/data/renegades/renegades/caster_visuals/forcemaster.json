@@ -1,0 +1,14 @@
+{
+  "neoforge:conditions": [
+    {"type": "neoforge:mod_loaded", "modid": "spell_engine"},
+    {"type": "neoforge:mod_loaded", "modid": "forcemaster_rpg"}
+  ],
+  "entity": "renegades:forcemaster",
+  "abilities": {
+    "sonic_hand": "forcemaster_rpg:sonic_hand",
+    "belial_smashing": "forcemaster_rpg:belial_smashing",
+    "nen_sphere": {"spell": "forcemaster_rpg:nen_sphere", "model": false},
+    "asal": "forcemaster_rpg:asal",
+    "overflow": "forcemaster_rpg:knuckle_arcane_overflow"
+  }
+}

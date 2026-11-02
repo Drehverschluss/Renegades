@@ -93,7 +93,8 @@ war archer and deadeye sets in tiers 2 and 3; wizard with Wizards: wizard robe w
 (random variant), then the fire, frost or arcane robes with the wand and staff of their school, then the netherite
 versions; priest with Paladins: priest robe with an acolyte wand, holy wand or holy staff, then the prior robe with a
 diamond holy wand or staff, then the netherite versions; for the wizard and priest sets, the Nether always uses tier 2
-and the End tier 3).
+and the End tier 3; forcemaster with Forcemaster RPG: oriene / phasleb / aken armor with iron / diamond / netherite
+knuckles in both hands).
 
 Equipment is chosen when the mob spawns naturally, from a spawn egg or spawner, or via `/summon` without NBT
 (`/summon` with NBT keeps vanilla behavior: no equipment is chosen).
@@ -325,13 +326,33 @@ The effects (Vicious Mockery, Crescendo, the song markers Tale of the Dragonslay
 ones from Bards RPG; the song's bonus is its own, so the markers only show it. Songs only affect renegades, never
 players. Its abilities keep their full cooldown.
 
+**Forcemaster** (requires [Forcemaster RPG](https://www.curseforge.com/minecraft/mc-mods/forcemaster-rpg), see
+"Classes that need other mods" below): a combo fighter with knuckles in both hands that never stands still – it closes
+in fast, circles its target at punching distance and steps in for the next combo (50 HP, attack 5, knockback resistance
+0.2). Every technique and every finished combo gives it an **arcane charge** (at most 5, shown as arcane particles at
+its fists, more and brighter with every charge); with 5 charges it unloads them in **Asal**. Its attacks are its own
+(no spells cast), modelled on the spells of the mod:
+
+| Ability (caster_visuals key) | Effect |
+|---|---|
+| Fist combo | 2–3 quick jabs left and right (× 0.5 each), then an uppercut (× 0.8) that lifts a target standing on the ground about a block; gives a charge |
+| Sonic hand (`sonic_hand`) | Target right in front of it (≤ 2.5 blocks): 5 very fast punches within a second (× 0.3 each) (cooldown 8 s) |
+| Belial smashing (`belial_smashing`) | Target 5.5–9 blocks away: a straight rush of up to 9 blocks that hits everything on the way once (× 0.7) and pushes it aside; stops at walls and at the edge of lava, fire or a drop (cooldown 12 s) |
+| Nen sphere (`nen_sphere`) | Target 6–14 blocks away (or keeping its distance for 3 s): charges visibly for 1 s – a hit of 4 or more damage stops it (cooldown then halved) – then a fast piercing arcane bolt up to 14 blocks (× 0.7 spell power, magic); a raised shield blocks it from the front (cooldown 10 s) |
+| Overflow (`overflow`, charges) | The look shown when it gains a charge |
+| Asal (`asal`) | With 5 charges and the target within 4 blocks: a clearly announced windup of 1.1 s (the hit zone in front is marked on the ground), then a huge blow straight ahead (5.5 × 2 blocks, × 3.0) that uses up all charges. Step out of the marked zone to dodge it. Afterwards it is **exhausted** for 2 s: slowed, no attacks, no dodging – the window to strike back (`enableAsal` in `[combat]`, default `true`; `false` = it keeps its charges and never unloads them) |
+| Dodge | A side step right after its target strikes at it in melee, about every second strike when free, at most every 7–10 s; never while exhausted |
+
+Fast punches ignore the target's short hurt cooldown, like the casters' bolts. Forcemaster RPG's own effects are not
+used: its arcane overflow only raises spell power attributes and shows nothing on a mob.
+
 Combat and magic system based on ANARCHY – RPG Minibosses by cleannrooster (CC0-1.0).
 
 ## Classes that need other mods
 
 Some classes mirror classes of other mods and only exist with that mod, because without its gear and spells they would
 be a plain copy of another class: the **Elemental Wizard** needs `elemental_wizards_rpg`, the **Berserker** needs
-`berserker_rpg`, the **Bard** needs `bards_rpg`. Without the mod:
+`berserker_rpg`, the **Bard** needs `bards_rpg`, the **Forcemaster** needs `forcemaster_rpg`. Without the mod:
 
 - no natural spawns; spawn groups with the class are left out (`/renegades spawngroup` names the missing mod);
 - its spawn egg is not in the creative tab; an egg from `/give` and the commands (`spawnelite`, `reequip`) report
@@ -343,6 +364,13 @@ Its data (equipment pools, spawn groups, caster_visuals, rare items) uses `neofo
 classes always use the Spell Engine look from caster_visuals, also with `casterVisuals = "builtin"` (their mods need
 Spell Engine; they have no built-in look of their own). A missing or wrong spell id in caster_visuals falls back to the
 plain built-in bolt and particles (one log line).
+
+## Dedicated servers: allow-flight
+
+Knockbacks, lifts and pulls of the renegades (and some effects of the RPG mods) can keep a player in the air for a
+moment. With `allow-flight=false` in `server.properties`, a dedicated server may then kick the player with "Flying is
+not enabled on this server". Renegades logs a warning at server start when `allow-flight` is `false`; setting it to
+`true` is recommended.
 
 ## Spawn groups (datapack)
 
@@ -388,6 +416,8 @@ spawn timer still makes one attempt per interval, so the total spawn rate stays 
 `berserker_priest` (a berserker leading a priest, weight 1): 8 of 62 weight, about as often as the wizard (7). With
 Bards RPG also `bard_solo` (weight 1), `warrior_bard` (a warrior leading a bard, weight 3), `paladin_bard` (weight 2)
 and, with Berserker RPG too, `berserker_bard` (weight 1): 7 of 69 weight; as a supporter the bard rarely spawns alone.
+With Forcemaster RPG also `forcemaster_solo` (weight 4), `forcemaster_pair` (two forcemasters, weight 1) and
+`forcemaster_priest` (a forcemaster leading a priest, weight 1): 6 of 75 weight, a bit rarer than the berserker.
 
 **Debug commands**: `/renegades groups <leader>` lists the templates, `/renegades spawngroup <id>` spawns one at your
 position like a natural spawn, `/renegades nearby` lists the renegades within `capRadius` with group, spawn type,
@@ -461,6 +491,7 @@ renegades with tier 2-3 gear carries one:
 | Elemental Wizard | Crystal Aqua / Ruby Terra / Aeternium Wind staff of its element, or the Valkyrie Elementalist Staff (Elemental Wizards RPG) | aqua/terra/wind staff of tier 2-3 (not wands) | 0.5 % |
 | Berserker | unique berserker axes 1 and 2 (Berserker RPG) | diamond/netherite berserker axe | 0.25 % |
 | Bard | unique lutes (battle) and lyres (guardian) (Bards RPG, need Arsenal too) | diamond/netherite lute or lyre | 0.5 % |
+| Forcemaster | unique knuckles 1 and 2 (Forcemaster RPG, need Arsenal too), main hand only | diamond/netherite knuckle | 0.25 % |
 
 **Debug command**: `/renegades rareitems` lists the loaded entries per class (slot, chance, items, replaces).
 
@@ -535,14 +566,16 @@ Ability keys: wizard `double_bolt`, `homing_bolts`, `nova` (variants `fire`, `fr
 `healing_cloud`, `absorption`, `holy_bolt`; elemental wizard `water_volley`, `water_whip`, `springwater`, `stone_spear`,
 `impale`, `stone_skin`, `air_cutter`, `aeroblast`, `windfield` (variants `aqua`, `terra`, `wind`); berserker `rage`,
 `bloody_strike`, `apprehend`, `guillotine`, `second_wind` (particles and sounds only); bard `song` (variants `battle`,
-`guardian`), `mockery`, `crescendo`, `encore`. The staff swing keeps
+`guardian`), `mockery`, `crescendo`, `encore`; forcemaster `sonic_hand`, `belial_smashing`, `nen_sphere`, `asal`,
+`overflow`. The staff swing keeps
 the built-in look.
 
 Included (only with Spell Engine and the class mod): wizard spells from Wizards (fire, frost, arcane), priest spells
 from Paladins & Priests (heal, circle of healing, divine protection, penance), elemental wizard spells from Elemental
 Wizards RPG (waterball, water whip, springwater, stone spear, impale, stone flesh, air cutter, aeroblast, windfield),
 berserker looks from Berserker RPG (wild rage, bloody strike, apprehend, northerner's guillotine, blood reckoning),
-bard spells from Bards RPG (wanderer's minuet, nature's minne, vicious mockery, crescendo, encore).
+bard spells from Bards RPG (wanderer's minuet, nature's minne, vicious mockery, crescendo, encore), forcemaster looks
+from Forcemaster RPG (sonic hand, belial smashing, nen sphere, asal, arcane overflow).
 
 **Debug command**: `/renegades castervisuals` shows the mode and the assigned spells per class and ability, and whether
 each spell exists.

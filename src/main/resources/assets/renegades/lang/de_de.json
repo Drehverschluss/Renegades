@@ -18,6 +18,8 @@
   "item.renegades.berserker_spawn_egg": "Spawn-Ei (Abtrünniger Berserker)",
   "entity.renegades.bard": "Abtrünniger Barde",
   "item.renegades.bard_spawn_egg": "Spawn-Ei (Abtrünniger Barde)",
+  "entity.renegades.forcemaster": "Abtrünniger Forcemaster",
+  "item.renegades.forcemaster_spawn_egg": "Spawn-Ei (Abtrünniger Forcemaster)",
   "message.renegades.class_unavailable": "%1$s ist nicht verfügbar (benötigt: %2$s)",
   "entity.renegades.elite": "%1$s %2$s",
   "entity.renegades.elite_set": "%1$s %2$s (Elite)",

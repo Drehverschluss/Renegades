@@ -1,0 +1,83 @@
+{
+  "neoforge:conditions": [
+    {"type": "neoforge:mod_loaded", "modid": "forcemaster_rpg"}
+  ],
+  "entity": "renegades:forcemaster",
+  "fallback": false,
+  "entries": [
+    {
+      "id": "forcemaster_tier1",
+      "conditions": {
+        "dimensions": ["minecraft:overworld"],
+        "max_distance": 1500
+      },
+      "equipment": {
+        "head": "forcemaster_rpg:oriene_head",
+        "chest": "forcemaster_rpg:oriene_chest",
+        "legs": "forcemaster_rpg:oriene_legs",
+        "feet": "forcemaster_rpg:oriene_feet",
+        "mainhand": "forcemaster_rpg:iron_knuckle",
+        "offhand": "forcemaster_rpg:iron_knuckle"
+      }
+    },
+    {
+      "id": "forcemaster_tier2",
+      "conditions": {
+        "dimensions": ["minecraft:overworld"],
+        "min_distance": 1500,
+        "max_distance": 4000
+      },
+      "equipment": {
+        "head": "forcemaster_rpg:phasleb_head",
+        "chest": "forcemaster_rpg:phasleb_chest",
+        "legs": "forcemaster_rpg:phasleb_legs",
+        "feet": "forcemaster_rpg:phasleb_feet",
+        "mainhand": "forcemaster_rpg:diamond_knuckle",
+        "offhand": "forcemaster_rpg:diamond_knuckle"
+      }
+    },
+    {
+      "id": "forcemaster_tier2_nether",
+      "conditions": {
+        "dimensions": ["minecraft:the_nether"]
+      },
+      "equipment": {
+        "head": "forcemaster_rpg:phasleb_head",
+        "chest": "forcemaster_rpg:phasleb_chest",
+        "legs": "forcemaster_rpg:phasleb_legs",
+        "feet": "forcemaster_rpg:phasleb_feet",
+        "mainhand": "forcemaster_rpg:diamond_knuckle",
+        "offhand": "forcemaster_rpg:diamond_knuckle"
+      }
+    },
+    {
+      "id": "forcemaster_tier3",
+      "conditions": {
+        "dimensions": ["minecraft:overworld"],
+        "min_distance": 4000
+      },
+      "equipment": {
+        "head": "forcemaster_rpg:aken_head",
+        "chest": "forcemaster_rpg:aken_chest",
+        "legs": "forcemaster_rpg:aken_legs",
+        "feet": "forcemaster_rpg:aken_feet",
+        "mainhand": "forcemaster_rpg:netherite_knuckle",
+        "offhand": "forcemaster_rpg:netherite_knuckle"
+      }
+    },
+    {
+      "id": "forcemaster_tier3_end",
+      "conditions": {
+        "dimensions": ["minecraft:the_end"]
+      },
+      "equipment": {
+        "head": "forcemaster_rpg:aken_head",
+        "chest": "forcemaster_rpg:aken_chest",
+        "legs": "forcemaster_rpg:aken_legs",
+        "feet": "forcemaster_rpg:aken_feet",
+        "mainhand": "forcemaster_rpg:netherite_knuckle",
+        "offhand": "forcemaster_rpg:netherite_knuckle"
+      }
+    }
+  ]
+}

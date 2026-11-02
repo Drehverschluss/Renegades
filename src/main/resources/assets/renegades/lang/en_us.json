@@ -18,6 +18,8 @@
   "item.renegades.berserker_spawn_egg": "Berserker Renegade Spawn Egg",
   "entity.renegades.bard": "Bard Renegade",
   "item.renegades.bard_spawn_egg": "Bard Renegade Spawn Egg",
+  "entity.renegades.forcemaster": "Forcemaster Renegade",
+  "item.renegades.forcemaster_spawn_egg": "Forcemaster Renegade Spawn Egg",
   "message.renegades.class_unavailable": "%1$s is not available (requires: %2$s)",
   "entity.renegades.elite": "%1$s %2$s",
   "entity.renegades.elite_set": "%1$s Elite %2$s",

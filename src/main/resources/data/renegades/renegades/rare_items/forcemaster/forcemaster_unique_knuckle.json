@@ -1,0 +1,11 @@
+{
+  "neoforge:conditions": [
+    {"type": "neoforge:mod_loaded", "modid": "forcemaster_rpg"},
+    {"type": "neoforge:mod_loaded", "modid": "arsenal"}
+  ],
+  "entity": "renegades:forcemaster",
+  "slot": "mainhand",
+  "chance": 0.0025,
+  "items": ["forcemaster_rpg:unique_knuckle_0", "forcemaster_rpg:unique_knuckle_1"],
+  "replaces": "#renegades:rare_replace/knuckle_t2_t3"
+}

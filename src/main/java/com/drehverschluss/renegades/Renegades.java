@@ -8,6 +8,7 @@ import com.drehverschluss.renegades.entity.ArcherRenegade;
 import com.drehverschluss.renegades.entity.BardRenegade;
 import com.drehverschluss.renegades.entity.BerserkerRenegade;
 import com.drehverschluss.renegades.entity.ElementalWizardRenegade;
+import com.drehverschluss.renegades.entity.ForcemasterRenegade;
 import com.drehverschluss.renegades.entity.PaladinRenegade;
 import com.drehverschluss.renegades.entity.PriestRenegade;
 import com.drehverschluss.renegades.entity.RenegadeClasses;
@@ -63,7 +64,10 @@ public class Renegades {
         NeoForge.EVENT_BUS.addListener(Renegades::addReloadListeners);
         NeoForge.EVENT_BUS.addListener(Renegades::onTagsUpdated);
         NeoForge.EVENT_BUS.addListener(Renegades::registerCommands);
-        NeoForge.EVENT_BUS.addListener((ServerStartedEvent event) -> SpawnStats.reset(event.getServer().getTickCount()));
+        NeoForge.EVENT_BUS.addListener((ServerStartedEvent event) -> {
+            SpawnStats.reset(event.getServer().getTickCount());
+            warnIfFlightDisabled(event.getServer());
+        });
         NeoForge.EVENT_BUS.addListener(RenegadeSpawner::onServerTick);
         NeoForge.EVENT_BUS.addListener(RenegadeProjectiles::onProjectileImpact);
         TickScheduler.register();
@@ -71,6 +75,18 @@ public class Renegades {
         if (DynamicDifficultyCompat.isLoaded()) {
             RenegadeLevels.setProvider(new DynamicDifficultyLevelProvider());
             LOGGER.info("Dynamic Difficulty found; mob levels are available for equipment pool conditions");
+        }
+    }
+
+    /**
+     * Knockbacks, pulls and lifts (ours and those of the RPG mods' effects) can keep a player in the air for a moment;
+     * with allow-flight=false the dedicated server may kick them for flying.
+     */
+    private static void warnIfFlightDisabled(net.minecraft.server.MinecraftServer server) {
+        if (server.isDedicatedServer() && !server.isFlightAllowed()) {
+            LOGGER.warn("allow-flight is false in server.properties: some renegade abilities (knockbacks, lifts, pulls) and effects of the RPG mods "
+                    + "can keep players in the air for a moment, and the server may kick them with \"Flying is not enabled on this server\". "
+                    + "Setting allow-flight=true is recommended.");
         }
     }
 
@@ -84,6 +100,7 @@ public class Renegades {
         event.put(ModEntityTypes.ELEMENTAL_WIZARD.get(), ElementalWizardRenegade.createAttributes().build());
         event.put(ModEntityTypes.BERSERKER.get(), BerserkerRenegade.createAttributes().build());
         event.put(ModEntityTypes.BARD.get(), BardRenegade.createAttributes().build());
+        event.put(ModEntityTypes.FORCEMASTER.get(), ForcemasterRenegade.createAttributes().build());
     }
 
     private static void registerSpawnPlacements(RegisterSpawnPlacementsEvent event) {

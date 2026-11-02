@@ -30,6 +30,8 @@ public final class ModItems {
             () -> new RenegadeSpawnEggItem(ModEntityTypes.BERSERKER, 0x6B3A26, 0x9E1B1B, new Item.Properties()));
     public static final DeferredItem<RenegadeSpawnEggItem> BARD_SPAWN_EGG = ITEMS.register("bard_spawn_egg",
             () -> new RenegadeSpawnEggItem(ModEntityTypes.BARD, 0x7A2E6B, 0xE3C25A, new Item.Properties()));
+    public static final DeferredItem<RenegadeSpawnEggItem> FORCEMASTER_SPAWN_EGG = ITEMS.register("forcemaster_spawn_egg",
+            () -> new RenegadeSpawnEggItem(ModEntityTypes.FORCEMASTER, 0x3B2A5C, 0x6FD3E8, new Item.Properties()));
 
     private ModItems() {
     }

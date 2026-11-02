@@ -1,0 +1,10 @@
+{
+  "neoforge:conditions": [
+    {"type": "neoforge:mod_loaded", "modid": "forcemaster_rpg"}
+  ],
+  "leader": "renegades:forcemaster",
+  "weight": 1,
+  "members": [
+    { "entity": "renegades:forcemaster", "min": 1, "max": 1 }
+  ]
+}
